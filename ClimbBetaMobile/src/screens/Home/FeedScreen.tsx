@@ -39,7 +39,7 @@ export default function FeedScreen({ navigation }: any) {
         <Text style={styles.headerTitle}>ClimbBeta</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           {/* Lupa para pesquisar utilizadores */}
-          <TouchableOpacity onPress={() => alert('Abriria pesquisa de utilizadores!')} style={{ marginRight: 15 }}>
+          <TouchableOpacity onPress={() => navigation.navigate('UserSearch')} style={{ marginRight: 15 }}>
             <Ionicons name="search" size={24} color="#333" />
           </TouchableOpacity>
         </View>

@@ -26,7 +26,12 @@ export default function GymDetailsScreen({ route, navigation }: any) {
         <Text style={styles.sectionTitle}>Boulders Recentes</Text>
 
         {MOCK_BOULDERS.map((boulder) => (
-          <View key={boulder.id} style={styles.boulderCard}>
+          <TouchableOpacity 
+            key={boulder.id} 
+            style={styles.boulderCard}
+            activeOpacity={0.7}
+            onPress={() => navigation.navigate('BoulderDetails')}
+          >
             
             {/* Cor do Boulder */}
             <View style={[styles.colorIndicator, { backgroundColor: boulder.hex }]} />
@@ -40,14 +45,13 @@ export default function GymDetailsScreen({ route, navigation }: any) {
               )}
             </View>
 
-            {/* Botão de Registar (Faz atalho para o Logbook) */}
+            {/* Botão de Registar (O atalho rápido) */}
             <TouchableOpacity 
               style={styles.logButton}
               onPress={() => {
-                // Navega para a Tab "Logbook" e abre o "IndoorLog"
                 navigation.navigate('Logbook', { 
                   screen: 'IndoorLog',
-                  params: { prefilledGym: gymName, prefilledGrade: boulder.grade } // Num cenário real passaríamos isto!
+                  params: { prefilledGym: gymName, prefilledGrade: boulder.grade }
                 });
               }}
             >
@@ -55,7 +59,7 @@ export default function GymDetailsScreen({ route, navigation }: any) {
               <Text style={styles.logButtonText}>Registar</Text>
             </TouchableOpacity>
             
-          </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
     </View>
@@ -81,6 +85,6 @@ const styles = StyleSheet.create({
   badge: { backgroundColor: '#FF9800', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, alignSelf: 'flex-start', marginTop: 4 },
   badgeText: { fontSize: 10, fontWeight: 'bold', color: '#fff' },
   
-  logButton: { flexDirection: 'row', backgroundColor: '#2E7D32', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, alignItems: 'center' },
+  logButton: { flexDirection: 'row', backgroundColor: '#2E7D32', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, alignItems: 'center', zIndex: 10 },
   logButtonText: { color: '#fff', fontWeight: 'bold', marginLeft: 4, fontSize: 13 }
 });

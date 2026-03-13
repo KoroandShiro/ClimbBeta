@@ -14,6 +14,10 @@ import GenericDetailsScreen from '../screens/GenericDetailsScreen';
 import IndoorLogScreen from '../screens/Logbook/IndoorLogScreen';
 import OutdoorLogScreen from '../screens/Logbook/OutdoorLogScreen';
 import GymDetailsScreen from '../screens/Explore/GymDetailsScreen';
+import AscentDetailsScreen from '../screens/Home/AscentDetailsScreen';
+import UserSearchScreen from '../screens/Home/UserSearchScreen';
+import BoulderDetailsScreen from '../screens/Explore/BoulderDetailsScreen';
+import MyProjectsScreen from '../screens/Profile/MyProjectsScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -23,7 +27,8 @@ function HomeStackNavigator() {
   return (
     <HomeStack.Navigator>
       <HomeStack.Screen name="Feed" component={FeedScreen} options={{ title: 'Comunidade' }} />
-      <HomeStack.Screen name="AscentDetails" component={GenericDetailsScreen} options={{ title: 'Detalhes da Subida' }} />
+      <HomeStack.Screen name="AscentDetails" component={AscentDetailsScreen} options={{ title: 'Detalhes da Subida' }} />
+      <HomeStack.Screen name="UserSearch" component={UserSearchScreen} options={{ title: 'Procurar Utilizador' }} />
     </HomeStack.Navigator>
   );
 }
@@ -34,6 +39,7 @@ function ExploreStackNavigator() {
     <ExploreStack.Navigator>
       <ExploreStack.Screen name="GymList" component={ExploreScreen} options={{ title: 'Ginásios' }} />
       <ExploreStack.Screen name="GymDetails" component={GymDetailsScreen} options={{ title: 'Detalhes do Ginásio' }} />
+      <ExploreStack.Screen name="BoulderDetails" component={BoulderDetailsScreen} options={{ title: 'Estatísticas da Via' }} />
     </ExploreStack.Navigator>
   );
 }
@@ -54,7 +60,7 @@ function ProfileStackNavigator() {
   return (
     <ProfileStack.Navigator>
       <ProfileStack.Screen name="MyProfile" component={ProfileScreen} options={{ title: 'O Meu Perfil' }} />
-      <ProfileStack.Screen name="MyProjects" component={GenericDetailsScreen} options={{ title: 'Projetos Guardados' }} />
+      <ProfileStack.Screen name="MyProjects" component={MyProjectsScreen} options={{ title: 'Projetos Guardados' }} />
     </ProfileStack.Navigator>
   );
 }
