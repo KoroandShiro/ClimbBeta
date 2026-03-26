@@ -1,0 +1,6 @@
+# ==========================================
+# Configurações de IDEs e SO na raiz do projeto
+# ==========================================
+.idea/
+.vscode/
+.DS_Store
