@@ -43,6 +43,18 @@ class JdbiUserRepository(private val jdbi: Jdbi) : UserRepository {
                 .mapTo(Int::class.java)
                 .one()
 
+            // Criar o perfil vazio baseado na Role!
+
+            if (user.role == com.climbbeta.api.domain.UserRole.CLIMBER) {
+                handle.createUpdate("INSERT INTO climber_profiles (user_id) VALUES (:id)")
+                    .bind("id", generatedId)
+                    .execute()
+            } else if (user.role == com.climbbeta.api.domain.UserRole.GYM_OWNER) {
+                handle.createUpdate("INSERT INTO gym_owner_profiles (user_id) VALUES (:id)")
+                    .bind("id", generatedId)
+                    .execute()
+            }
+
             // Devolvemos uma cópia do User original mas agora com o ID verdadeiro
             user.copy(id = generatedId)
         }
@@ -79,4 +91,5 @@ class JdbiUserRepository(private val jdbi: Jdbi) : UserRepository {
                 .orElse(null)
         }
     }
+
 }
