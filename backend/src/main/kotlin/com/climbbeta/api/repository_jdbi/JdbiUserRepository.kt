@@ -47,4 +47,36 @@ class JdbiUserRepository(private val jdbi: Jdbi) : UserRepository {
             user.copy(id = generatedId)
         }
     }
+
+    override fun getUserByEmail(email: String): User? {
+        return jdbi.withHandle<User?, Exception> { handle ->
+            handle.createQuery(
+                """
+            SELECT id, username, email, password_hash AS passwordHash, role, created_at AS createdAt 
+            FROM users 
+            WHERE email = :email
+            """
+            )
+                .bind("email", email)
+                .mapTo(User::class.java)
+                .findOne()
+                .orElse(null) // Devolve null se não encontrar nenhum user com esse email
+        }
+    }
+
+    override fun getUserById(id: Int): User? {
+        return jdbi.withHandle<User?, Exception> { handle ->
+            handle.createQuery(
+                """
+            SELECT id, username, email, password_hash AS passwordHash, role, created_at AS createdAt 
+            FROM users 
+            WHERE id = :id
+            """
+            )
+                .bind("id", id)
+                .mapTo(User::class.java)
+                .findOne()
+                .orElse(null)
+        }
+    }
 }
