@@ -1,0 +1,80 @@
+package com.climbbeta.api.repository_jdbi
+
+import com.climbbeta.api.domain.Boulder
+import com.climbbeta.api.repository.BoulderRepository
+import org.jdbi.v3.core.Jdbi
+import org.springframework.stereotype.Repository
+
+@Repository
+class JdbiBoulderRepository(private val jdbi: Jdbi) : BoulderRepository {
+
+    override fun createBoulder(boulder: Boulder): Boulder {
+        return jdbi.withHandle<Boulder, Exception> { handle ->
+            val id = handle.createUpdate(
+                """
+                INSERT INTO boulders (gym_id, color, hex_color, grade, setter_name, set_date, is_active, image_url)
+                VALUES (:gymId, :color, :hexColor, :grade, :setterName, :setDate, :isActive, :imageUrl)
+                """
+            )
+                .bind("gymId", boulder.gymId)
+                .bind("color", boulder.color)
+                .bind("hexColor", boulder.hexColor)
+                .bind("grade", boulder.grade)
+                .bind("setterName", boulder.setterName)
+                .bind("setDate", boulder.setDate)
+                .bind("isActive", boulder.isActive)
+                .bind("imageUrl", boulder.imageUrl)
+                .executeAndReturnGeneratedKeys("id")
+                .mapTo(Int::class.java)
+                .one()
+
+            boulder.copy(id = id)
+        }
+    }
+
+    override fun getBouldersByGymId(gymId: Int): List<Boulder> {
+        return jdbi.withHandle<List<Boulder>, Exception> { handle ->
+            handle.createQuery(
+                """
+                SELECT id, gym_id AS gymId, color, hex_color AS hexColor, grade, 
+                       setter_name AS setterName, set_date AS setDate, 
+                       is_active AS isActive, image_url AS imageUrl
+                FROM boulders
+                WHERE gym_id = :gymId AND is_active = true
+                ORDER BY set_date DESC
+                """
+            )
+                .bind("gymId", gymId)
+                .mapTo(Boulder::class.java)
+                .list()
+        }
+    }
+
+    override fun getBoulderById(id: Int): Boulder? {
+        return jdbi.withHandle<Boulder?, Exception> { handle ->
+            handle.createQuery(
+                """
+                SELECT id, gym_id AS gymId, color, hex_color AS hexColor, grade, 
+                       setter_name AS setterName, set_date AS setDate, 
+                       is_active AS isActive, image_url AS imageUrl
+                FROM boulders
+                WHERE id = :id
+                """
+            )
+                .bind("id", id)
+                .mapTo(Boulder::class.java)
+                .findOne()
+                .orElse(null)
+        }
+    }
+
+    override fun updateBoulderStatus(id: Int, isActive: Boolean): Boolean {
+        return jdbi.withHandle<Boolean, Exception> { handle ->
+            val rows = handle.createUpdate("UPDATE boulders SET is_active = :isActive WHERE id = :id")
+                .bind("id", id)
+                .bind("isActive", isActive)
+                .execute()
+            rows > 0
+        }
+    }
+}

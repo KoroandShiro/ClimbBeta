@@ -50,8 +50,9 @@ class JdbiUserRepository(private val jdbi: Jdbi) : UserRepository {
                     .bind("id", generatedId)
                     .execute()
             } else if (user.role == com.climbbeta.api.domain.UserRole.GYM_OWNER) {
-                handle.createUpdate("INSERT INTO gym_owner_profiles (user_id) VALUES (:id)")
+                handle.createUpdate("INSERT INTO gym_owner_profiles (user_id, company_name) VALUES (:id, :companyName)")
                     .bind("id", generatedId)
+                    .bind("companyName", "Nome da Empresa (Por preencher)")
                     .execute()
             }
 
