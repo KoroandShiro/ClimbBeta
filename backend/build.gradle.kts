@@ -35,6 +35,10 @@ dependencies {
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("org.mindrot:jbcrypt:0.4")
+
+	testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
+    testImplementation("org.mockito:mockito-core:5.2.0")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 kotlin {
