@@ -15,6 +15,9 @@ class AuthenticationInterceptor(
 ) : HandlerInterceptor {
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
+        if (request.method == "OPTIONS") {
+            return true // temporary
+        }
         // 1. Procurar o cabeçalho "Authorization"
         val authHeader = request.getHeader("Authorization")
 
