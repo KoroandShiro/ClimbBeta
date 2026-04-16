@@ -1,4 +1,4 @@
-package com.climbbeta.api
+package com.climbbeta.api.services
 
 import com.climbbeta.api.domain.Gym
 import com.climbbeta.api.domain.User
