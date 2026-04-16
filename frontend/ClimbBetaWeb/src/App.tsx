@@ -1,13 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
-
-// Componente temporário para o Ticket 2D
-const TempDashboard = () => (
-    <div style={{ padding: '40px', textAlign: 'center' }}>
-        <h1>✅ Entraste no Dashboard do Ginásio!</h1>
-        <p>O Token foi guardado com sucesso no navegador.</p>
-    </div>
-);
+import Dashboard from './pages/Dashboard'; // <-- Importamos o Dashboard a sério!
 
 function App() {
   return (
@@ -15,7 +8,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/gyms" element={<TempDashboard />} />
+        <Route path="/gyms" element={<Dashboard />} /> 
       </Routes>
     </BrowserRouter>
   );
