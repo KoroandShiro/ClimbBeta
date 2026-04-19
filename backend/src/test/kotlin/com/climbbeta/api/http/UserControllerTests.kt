@@ -14,7 +14,7 @@ import org.mockito.kotlin.whenever
 import org.springframework.http.HttpStatus
 
 @ExtendWith(MockitoExtension::class)
-class UserControllerTests {
+class   UserControllerTests {
 
     @Mock
     private lateinit var userService: UserService
