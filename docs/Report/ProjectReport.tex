@@ -1,0 +1,228 @@
+% Classe do documento e parâmetros gerais.
+\documentclass[a4paper,openright,twoside,11pt]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\addto{\captionsportuguese}{\renewcommand{\bibname}{Refer\^{e}ncias}}
+\addto{\captionsportuguese}{\renewcommand{\contentsname}{\'{I}ndice}}
+
+\usepackage{lipsum} % gerador de texto
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage[Algoritmo]{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\renewcommand{\algorithmicrequire}{\textbf{Dados: }}
+\renewcommand{\algorithmicensure}{\textbf{Resultado: }}
+
+% pdflatex
+
+% redefinição das margens das páginas
+\setlength{\textheight}{24.00cm}
+\setlength{\textwidth}{15.50cm}
+\setlength{\topmargin}{0.35cm}
+\setlength{\headheight}{0cm}
+\setlength{\headsep}{0cm}
+\setlength{\oddsidemargin}{0.25cm}
+\setlength{\evensidemargin}{0.25cm}
+\setlength{\textfloatsep}{16pt}
+
+
+% Página inicial (capa)
+\title{
+   \vspace{-50mm}
+   \begin{minipage}[l]{\textwidth}
+      \hspace{-20mm}\resizebox{75mm}{!}{\includegraphics{./figures/logoISELnew2.png}}\\
+   \end{minipage}\\[20mm]
+   {\huge \textbf{ClimbBeta}\\[1ex]\LARGE Integrated Platform for Managing and Sharing Climbing and Bouldering Ascents}
+}
+
+% Nome dos autores (um por linha)
+\author{
+\begin{tabular}{ll}
+             & Gonçalo Matos  \\
+             & Rúben Duarte \\[50mm]
+\end{tabular}}
+
+\date{
+\begin{tabular}{ll}
+  {Supervisores:} & Filipe Freitas \\
+\end{tabular}\\[10mm]
+% Deixar o indicador respetivo em função da versão do relatório.
+Relatório do projeto realizado no âmbito de Projecto e Seminário\\
+Licenciatura em Engenharia Informática e de Computadores\\[20mm]
+*Abril* de 2026}
+
+
+
+\begin{document}
+\pagenumbering{roman}
+\thispagestyle{empty}
+\maketitle
+
+\baselineskip 18pt % line spacing: 12pt for single, 18pt for 1 1/2, and 24pt for double spacing
+
+\newpage
+\thispagestyle{empty}
+% Fim da contracapa
+
+% Página com identificação completa (número e nome) e assinaturas do(s) estudante(s) e do(s) orientador(es)
+\cleardoublepage
+\setcounter{page}{1}
+\begin{center}
+\textsc{\LARGE Instituto Superior de Engenharia de Lisboa}\\[50mm]
+
+{\huge \textbf{ClimbBeta}\\[1ex]\LARGE Integrated Platform for Managing and Sharing Climbing and Bouldering Ascent}\\[20mm]
+
+% \begin{tabular}{rl}
+  Gonçalo Matos, n.º50453, e-mail: a50453@alunos.isel.pt, tel.: 924391660\\[10mm]
+         %& \rule{75mm}{0.5pt}\\[5mm]
+\rule{75mm}{0.5pt}\\[5mm]
+  Rúben Duarte, n.º48951, e-mail: a48951@alunos.isel.pt, tel.: 939423507\\[10mm]
+      %& \rule{75mm}{0.5pt}\\
+\rule{75mm}{0.5pt}\\[5mm]
+% \end{tabular}\\[10mm]
+
+% \begin{tabular}{rl}
+  Supervisores: Filipe Freitas, e-mail: filipe.freitas@isel.pt \\[10mm]
+                %& \rule{75mm}{0.5pt}\\[5mm]
+    \rule{75mm}{0.5pt}\\[5mm]
+
+%\end{tabular}\\[10mm]
+
+Relatório do projeto realizado no âmbito de Projecto e Seminário\\
+Licenciatura em Engenharia Informática e de Computadores\\[20mm]
+*Abril* de 2026\\
+\end{center}
+
+% Página de resumo em Inglês
+\cleardoublepage
+\chapter*{Abstract}
+The objective of this project is to develop ClimbBeta, a full-stack platform dedicated to the management, logging, and sharing of indoor climbing and bouldering activities. The application targets two main audiences: practitioners (climbers) and sports facility managers (climbing gyms).
+
+% Página de resumo em Português
+\cleardoublepage
+\chapter*{Resumo}
+O objetivo deste projeto é desenvolver ClimbBeta, uma plataforma full-stack dedicada à gestão, registo e partilha de atividades de escalada indoor e bouldering. A plataforma foi desenhada para atender a dois públicos-alvo principais: praticantes (escaladores) e gestores de infraestruturas desportivas (ginásios de escalada).
+
+%{\bf Palavras-chave:} lista de palavras-chave separadas por ;.
+
+%% Página de agradecimentos
+%\cleardoublepage
+%\chapter*{Agradecimentos}
+%Texto dos agradecimentos. É opcional.\\
+
+% Geração do índice de conteúdos
+\cleardoublepage
+\tableofcontents \cleardoublepage
+
+% Geração do índice de figuras e de tabelas
+%\listoffigures \cleardoublepage
+%\listoftables \cleardoublepage
+
+% Reiniciar a numeração de páginas
+\setcounter{page}{1}
+\pagenumbering{arabic}
+
+% Capitulo 1
+\include{introduction}
+
+% Capitulo 2
+\include{problem}
+
+% Capitulo 3
+\include{architecture}
+
+% Capitulo 4
+\include{backend}
+
+% Capitulo 5
+\include{frontend}
+
+% Capitulo 6
+\include{mobileApp}
+
+
+% Capitulo 7
+\include{conclusion}
+
+% Referências
+\bibliographystyle{unsrt}
+\bibliography{references}
+\addcontentsline{toc}{chapter}{References}
+
+
+\end{document} 
+
+%\tableofcontents
+
+%\newpage
+
+%\section{Introduction}
+
+%\subsection{Introduction}
+%The goal of this project is to develop a web application that allows the management of surfing athletes. This application is mainly aimed at coaches, but athletes can also access it to view their performance. Coaches will be able to register athletes, log different training sessions (e.g. gym, surf), record competition results, and monitor
+%performance through interactive charts. This will help them analyze progress and adjust training plans. This project is being developed to meet coaches' need for a more efficient and effective platform, replacing manual registration, which can be time-consuming and difficult to manage as the number of athletes grows. The platform not only saves time but also ensures greater accuracy and accessibility of data, allowing coaches to focus more on their athletes’ development and less on administrative tasks.
+
+%\subsection{System Requirements}
+
+%\subsubsection{Functional Requirements}
+%\begin{itemize}
+%\item \textbf{User registration:} Coaches should be able to register by providing a username and password.
+%\item \textbf{Athlete management:} Coaches should be able to add and remove their athletes. Adding an athlete will only require their name and date of birth.
+%\item \textbf{Athlete profile:} Coaches should be able to add and view information related to their athletes, such as weight, height, body mass index, and more. Athletes can also view this same information.
+%\item \textbf{Athletes' training records:} Coaches, through interactive tables and charts, should be able to record and track each athlete's training sessions. Each training session contains different information:
+%\begin{itemize}
+%\item \textbf{Surf training sessions:} Sea conditions, maneuvers performed, and a training-related questionnaire completed by the athlete.
+%\item \textbf{Gym training sessions:} Type of exercise, repetitions, and weight.
+%\end{itemize}
+%\item \textbf{Athletes' summaries:} The application should allow, weekly or monthly, summaries so that coaches and athletes can analyze the progress.
+%\item \textbf{Athletes' competition records:} Coaches can store data from their athletes' competitions, such as the date, location, and score achieved.
+%\end{itemize}
+
+%\subsubsection{Non-Functional Requirements}
+%\begin{itemize}
+%\item \textbf{User-friendly:} The application should be easy to understand, and therefore, it should have a simple and intuitive user interface.
+%\item \textbf{Cloud Deployment:} The application will be hosted on a cloud platform to ensure easy access. This will allow users to access the platform from anywhere without needing local installations.
+%\item \textbf{Tested:} The application must include tests to ensure that all functionalities work correctly.
+%\end{itemize}
+
+%\subsubsection{Optional Features}
+%\begin{itemize}
+%\item \textbf{PDF Generation:} The application should be able to generate a PDF file with the athlete's summaries, so the coach can interact with the summaries more easily.
+%\item \textbf{Planning of future training sessions:} In addition to accessing past training sessions, the coach will be able to schedule new training sessions by providing the date and type of training. Athletes will be able to access this information.
+%\item \textbf{Email notifications:} The application will notify athletes by email if any training session is scheduled or changed. For this, athletes will need to associate their email address.
+%\end{itemize}
+
+%\subsection{Technologies}
+%In the development of this project different technologies will be employed, such as the Kotlin programming language \cite{kotlin} and the Spring framework \cite{spring}, which will be utilized for the creation of the API. PostgreSQL \cite{postgresql} will also be used for data storage. Finally, TypeScript \cite{typescript} will be applied, together with the React library \cite{react}, for the creation of the website.
+
+%\subsection{Risks}
+%\begin{itemize}
+%\item Having no knowledge of surfing practice may lead to difficulties in creating a practical design for coaches, as we don’t know the best way to present information to them. Consequently, frequent communication with the practitioners will be essential.
+%\item In frontend development, we may encounter more challenges because, although these technologies aren't new to us, we have less experience with TypeScript and React.
+%\end{itemize}
+
+%\subsection{Plan}
+%\begin{figure}[h]
+%\centering
+%\includegraphics [width=6in]{GanttChart.png}
+%\caption{Gantt Chart plan.}
+%\end{figure}
+
+%\section{Problem}
+
+%\section{Architecture}
+
+%\section{Technologies}
+
+%\section{Backend}
+
+%\section{Frontend}
+
+%\section{Conclusions}
+
+%\bibliographystyle{unsrt}
+%\bibliography{references}
+
+%\end{document}
