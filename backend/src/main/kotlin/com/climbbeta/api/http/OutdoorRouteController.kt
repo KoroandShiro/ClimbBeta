@@ -1,0 +1,54 @@
+package com.climbbeta.api.http
+
+import com.climbbeta.api.domain.OutdoorRoute
+import com.climbbeta.api.domain.User
+import com.climbbeta.api.services.OutdoorRouteService
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.RequestAttribute
+
+data class OutdoorRouteCreateInput(
+    val name: String?,
+    val sector: String,
+    val location: String,
+    val grade: String
+)
+
+@RestController
+@RequestMapping("/outdoor-routes")
+class OutdoorRouteController(
+    private val outdoorRouteService: OutdoorRouteService
+) {
+
+    @PostMapping
+    fun createRoute(
+        @RequestBody input: OutdoorRouteCreateInput,
+        @RequestAttribute("authenticatedUser") user: User // Injetado automaticamente pelo AuthenticationInterceptor!
+    ): ResponseEntity<Map<String, Int>> {
+        val routeId = outdoorRouteService.createRoute(
+            creatorId = user.id,
+            name = input.name,
+            sector = input.sector,
+            location = input.location,
+            grade = input.grade
+        )
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapOf("id" to routeId))
+    }
+
+    @GetMapping
+    fun getAllRoutes(): ResponseEntity<List<OutdoorRoute>> {
+        val routes = outdoorRouteService.getAllRoutes()
+        return ResponseEntity.ok(routes)
+    }
+
+    @GetMapping("/{id}")
+    fun getRouteById(@PathVariable id: Int): ResponseEntity<OutdoorRoute> {
+        val route = outdoorRouteService.getRouteById(id)
+        return if (route != null) {
+            ResponseEntity.ok(route)
+        } else {
+            ResponseEntity.status(HttpStatus.NOT_FOUND).build()
+        }
+    }
+}
