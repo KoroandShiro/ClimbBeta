@@ -131,7 +131,17 @@ Mudar o conteúdo deste ficheiro é crucial conforme o projeto avança, para ref
 
 > **🚀 Trabalho em Paralelo:** O **Dev A** faz as tabelas M:N da Gamificação (Likes/Saves), o **Dev B** faz as tabelas Sociais (Follows/Feed). Ficheiros diferentes, avanço brutal.
 
-### `[Backend] Ticket 4A: Interações Sociais e Feed`
+### `[Backend] Ticket 4A: Fluxo de Aprovação de Gym Owners`
+**Descrição:** Impedir que utilizadores recém-registados como `GYM_OWNER` comecem a criar ginásios sem validação prévia da plataforma.
+**🔗 Endpoints Associados:**
+- `PUT /admin/users/{id}/status` (Aprovar/Rejeitar)
+**🛠️ Tarefas:**
+- [ ] Adicionar coluna `account_status` (PENDING, ACTIVE, REJECTED) à tabela `users` (Default `ACTIVE` para Climbers, `PENDING` para Owners).
+- [ ] Atualizar o `POST /users/register` para atribuir o status correto consoante a `role`.
+- [ ] Atualizar os serviços de Ginásios (`POST /gyms`) para bloquear a criação se o `ownerId` tiver status `PENDING`.
+- [ ] (Opcional) Criar endpoint básico de Admin para listar contas pendentes e aprovar.
+
+### `[Backend] Ticket 4B: Interações Sociais e Feed`
 **🔗 Endpoints Associados:** - `POST /climbers/{id}/follow`
 - `DELETE /climbers/{id}/follow`
 - `GET /feed`
@@ -139,7 +149,7 @@ Mudar o conteúdo deste ficheiro é crucial conforme o projeto avança, para ref
 - [ ] Fazer os INSERTs/DELETEs na tabela `follows_climber`.
 - [ ] A query do terror (Feed): Juntar `ascents` aos `climbers` que o user segue e ordenar por data.
 
-### `[Backend] Ticket 4B: Gamificação (Likes, Saves e Leaderboard)`
+### `[Backend] Ticket 4C: Gamificação (Likes, Saves e Leaderboard)`
 **🔗 Endpoints Associados:** - `POST /ascents/{id}/like`
 - `POST /boulders/{id}/save`
 - `GET /projects/me`
@@ -148,14 +158,14 @@ Mudar o conteúdo deste ficheiro é crucial conforme o projeto avança, para ref
 - [ ] Inserir os likes e saves nas respetivas tabelas M:N.
 - [ ] Construir a query SQL do Leaderboard (agrupar `ascents` de um boulder, ordenar por flash e número de tentativas).
 
-### `[Backend] Ticket 4C: Comentários e Media (Vídeos)`
+### `[Backend] Ticket 4D: Comentários e Media (Vídeos)`
 **🔗 Endpoints Associados:** - `POST /ascents/{id}/comments`
 - `POST /media`
 **🛠️ Tarefas:**
 - [ ] Guardar comentários nas subidas.
 - [ ] Guardar links de vídeos (Beta) e ligar a boulders ou ascents.
 
-### `[Frontend Mobile] Ticket 4D: Integrar Social na App`
+### `[Frontend Mobile] Ticket 4E: Integrar Social na App`
 **🚨 BLOQUEIO:** *Depende das APIs da Fase 4 estarem feitas.*
 **🛠️ Tarefas:**
 - [ ] Criar o Ecrã "Home" e consumir o `GET /feed`.

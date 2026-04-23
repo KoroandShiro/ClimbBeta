@@ -13,6 +13,7 @@ services:
       - "5432:5432"
     volumes:
       - climbbeta-db-data:/var/lib/postgresql/data
+      - ./src/main/resources/sql/create-schema.sql:/docker-entrypoint-initdb.d/init.sql
 
   # Opcional: Se não quiseres usar o pgAdmin que tens instalado no PC,
   # o Docker também pode levantar um pgAdmin na Web!
