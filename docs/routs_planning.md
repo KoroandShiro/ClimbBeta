@@ -116,14 +116,37 @@ Mudar o conteúdo deste ficheiro é crucial conforme o projeto avança, para ref
 - [ ] Tratar a lógica: se vier `boulder_id`, é indoor; se vier `outdoor_route_id`, é outdoor.
 - [ ] Desenvolver as rotas de GET e DELETE.
 
-### `[Frontend Mobile] Ticket 3D: UI do Logbook`
-**🚨 BLOQUEIO:** *Precisa da App base (3B) e da API de Ascents (3C).*
-**Descrição:** O formulário no telemóvel para registar a subida.
+### `[Frontend Mobile] Ticket 3D: UI do Logbook (O Questionário de Ascents)`
+**Descrição:** Substituir a navegação hardcoded atual pelo formulário real onde o escalador regista a sua subida.
+**🔗 Endpoints:** Consome o `POST /ascents` (O Super-Endpoint).
 **🛠️ Tarefas:**
-- [ ] Criar ecrã de Log (Escolher Tries, Flash/Redpoint, Data).
-- [ ] Ligar botão guardar ao `POST /ascents`.
-- [ ] Ecrã de perfil para ver o histórico pessoal (`GET /ascents/me`).
+- [ ] Criar modal/ecrã de registo ao clicar num Boulder.
+- [ ] Formulário com: Data, Tentativas, Estilo (Flash/Redpoint/Project) e Notas.
+- [ ] Ligar botão "Gravar" à API e mostrar mensagem de sucesso.
 
+### `[Frontend Web] Ticket 3E: Dashboard do Owner & Persistência`
+**Descrição:** A "casa" do dono do ginásio no browser.
+**🔗 Endpoints:** Consome `GET /gyms`, `PUT /gyms/{id}`.
+**🛠️ Tarefas:**
+- [ ] Configurar Cookies/LocalStorage no Vite para o Owner não perder o login no refresh.
+- [ ] Criar página principal que lista os ginásios do Owner logado.
+- [ ] Formulário para editar dados do ginásio (Morada, Imagem de Capa).
+
+### `[Frontend Mobile] Ticket 3F: Ecrãs de Autenticação Reais`
+**Descrição:** Remover o login automático (`dev_email`) e criar as portas de entrada da App.
+**🔗 Endpoints:** Consome `POST /users/login` e `POST /users/register`.
+**🛠️ Tarefas:**
+- [ ] Criar ecrã de Login e de Registo.
+- [ ] Guardar o Token de forma segura no telemóvel (`Expo SecureStore`).
+- [ ] Criar lógica de "Auto-Login" (se já tiver token válido, salta direto para o Explore).
+
+### `[Frontend Mobile] Ticket 3G: Exploração Outdoor (Mapa e Filtros)`
+**Descrição:** Interface para a comunidade ver e adicionar rochas na natureza. Crucial: Evitar rochas duplicadas!
+**🔗 Endpoints:** Consome `GET /outdoor-routes` e `POST /outdoor-routes`.
+**🛠️ Tarefas:**
+- [ ] Criar separador "Outdoor" com um Mapa (ou lista com barra de pesquisa/filtros por localização).
+- [ ] Lógica visual: Antes de poder criar uma rocha, o utilizador *tem* de pesquisar no mapa se ela já existe.
+- [ ] Criar formulário de submissão de nova Rocha (`POST`).
 ---
 
 ## 💬 FASE 4: Comunidade, Media e Gamificação
@@ -131,15 +154,15 @@ Mudar o conteúdo deste ficheiro é crucial conforme o projeto avança, para ref
 
 > **🚀 Trabalho em Paralelo:** O **Dev A** faz as tabelas M:N da Gamificação (Likes/Saves), o **Dev B** faz as tabelas Sociais (Follows/Feed). Ficheiros diferentes, avanço brutal.
 
-### `[Backend] Ticket 4A: Fluxo de Aprovação de Gym Owners`
-**Descrição:** Impedir que utilizadores recém-registados como `GYM_OWNER` comecem a criar ginásios sem validação prévia da plataforma.
-**🔗 Endpoints Associados:**
-- `PUT /admin/users/{id}/status` (Aprovar/Rejeitar)
+### `[Backend] Ticket 4A: O Gatekeeper (Códigos de Ativação VIP)`
+**Descrição:** Um Gym Owner pode criar conta livremente, mas o seu `status` fica como `PENDING`. Para criar ginásios, precisa de inserir um código único gerado pelo Admin (tu).
+**🔗 Endpoints Associados:** `POST /admin/codes`, `POST /users/verify-code`.
 **🛠️ Tarefas:**
-- [ ] Adicionar coluna `account_status` (PENDING, ACTIVE, REJECTED) à tabela `users` (Default `ACTIVE` para Climbers, `PENDING` para Owners).
-- [ ] Atualizar o `POST /users/register` para atribuir o status correto consoante a `role`.
-- [ ] Atualizar os serviços de Ginásios (`POST /gyms`) para bloquear a criação se o `ownerId` tiver status `PENDING`.
-- [ ] (Opcional) Criar endpoint básico de Admin para listar contas pendentes e aprovar.
+- [ ] Criar tabela `activation_codes` (code, is_used).
+- [ ] Adicionar coluna `status` (PENDING / VERIFIED) à tabela `users`.
+- [ ] Criar endpoint onde o Admin gera os códigos.
+- [ ] Criar endpoint onde o Owner submete o código (se válido, passa a VERIFIED).
+- [ ] Bloquear o `POST /gyms`: Só Owners VERIFIED podem criar ginásios.
 
 ### `[Backend] Ticket 4B: Interações Sociais e Feed`
 **🔗 Endpoints Associados:** - `POST /climbers/{id}/follow`
@@ -171,6 +194,20 @@ Mudar o conteúdo deste ficheiro é crucial conforme o projeto avança, para ref
 - [ ] Criar o Ecrã "Home" e consumir o `GET /feed`.
 - [ ] Botão de Like nas subidas do feed.
 - [ ] Adicionar separador "Leaderboard" no detalhe do Boulder.
+
+### `[Frontend Web] Ticket 4F: O Painel do Admin e Bloqueio do Owner`
+**Descrição:** O reflexo do Ticket 4A no Frontend. O Admin tem o seu painel de controlo, e o Owner bloqueado vê uma página a pedir o código.
+**🛠️ Tarefas:**
+- [ ] **Visão Owner:** Se o Owner logado for `PENDING`, a Dashboard Web não mostra ginásios, mostra apenas uma "Parede de Bloqueio" a pedir o "Código de Ativação".
+- [ ] **Visão Admin:** Ecrã exclusivo (ROLE_ADMIN) com um botão mágico: "Gerar Novo Código" e uma lista de códigos já gerados.
+
+### `[Frontend Mobile] Ticket 4G: Perfil do Escalador`
+**Descrição:** Onde o escalador vê as suas estatísticas e pode fazer logout.
+**🔗 Endpoints:** Consome `GET /ascents/me` e `GET /profiles/me`.
+**🛠️ Tarefas:**
+- [ ] Criar tab "Perfil" na navegação.
+- [ ] Mostrar Logbook visual com histórico de subidas.
+- [ ] Botão de Logout (Limpa o SecureStore e volta ao Login).
 
 ---
 

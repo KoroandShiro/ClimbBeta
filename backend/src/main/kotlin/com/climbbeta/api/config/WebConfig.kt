@@ -23,8 +23,13 @@ class WebConfig(
 
     override fun addCorsMappings(registry: CorsRegistry) {
         registry.addMapping("/**") // Permite todas as rotas da nossa API
-            .allowedOrigins("http://localhost:5173", "http://localhost:3000") // Permite o Vite e outras portas
+            .allowedOrigins(
+                "http://localhost:5173", // O teu projeto Web (Dashboard Owner)
+                "http://localhost:3000", // Outras portas comuns
+                "http://localhost:8081"  // O teu Expo Web (App Mobile no Browser) - AQUI ESTÁ A CORREÇÃO!
+            )
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Permite estes verbos
             .allowedHeaders("*") // Permite enviar o nosso cabeçalho de Authorization
+            .allowCredentials(true) // Fundamental para a Fase de Cookies (Ticket 3E/1D)!
     }
 }
