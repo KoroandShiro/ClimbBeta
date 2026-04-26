@@ -43,6 +43,15 @@ class JdbiAscentRepository(private val jdbi: Jdbi) : AscentRepository {
         }
     }
 
+    override fun getById(id: Int): Ascent? {
+        return jdbi.withHandle<Ascent?, Exception> { handle ->
+            handle.createQuery("SELECT * FROM ascents WHERE id = :id")
+                .bind("id", id)
+                .mapTo(Ascent::class.java)
+                .findOne().orElse(null)
+        }
+    }
+
     override fun delete(id: Int, climberId: Int): Boolean {
         return jdbi.withHandle<Boolean, Exception> { handle ->
             handle.createUpdate("DELETE FROM ascents WHERE id = :id AND climber_id = :climberId")

@@ -28,5 +28,7 @@ class AscentService(private val ascentRepository: AscentRepository) {
 
     fun getClimberLogbook(climberId: Int) = ascentRepository.getByClimberId(climberId)
 
+    fun getAscentById(id: Int): Ascent? = ascentRepository.getById(id)
+
     fun removeAscent(id: Int, climberId: Int) = ascentRepository.delete(id, climberId)
 }

@@ -17,5 +17,6 @@ interface AscentRepository {
     ): Int
 
     fun getByClimberId(climberId: Int): List<Ascent>
+    fun getById(id: Int): Ascent?
     fun delete(id: Int, climberId: Int): Boolean
 }

@@ -41,6 +41,12 @@ class AscentController(private val ascentService: AscentService) {
         return ascentService.getClimberLogbook(user.id)
     }
 
+    @GetMapping("/{id}")
+    fun getById(@PathVariable id: Int): ResponseEntity<Ascent> {
+        val ascent = ascentService.getAscentById(id)
+        return if (ascent != null) ResponseEntity.ok(ascent) else ResponseEntity.notFound().build()
+    }
+
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Int, @RequestAttribute("authenticatedUser") user: User): ResponseEntity<Unit> {
         val deleted = ascentService.removeAscent(id, user.id)
