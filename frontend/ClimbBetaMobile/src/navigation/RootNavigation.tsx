@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import FeedScreen from '../screens/Home/FeedScreen';
 import ExploreScreen from '../screens/Explore/ExploreScreen';
 import LogbookEntryScreen from '../screens/Logbook/LogbookEntryScreen';
+import LogAscentScreen from '../screens/Logbook/LogAscentScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
 
 // Ecrãs Secundários (Mockups genéricos para testes)
@@ -51,6 +52,7 @@ function LogbookStackNavigator() {
       <LogbookStack.Screen name="LogEntry" component={LogbookEntryScreen} options={{ title: 'Registar Via' }} />
       <LogbookStack.Screen name="IndoorLog" component={IndoorLogScreen} options={{ title: 'Registo Indoor' }} />
       <LogbookStack.Screen name="OutdoorLog" component={OutdoorLogScreen} options={{ title: 'Registo Outdoor' }} />
+      <LogbookStack.Screen name="LogAscent" component={LogAscentScreen} options={{ title: 'Registar Subida' }} />
     </LogbookStack.Navigator>
   );
 }

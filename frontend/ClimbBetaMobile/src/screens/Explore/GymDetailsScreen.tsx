@@ -92,8 +92,11 @@ export default function GymDetailsScreen({ route, navigation }: any) {
                         style={styles.logButton}
                         onPress={() => {
                           navigation.navigate('Logbook', {
-                            screen: 'IndoorLog',
-                            params: { prefilledGym: gymName, prefilledGrade: boulder.grade },
+                            screen: 'LogAscent', // A "Porta" dentro da Tab
+                            params: { 
+                              boulderId: boulder.id, 
+                              boulderColor: boulder.color 
+                            }
                           });
                         }}
                     >
