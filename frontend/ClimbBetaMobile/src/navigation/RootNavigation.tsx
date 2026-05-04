@@ -3,15 +3,23 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 
+// Importar Explore screens
+import ExploreTypeScreen from "../screens/Explore/ExploreTypeScreen";
+import ExploreScreen from '../screens/Explore/ExploreScreen';
+
+// Importar Outdoor screens
+import OutdoorScreen from '../screens/Outdoor/OutdoorScreen';
+import OutdoorCreateScreen from '../screens/Outdoor/OutdoorCreateScreen';
+import OutdoorDetailsScreen from '../screens/Outdoor/OutdoorDetailsScreen';
+
+
 // Importar os Ecrãs Principais
 import FeedScreen from '../screens/Home/FeedScreen';
-import ExploreScreen from '../screens/Explore/ExploreScreen';
 import LogbookEntryScreen from '../screens/Logbook/LogbookEntryScreen';
 import LogAscentScreen from '../screens/Logbook/LogAscentScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
 
 // Ecrãs Secundários (Mockups genéricos para testes)
-import GenericDetailsScreen from '../screens/GenericDetailsScreen'; 
 import IndoorLogScreen from '../screens/Logbook/IndoorLogScreen';
 import OutdoorLogScreen from '../screens/Logbook/OutdoorLogScreen';
 import GymDetailsScreen from '../screens/Explore/GymDetailsScreen';
@@ -38,12 +46,22 @@ const ExploreStack = createNativeStackNavigator();
 function ExploreStackNavigator() {
   return (
     <ExploreStack.Navigator>
+        {/* Ecrã inicial: escolher entre Ginásios e Outdoor */}
+        <ExploreStack.Screen name="ExploreType" component={ExploreTypeScreen} options={{ title: 'Exploração', headerShown: true }} />
+
+        {/* Ginásios */}
       <ExploreStack.Screen name="GymList" component={ExploreScreen} options={{ title: 'Ginásios' }} />
       <ExploreStack.Screen name="GymDetails" component={GymDetailsScreen} options={{ title: 'Detalhes do Ginásio' }} />
       <ExploreStack.Screen name="BoulderDetails" component={BoulderDetailsScreen} options={{ title: 'Estatísticas da Via' }} />
+
+        {/* Outdoor */}
+        <ExploreStack.Screen name="OutdoorList" component={OutdoorScreen} options={{ title: 'Outdoor' }} />
+        <ExploreStack.Screen name="OutdoorDetails" component={OutdoorDetailsScreen} options={{ title: 'Detalhes da Via' }} />
+        <ExploreStack.Screen name= "OutdoorCreate" component={OutdoorCreateScreen} options={{ title: 'Adicionar Rocha' }} />
     </ExploreStack.Navigator>
   );
 }
+
 
 const LogbookStack = createNativeStackNavigator();
 function LogbookStackNavigator() {

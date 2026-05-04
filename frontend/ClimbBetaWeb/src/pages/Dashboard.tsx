@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
+ import { useNavigate, Link } from 'react-router-dom';
 import { getGyms, getActiveBoulders, createBoulder, type Gym, type Boulder } from '../services/gymService';
 import { logout } from '../services/authService';
 
@@ -79,9 +80,14 @@ export default function Dashboard() {
             {/* CABEÇALHO */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <h1>{gym ? gym.name : 'O Meu Ginásio'}</h1>
+                <div style={{ display: 'flex', gap: 8 }}>
+                    <Link to="/outdoor" style={{ padding: '8px 12px', background: '#06b6d4', color: 'white', borderRadius: 4, textDecoration: 'none' }}>
+                        Outdoor
+                    </Link>
                 <button onClick={handleLogout} style={{ padding: '8px 16px', backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
                     Sair
                 </button>
+                </div>
             </div>
 
             {/* FORMULÁRIO DE NOVA VIA */}
