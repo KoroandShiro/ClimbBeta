@@ -91,12 +91,9 @@ export default function GymDetailsScreen({ route, navigation }: any) {
                     <TouchableOpacity
                         style={styles.logButton}
                         onPress={() => {
-                          navigation.navigate('Logbook', {
-                            screen: 'LogAscent', // A "Porta" dentro da Tab
-                            params: { 
-                              boulderId: boulder.id, 
-                              boulderColor: boulder.color 
-                            }
+                          navigation.navigate('LogAscent', { 
+                            boulderId: boulder.id, 
+                            boulderColor: boulder.color 
                           });
                         }}
                     >

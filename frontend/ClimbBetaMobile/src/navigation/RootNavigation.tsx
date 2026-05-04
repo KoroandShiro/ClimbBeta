@@ -41,6 +41,7 @@ function ExploreStackNavigator() {
       <ExploreStack.Screen name="GymList" component={ExploreScreen} options={{ title: 'Ginásios' }} />
       <ExploreStack.Screen name="GymDetails" component={GymDetailsScreen} options={{ title: 'Detalhes do Ginásio' }} />
       <ExploreStack.Screen name="BoulderDetails" component={BoulderDetailsScreen} options={{ title: 'Estatísticas da Via' }} />
+      <LogbookStack.Screen name="LogAscent" component={LogAscentScreen} options={{ title: 'Registar Subida' }} />
     </ExploreStack.Navigator>
   );
 }
@@ -52,7 +53,6 @@ function LogbookStackNavigator() {
       <LogbookStack.Screen name="LogEntry" component={LogbookEntryScreen} options={{ title: 'Registar Via' }} />
       <LogbookStack.Screen name="IndoorLog" component={IndoorLogScreen} options={{ title: 'Registo Indoor' }} />
       <LogbookStack.Screen name="OutdoorLog" component={OutdoorLogScreen} options={{ title: 'Registo Outdoor' }} />
-      <LogbookStack.Screen name="LogAscent" component={LogAscentScreen} options={{ title: 'Registar Subida' }} />
     </LogbookStack.Navigator>
   );
 }

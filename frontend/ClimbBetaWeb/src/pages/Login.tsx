@@ -1,24 +1,30 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../services/authService';
+import { login as apiLogin } from '../services/authService'; // Renomeei para não chocar com o do Contexto
+import { useAuth } from '../contexts/AuthContext'; // <-- Importamos o nosso Hook
 
 export default function Login() {
-    // O TypeScript sabe automaticamente que isto são strings e booleanos pelos valores iniciais
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     
     const navigate = useNavigate();
+    const { login: contextLogin } = useAuth(); // <-- Trazemos a função de login do Contexto
 
-    // Tipamos o evento 'e' para o React saber que vem de um formulário (HTMLFormElement)
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError('');
         setIsLoading(true);
 
         try {
-            await login(email, password);
+            // Chamamos a tua API real
+            const tokenRecebido = await apiLogin(email, password);
+            
+            // ATENÇÃO: Se o teu apiLogin não estiver a devolver o token (string), 
+            // tens de ir ao authService.ts garantir que ele faz "return response.data.token"
+            
+            contextLogin(tokenRecebido); // <-- O Contexto guarda na gaveta (localStorage)
             navigate('/gyms'); 
         } catch (err: any) {
             setError(err.message);

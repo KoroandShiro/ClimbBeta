@@ -5,17 +5,20 @@ interface LoginResponse {
     token: string;
 }
 
-export const login = async (email: string, passwordRaw: string): Promise<boolean> => {
-    // Dizemos ao apiFetch que esperamos receber um objeto do tipo LoginResponse
+// 1. Mudámos de Promise<boolean> para Promise<string>
+export const login = async (email: string, passwordRaw: string): Promise<string> => {
     const data = await apiFetch<LoginResponse>('/users/login', {
         method: 'POST',
         body: JSON.stringify({ email, passwordRaw }),
     });
 
-    localStorage.setItem('@ClimbBeta:token', data.token);
-    return true;
+    // 2. Já não mexemos no localStorage aqui. O AuthContext trata disso!
+    // 3. Devolvemos a string do token diretamente para o Login.tsx
+    return data.token; 
 };
 
+// Como o AuthContext agora trata do logout limpando a sessão, 
+// esta função pode ficar vazia por agora (ou até ser apagada depois).
 export const logout = (): void => {
-    localStorage.removeItem('@ClimbBeta:token');
+    // O AuthContext agora é quem limpa o token
 };
