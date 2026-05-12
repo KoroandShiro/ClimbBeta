@@ -1,14 +1,8 @@
+import * as SecureStore from 'expo-secure-store';
+
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://10.0.2.2:8080';
 
-let authToken: string | null = null;
-
-export function setAuthToken(token: string) {
-    authToken = token;
-}
-
-export function clearAuthToken() {
-    authToken = null;
-}
+export const TOKEN_KEY = 'climbbeta_token';
 
 export class ApiError extends Error {
     status: number;
@@ -23,13 +17,13 @@ export class ApiError extends Error {
 export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const headers = new Headers(options.headers);
 
-    // So define JSON content-type when body is not FormData
     if (!(options.body instanceof FormData) && !headers.has('Content-Type')) {
         headers.set('Content-Type', 'application/json');
     }
 
-    if (authToken) {
-        headers.set('Authorization', `Bearer ${authToken}`);
+    const token = await SecureStore.getItemAsync(TOKEN_KEY);
+    if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
     }
 
     const response = await fetch(`${BASE_URL}${endpoint}`, {

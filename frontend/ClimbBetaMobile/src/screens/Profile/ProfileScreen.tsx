@@ -1,16 +1,19 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function ProfileScreen({ navigation }: any) {
+  const { logout } = useAuth();
+
   return (
     <ScrollView style={styles.container}>
-      
+
       {/* 1. Cabeçalho do Perfil */}
       <View style={styles.header}>
-        <Image 
-          source={{ uri: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }} 
-          style={styles.avatar} 
+        <Image
+          source={{ uri: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }}
+          style={styles.avatar}
         />
         <Text style={styles.name}>Gonçalo Matos</Text>
         <Text style={styles.username}>@gmatos_climb</Text>
@@ -37,7 +40,7 @@ export default function ProfileScreen({ navigation }: any) {
 
       {/* 3. Botões de Ação (Tabelas saved_boulders e favorite_climbers) */}
       <View style={styles.actionsContainer}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.actionCard}
           onPress={() => navigation.navigate('MyProjects')}
         >
@@ -46,7 +49,7 @@ export default function ProfileScreen({ navigation }: any) {
           <Text style={styles.actionSub}>12 vias pendentes</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.actionCard}
           onPress={() => alert('Abriria a lista de amigos!')}
         >
@@ -56,10 +59,16 @@ export default function ProfileScreen({ navigation }: any) {
         </TouchableOpacity>
       </View>
 
+      {/* Logout */}
+      <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+        <Ionicons name="log-out-outline" size={20} color="#c62828" />
+        <Text style={styles.logoutText}>Terminar Sessão</Text>
+      </TouchableOpacity>
+
       {/* 4. Lista de Histórico (Dummy data) */}
       <View style={styles.historySection}>
         <Text style={styles.historyTitle}>Últimas Ascensões</Text>
-        
+
         <View style={styles.historyItem}>
           <View style={styles.historyIcon}><Ionicons name="checkmark-done" size={20} color="#fff" /></View>
           <View style={styles.historyText}>
@@ -83,7 +92,7 @@ export default function ProfileScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
-  
+
   // Header Styles
   header: { alignItems: 'center', padding: 20, backgroundColor: '#fff' },
   avatar: { width: 100, height: 100, borderRadius: 50, marginBottom: 10, backgroundColor: '#e0e0e0' },
@@ -100,13 +109,17 @@ const styles = StyleSheet.create({
 
   // Actions Styles
   actionsContainer: { flexDirection: 'row', padding: 15, gap: 15 },
-  actionCard: { 
-    flex: 1, backgroundColor: '#fff', padding: 20, borderRadius: 12, 
-    alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, 
-    shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 
+  actionCard: {
+    flex: 1, backgroundColor: '#fff', padding: 20, borderRadius: 12,
+    alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1, shadowRadius: 4, elevation: 3
   },
   actionTitle: { fontSize: 14, fontWeight: 'bold', color: '#333', marginTop: 10, textAlign: 'center' },
   actionSub: { fontSize: 12, color: '#777', marginTop: 4 },
+
+  // Logout Styles
+  logoutButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', margin: 16, padding: 14, backgroundColor: '#fff', borderRadius: 10, borderWidth: 1, borderColor: '#ffcdd2', gap: 8 },
+  logoutText: { color: '#c62828', fontWeight: 'bold', fontSize: 15 },
 
   // History Styles
   historySection: { padding: 20 },

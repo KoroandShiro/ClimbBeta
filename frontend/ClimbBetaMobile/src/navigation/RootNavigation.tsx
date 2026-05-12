@@ -1,7 +1,14 @@
 import React from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
+
+import { useAuth } from '../contexts/AuthContext';
+
+// Auth Screens
+import LoginScreen from '../screens/Auth/LoginScreen';
+import RegisterScreen from '../screens/Auth/RegisterScreen';
 
 // Importar os Ecrãs Principais
 import FeedScreen from '../screens/Home/FeedScreen';
@@ -10,8 +17,7 @@ import LogbookEntryScreen from '../screens/Logbook/LogbookEntryScreen';
 import LogAscentScreen from '../screens/Logbook/LogAscentScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
 
-// Ecrãs Secundários (Mockups genéricos para testes)
-import GenericDetailsScreen from '../screens/GenericDetailsScreen'; 
+// Ecrãs Secundários
 import IndoorLogScreen from '../screens/Logbook/IndoorLogScreen';
 import OutdoorLogScreen from '../screens/Logbook/OutdoorLogScreen';
 import GymDetailsScreen from '../screens/Explore/GymDetailsScreen';
@@ -20,9 +26,20 @@ import UserSearchScreen from '../screens/Home/UserSearchScreen';
 import BoulderDetailsScreen from '../screens/Explore/BoulderDetailsScreen';
 import MyProjectsScreen from '../screens/Profile/MyProjectsScreen';
 
+// --- AUTH STACK ---
+const AuthStack = createNativeStackNavigator();
+function AuthStackNavigator() {
+  return (
+    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+      <AuthStack.Screen name="Login" component={LoginScreen} />
+      <AuthStack.Screen name="Register" component={RegisterScreen} />
+    </AuthStack.Navigator>
+  );
+}
+
+// --- APP STACKS ---
 const Tab = createBottomTabNavigator();
 
-// --- STACKS (Pilhas de Ecrãs) ---
 const HomeStack = createNativeStackNavigator();
 function HomeStackNavigator() {
   return (
@@ -41,7 +58,7 @@ function ExploreStackNavigator() {
       <ExploreStack.Screen name="GymList" component={ExploreScreen} options={{ title: 'Ginásios' }} />
       <ExploreStack.Screen name="GymDetails" component={GymDetailsScreen} options={{ title: 'Detalhes do Ginásio' }} />
       <ExploreStack.Screen name="BoulderDetails" component={BoulderDetailsScreen} options={{ title: 'Estatísticas da Via' }} />
-      <LogbookStack.Screen name="LogAscent" component={LogAscentScreen} options={{ title: 'Registar Subida' }} />
+      <ExploreStack.Screen name="LogAscent" component={LogAscentScreen} options={{ title: 'Registar Subida' }} />
     </ExploreStack.Navigator>
   );
 }
@@ -67,19 +84,17 @@ function ProfileStackNavigator() {
   );
 }
 
-// --- TABS (O Menu de Baixo) ---
-export default function RootNavigation() {
+function AppTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        headerShown: false, // Esconde o header da Tab porque o Stack já tem o seu
+        headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: any = 'home';
           if (route.name === 'Home') iconName = focused ? 'home' : 'home-outline';
           else if (route.name === 'Explore') iconName = focused ? 'map' : 'map-outline';
           else if (route.name === 'Logbook') iconName = focused ? 'add-circle' : 'add-circle-outline';
           else if (route.name === 'Profile') iconName = focused ? 'person' : 'person-outline';
-          
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: '#2E7D32',
@@ -92,4 +107,18 @@ export default function RootNavigation() {
       <Tab.Screen name="Profile" component={ProfileStackNavigator} options={{ title: 'Perfil' }} />
     </Tab.Navigator>
   );
+}
+
+export default function RootNavigation() {
+  const { token, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#2E7D32" />
+      </View>
+    );
+  }
+
+  return token ? <AppTabs /> : <AuthStackNavigator />;
 }
