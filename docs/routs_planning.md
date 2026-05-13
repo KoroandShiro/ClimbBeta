@@ -130,6 +130,7 @@ Mudar o conteúdo deste ficheiro é crucial conforme o projeto avança, para ref
 **🛠️ Tarefas:**
 - [ ] Configurar Cookies/LocalStorage no Vite para o Owner não perder o login no refresh.
 - [ ] Criar página principal que lista os ginásios do Owner logado.
+- [ ] Criar ecrã/modal de "Criar Ginásio" (liga ao `POST /gyms`).
 - [ ] Formulário para editar dados do ginásio (Morada, Imagem de Capa).
 
 ### `[Frontend Mobile] Ticket 3F: Ecrãs de Autenticação Reais`

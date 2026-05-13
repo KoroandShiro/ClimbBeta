@@ -1,6 +1,7 @@
 package com.climbbeta.api.repository_jdbi
 
 import com.climbbeta.api.domain.User
+import com.climbbeta.api.domain.UserStatus
 import com.climbbeta.api.repository.UserRepository
 import org.jdbi.v3.core.Jdbi
 import org.springframework.stereotype.Repository
@@ -31,14 +32,15 @@ class JdbiUserRepository(private val jdbi: Jdbi) : UserRepository {
             // Fazemos o INSERT e pedimos ao Postgres para devolver o ID gerado!
             val generatedId = handle.createUpdate(
                 """
-                INSERT INTO users (username, email, password_hash, role) 
-                VALUES (:username, :email, :passwordHash, :role::user_role)
+                INSERT INTO users (username, email, password_hash, role, status)
+                VALUES (:username, :email, :passwordHash, :role::user_role, :status::user_status)
                 """
             )
                 .bind("username", user.username)
                 .bind("email", user.email)
                 .bind("passwordHash", user.passwordHash)
                 .bind("role", user.role.name)
+                .bind("status", user.status.name)
                 .executeAndReturnGeneratedKeys("id")
                 .mapTo(Int::class.java)
                 .one()
@@ -65,8 +67,8 @@ class JdbiUserRepository(private val jdbi: Jdbi) : UserRepository {
         return jdbi.withHandle<User?, Exception> { handle ->
             handle.createQuery(
                 """
-            SELECT id, username, email, password_hash AS passwordHash, role, created_at AS createdAt 
-            FROM users 
+            SELECT id, username, email, password_hash AS passwordHash, role, status, created_at AS createdAt
+            FROM users
             WHERE email = :email
             """
             )
@@ -81,8 +83,8 @@ class JdbiUserRepository(private val jdbi: Jdbi) : UserRepository {
         return jdbi.withHandle<User?, Exception> { handle ->
             handle.createQuery(
                 """
-            SELECT id, username, email, password_hash AS passwordHash, role, created_at AS createdAt 
-            FROM users 
+            SELECT id, username, email, password_hash AS passwordHash, role, status, created_at AS createdAt
+            FROM users
             WHERE id = :id
             """
             )
@@ -90,6 +92,17 @@ class JdbiUserRepository(private val jdbi: Jdbi) : UserRepository {
                 .mapTo(User::class.java)
                 .findOne()
                 .orElse(null)
+        }
+    }
+
+    override fun updateUserStatus(userId: Int, status: UserStatus) {
+        jdbi.withHandle<Unit, Exception> { handle ->
+            handle.createUpdate(
+                "UPDATE users SET status = :status::user_status WHERE id = :id"
+            )
+                .bind("status", status.name)
+                .bind("id", userId)
+                .execute()
         }
     }
 

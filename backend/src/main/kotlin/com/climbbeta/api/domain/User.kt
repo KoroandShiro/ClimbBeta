@@ -8,5 +8,6 @@ data class User(
     val email: String,
     val passwordHash: String,
     val role: UserRole,
+    val status: UserStatus = UserStatus.PENDING,
     val createdAt: LocalDateTime? = null
 )

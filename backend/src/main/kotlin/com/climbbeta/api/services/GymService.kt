@@ -3,6 +3,7 @@ package com.climbbeta.api.services
 import com.climbbeta.api.domain.Gym
 import com.climbbeta.api.domain.User
 import com.climbbeta.api.domain.UserRole
+import com.climbbeta.api.domain.UserStatus
 import com.climbbeta.api.repository.GymRepository
 import com.climbbeta.api.repository.UserRepository
 import org.springframework.stereotype.Service
@@ -25,6 +26,10 @@ class GymService(
 
         if (authenticatedUser.role != UserRole.ADMIN && authenticatedUser.role != UserRole.GYM_OWNER) {
             throw SecurityException("Apenas ADMIN ou GYM_OWNER podem criar ginásios.")
+        }
+
+        if (authenticatedUser.role == UserRole.GYM_OWNER && authenticatedUser.status != UserStatus.VERIFIED) {
+            throw SecurityException("A conta precisa de ser verificada antes de poder criar ginásios. Insira o código de ativação.")
         }
 
         if (authenticatedUser.role == UserRole.GYM_OWNER && authenticatedUser.id != ownerId) {

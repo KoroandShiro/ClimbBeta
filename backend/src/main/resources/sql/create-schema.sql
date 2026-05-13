@@ -4,6 +4,7 @@
 
 -- 1. Criação de Tipos Enumerados (Enums)
 CREATE TYPE user_role AS ENUM ('ADMIN', 'CLIMBER', 'GYM_OWNER');
+CREATE TYPE user_status AS ENUM ('PENDING', 'VERIFIED');
 CREATE TYPE media_type AS ENUM ('IMAGE', 'VIDEO');
 
 -- =========================================================================
@@ -16,6 +17,7 @@ CREATE TABLE users (
                        email VARCHAR(255) UNIQUE NOT NULL,
                        password_hash VARCHAR(255) NOT NULL,
                        role user_role NOT NULL,
+                       status user_status NOT NULL DEFAULT 'PENDING',
                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -39,6 +41,13 @@ CREATE TABLE gym_owner_profiles (
                                     user_id INT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
                                     company_name VARCHAR(100) NOT NULL,
                                     contact_phone VARCHAR(20)
+);
+
+CREATE TABLE activation_codes (
+                                  code       VARCHAR(36) PRIMARY KEY,
+                                  is_used    BOOLEAN NOT NULL DEFAULT FALSE,
+                                  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                  used_by    INT REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- =========================================================================

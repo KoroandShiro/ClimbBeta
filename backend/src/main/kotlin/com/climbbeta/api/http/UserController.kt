@@ -1,6 +1,7 @@
 package com.climbbeta.api.http
 
 import com.climbbeta.api.domain.UserRole
+import com.climbbeta.api.domain.UserStatus
 import com.climbbeta.api.services.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -18,7 +19,12 @@ data class UserOutputModel(
     val id: Int,
     val username: String,
     val email: String,
-    val role: UserRole
+    val role: UserRole,
+    val status: UserStatus
+)
+
+data class VerifyCodeInputModel(
+    val code: String
 )
 
 data class UserLoginInputModel(
@@ -53,7 +59,8 @@ class UserController(
                 id = createdUser.id,
                 username = createdUser.username,
                 email = createdUser.email,
-                role = createdUser.role
+                role = createdUser.role,
+                status = createdUser.status
             )
 
             // Devolvemos status 201 (Created)
@@ -88,7 +95,30 @@ class UserController(
             ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
 
         // Devolvemos os dados para provar que sabemos quem ele é
-        val output = UserOutputModel(user.id, user.username, user.email, user.role)
+        val output = UserOutputModel(user.id, user.username, user.email, user.role, user.status)
         return ResponseEntity.ok(output)
+    }
+
+    @PostMapping("/verify-code")
+    fun verifyCode(
+        @RequestBody input: VerifyCodeInputModel,
+        request: jakarta.servlet.http.HttpServletRequest
+    ): ResponseEntity<Any> {
+        val user = request.getAttribute("authenticatedUser") as? com.climbbeta.api.domain.User
+            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+
+        return try {
+            val updatedUser = userService.verifyActivationCode(user, input.code)
+            val output = UserOutputModel(updatedUser.id, updatedUser.username, updatedUser.email, updatedUser.role, updatedUser.status)
+            ResponseEntity.ok(output)
+        } catch (e: SecurityException) {
+            ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("error" to e.message))
+        } catch (e: IllegalStateException) {
+            ResponseEntity.status(HttpStatus.CONFLICT).body(mapOf("error" to e.message))
+        } catch (e: NoSuchElementException) {
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to e.message))
+        } catch (e: IllegalArgumentException) {
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to e.message))
+        }
     }
 }

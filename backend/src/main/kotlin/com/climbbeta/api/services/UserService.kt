@@ -4,6 +4,8 @@ import org.mindrot.jbcrypt.BCrypt
 import com.climbbeta.api.domain.Token
 import com.climbbeta.api.domain.User
 import com.climbbeta.api.domain.UserRole
+import com.climbbeta.api.domain.UserStatus
+import com.climbbeta.api.repository.ActivationCodeRepository
 import com.climbbeta.api.repository.TokenRepository
 import com.climbbeta.api.repository.UserRepository
 import org.springframework.stereotype.Service
@@ -12,10 +14,10 @@ import java.util.UUID
 @Service
 class UserService(
     private val userRepository: UserRepository,
-    private val tokenRepository: TokenRepository
+    private val tokenRepository: TokenRepository,
+    private val activationCodeRepository: ActivationCodeRepository
 ) {
     fun createUser(username: String, email: String, passwordRaw: String, role: UserRole): User {
-        // 1. Verificar se o email ou username já existem
         if (userRepository.existsByEmail(email)) {
             throw IllegalArgumentException("Este email já está registado!")
         }
@@ -23,19 +25,41 @@ class UserService(
             throw IllegalArgumentException("Este username já está em uso!")
         }
 
-        // Gerar o Hash da password (o gensalt() adiciona lixo aleatório para ser impossível de decifrar)
         val hashedPw = BCrypt.hashpw(passwordRaw, BCrypt.gensalt())
 
-        // 2. Criar o objeto User (Num cenário real faríamos o Hash da password aqui)
+        // GYM_OWNER começa PENDING até inserir um código de ativação do Admin
+        val initialStatus = if (role == UserRole.GYM_OWNER) UserStatus.PENDING else UserStatus.VERIFIED
+
         val newUser = User(
             username = username,
             email = email,
-            passwordHash = hashedPw, // Para já guardamos a raw, depois pomos o BCrypt!
-            role = role
+            passwordHash = hashedPw,
+            role = role,
+            status = initialStatus
         )
 
-        // 3. Mandar o repositório gravar na Base de Dados e devolver o utilizador criado
         return userRepository.createUser(newUser)
+    }
+
+    fun verifyActivationCode(authenticatedUser: User, code: String): User {
+        if (authenticatedUser.role != UserRole.GYM_OWNER) {
+            throw SecurityException("Apenas GYM_OWNER pode verificar um código de ativação.")
+        }
+        if (authenticatedUser.status == UserStatus.VERIFIED) {
+            throw IllegalStateException("A conta já está verificada.")
+        }
+
+        val activation = activationCodeRepository.getByCode(code)
+            ?: throw NoSuchElementException("Código de ativação inválido.")
+
+        if (activation.isUsed) {
+            throw IllegalArgumentException("Este código já foi utilizado.")
+        }
+
+        activationCodeRepository.markAsUsed(code, authenticatedUser.id)
+        userRepository.updateUserStatus(authenticatedUser.id, UserStatus.VERIFIED)
+
+        return userRepository.getUserById(authenticatedUser.id)!!
     }
 
     fun login(email: String, passwordRaw: String): String {
