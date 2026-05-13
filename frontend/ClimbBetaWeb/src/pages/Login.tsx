@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login as apiLogin } from '../services/authService'; // Renomeei para não chocar com o do Contexto
-import { useAuth } from '../contexts/AuthContext'; // <-- Importamos o nosso Hook
+import { login as apiLogin } from '../services/authService';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    
+
     const navigate = useNavigate();
-    const { login: contextLogin } = useAuth(); // <-- Trazemos a função de login do Contexto
+    const { login: contextLogin } = useAuth();
 
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -18,14 +18,9 @@ export default function Login() {
         setIsLoading(true);
 
         try {
-            // Chamamos a tua API real
             const tokenRecebido = await apiLogin(email, password);
-            
-            // ATENÇÃO: Se o teu apiLogin não estiver a devolver o token (string), 
-            // tens de ir ao authService.ts garantir que ele faz "return response.data.token"
-            
-            contextLogin(tokenRecebido); // <-- O Contexto guarda na gaveta (localStorage)
-            navigate('/gyms'); 
+            await contextLogin(tokenRecebido); // guarda token e carrega perfil do utilizador
+            navigate('/gyms');
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -37,34 +32,34 @@ export default function Login() {
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f3f4f6' }}>
             <div style={{ padding: '40px', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', width: '100%', maxWidth: '400px' }}>
                 <h1 style={{ textAlign: 'center', marginBottom: '24px', color: '#1f2937' }}>🧗 ClimbBeta Web</h1>
-                
+
                 {error && <p style={{ color: '#ef4444', textAlign: 'center', marginBottom: '16px', fontWeight: 'bold' }}>{error}</p>}
-                
+
                 <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <div>
                         <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Email</label>
-                        <input 
-                            type="email" 
+                        <input
+                            type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             style={{ width: '90%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
-                            required 
+                            required
                         />
                     </div>
-                    
+
                     <div>
                         <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Password</label>
-                        <input 
-                            type="password" 
+                        <input
+                            type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             style={{ width: '90%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
-                            required 
+                            required
                         />
                     </div>
-                    
-                    <button 
-                        type="submit" 
+
+                    <button
+                        type="submit"
                         disabled={isLoading}
                         style={{ padding: '12px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: isLoading ? 'not-allowed' : 'pointer', marginTop: '8px' }}
                     >

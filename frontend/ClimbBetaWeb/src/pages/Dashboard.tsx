@@ -1,22 +1,25 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getGyms, getActiveBoulders, createBoulder, updateGym, type Gym, type Boulder } from '../services/gymService';
-import { useAuth } from '../contexts/AuthContext'; 
+import { useAuth } from '../contexts/AuthContext';
+import ActivationWallCard from '../components/ActivationWallCard';
+import CreateGymModal from '../components/CreateGymModal';
 
 export default function Dashboard() {
     const navigate = useNavigate();
-    const { logout: contextLogout } = useAuth(); 
-    
-    const [gyms, setGyms] = useState<Gym[]>([]); 
-    const [selectedGym, setSelectedGym] = useState<Gym | null>(null); 
-    
+    const { logout: contextLogout, user, isLoading: authLoading } = useAuth();
+
+    const [gyms, setGyms] = useState<Gym[]>([]);
+    const [selectedGym, setSelectedGym] = useState<Gym | null>(null);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+
     // --- ESTADOS PARA EDIÇÃO DO GINÁSIO ---
     const [isEditingGym, setIsEditingGym] = useState(false);
     const [editName, setEditName] = useState('');
     const [editAddress, setEditAddress] = useState('');
-    const [editCity, setEditCity] = useState(''); // <-- NOVO ESTADO
+    const [editCity, setEditCity] = useState('');
     const [editImageUrl, setEditImageUrl] = useState('');
-    
+
     // --- ESTADOS DAS VIAS ---
     const [boulders, setBoulders] = useState<Boulder[]>([]);
     const [newColor, setNewColor] = useState('');
@@ -41,14 +44,13 @@ export default function Dashboard() {
     };
 
     const handleSelectGym = async (gym: Gym) => {
-        setSelectedGym(gym); 
-        // Preenche os dados do formulário de edição com os dados atuais
+        setSelectedGym(gym);
         setEditName(gym.name);
         setEditAddress(gym.address || '');
         setEditCity(gym.city);
         setEditImageUrl(gym.coverImageUrl || '');
-        setIsEditingGym(false); // Garante que entra no modo "Visualização"
-        
+        setIsEditingGym(false);
+
         try {
             const viasAtivas = await getActiveBoulders(gym.id);
             setBoulders(viasAtivas);
@@ -57,7 +59,6 @@ export default function Dashboard() {
         }
     };
 
-    // --- NOVA FUNÇÃO DE GUARDAR EDIÇÃO ---
     const handleUpdateGym = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!selectedGym) return;
@@ -70,10 +71,9 @@ export default function Dashboard() {
                 coverImageUrl: editImageUrl
             });
 
-            // Atualiza o ginásio selecionado e a lista principal
             setSelectedGym(updatedGym);
             setGyms(gyms.map(g => g.id === updatedGym.id ? updatedGym : g));
-            setIsEditingGym(false); // Sai do modo de edição
+            setIsEditingGym(false);
             alert('Ginásio atualizado com sucesso!');
         } catch (error: any) {
             alert('Erro ao atualizar ginásio: ' + error.message);
@@ -85,10 +85,10 @@ export default function Dashboard() {
         if (!selectedGym) return;
 
         try {
-            const dataHoje = new Date().toISOString().split('T')[0]; 
+            const dataHoje = new Date().toISOString().split('T')[0];
             const novoBoulder = await createBoulder(selectedGym.id, {
                 color: newColor,
-                hexColor: '#808080', 
+                hexColor: '#808080',
                 grade: newGrade,
                 setterName: 'Koro',
                 setDate: dataHoje,
@@ -96,7 +96,7 @@ export default function Dashboard() {
             });
 
             setBoulders([novoBoulder, ...boulders]);
-            setNewColor(''); 
+            setNewColor('');
             alert('Via adicionada à parede!');
         } catch (error: any) {
             alert('Erro ao adicionar via: ' + error.message);
@@ -104,15 +104,15 @@ export default function Dashboard() {
     };
 
     const handleLogout = () => {
-        contextLogout(); 
+        contextLogout();
         navigate('/login');
     };
 
-    if (isLoading) return <h2 style={{ textAlign: 'center', marginTop: '50px' }}>A carregar o teu Império... 🏢</h2>;
+    if (authLoading || isLoading) return <h2 style={{ textAlign: 'center', marginTop: '50px' }}>A carregar o teu Império... 🏢</h2>;
 
     return (
         <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px', fontFamily: 'sans-serif' }}>
-            
+
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', borderBottom: '2px solid #e5e7eb', paddingBottom: '10px' }}>
                 <h1>🏢 Portal de Gestão</h1>
                 <button onClick={handleLogout} style={{ padding: '8px 16px', backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
@@ -120,11 +120,32 @@ export default function Dashboard() {
                 </button>
             </div>
 
+            {/* PAREDE DE BLOQUEIO: owner pendente de ativação */}
+            {user?.status === 'PENDING' && <ActivationWallCard />}
+
+            {/* DASHBOARD NORMAL: owner verificado */}
+            {user?.status === 'VERIFIED' && (
+            <>
+            {showCreateModal && (
+                <CreateGymModal
+                    onCreated={() => { carregarGinasios(); setShowCreateModal(false); }}
+                    onClose={() => setShowCreateModal(false)}
+                />
+            )}
+
             {!selectedGym ? (
                 <div>
-                    <h2>Os Meus Ginásios</h2>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                        <h2 style={{ margin: 0 }}>Os Meus Ginásios</h2>
+                        <button
+                            onClick={() => setShowCreateModal(true)}
+                            style={{ padding: '10px 20px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+                        >
+                            + Adicionar Ginásio
+                        </button>
+                    </div>
                     {gyms.length === 0 ? (
-                        <p style={{ color: 'gray' }}>Não tens ginásios associados a esta conta.</p>
+                        <p style={{ color: 'gray' }}>Não tens ginásios associados a esta conta. Adiciona o teu primeiro ginásio!</p>
                     ) : (
                         <div style={{ display: 'grid', gap: '15px', marginTop: '20px' }}>
                             {gyms.map(gym => (
@@ -133,7 +154,7 @@ export default function Dashboard() {
                                         <strong style={{ fontSize: '20px', display: 'block' }}>{gym.name}</strong>
                                         <span style={{ color: '#6b7280', fontSize: '14px' }}>📍 {gym.address || 'Sem morada registada'}</span>
                                     </div>
-                                    <button 
+                                    <button
                                         onClick={() => handleSelectGym(gym)}
                                         style={{ padding: '10px 20px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
                                     >
@@ -146,13 +167,13 @@ export default function Dashboard() {
                 </div>
             ) : (
                 <div>
-                    <button 
-                        onClick={() => setSelectedGym(null)} 
+                    <button
+                        onClick={() => setSelectedGym(null)}
                         style={{ marginBottom: '20px', padding: '8px 12px', backgroundColor: '#f3f4f6', border: '1px solid #d1d5db', borderRadius: '4px', cursor: 'pointer', color: '#374151' }}
                     >
                         ⬅ Voltar à Lista
                     </button>
-                    
+
                     {/* --- CABEÇALHO DO GINÁSIO (MODO VISUALIZAÇÃO OU EDIÇÃO) --- */}
                     <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '8px', border: '1px solid #e5e7eb', marginBottom: '30px' }}>
                         {!isEditingGym ? (
@@ -198,7 +219,7 @@ export default function Dashboard() {
                         )}
                     </div>
 
-                    {/* --- ZONA DA PAREDE (Fica inalterada) --- */}
+                    {/* --- ZONA DA PAREDE --- */}
                     <div style={{ backgroundColor: '#f3f4f6', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
                         <h3>➕ Adicionar Nova Via</h3>
                         <form onSubmit={handleAddBoulder} style={{ display: 'flex', gap: '10px', alignItems: 'flex-end' }}>
@@ -238,6 +259,8 @@ export default function Dashboard() {
                         {boulders.length === 0 && <p style={{ color: 'gray' }}>Não tens vias na parede. Adiciona uma em cima!</p>}
                     </div>
                 </div>
+            )}
+            </>
             )}
         </div>
     );

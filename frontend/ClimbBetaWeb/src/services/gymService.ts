@@ -45,8 +45,8 @@ export const createBoulder = (gymId: number, boulderData: CreateBoulderInput): P
 export interface GymUpdateRequest {
     name: string;
     address: string | null;
-    city: string; 
-    coverImageUrl: string | null; 
+    city: string;
+    coverImageUrl: string | null;
 }
 
 export const updateGym = async (gymId: number, gymData: GymUpdateRequest): Promise<Gym> => {
@@ -55,4 +55,19 @@ export const updateGym = async (gymId: number, gymData: GymUpdateRequest): Promi
         body: JSON.stringify(gymData),
     });
     return response;
+};
+
+export interface GymCreateData {
+    ownerId: number;
+    name: string;
+    address: string;
+    city: string;
+    coverImageUrl?: string;
+}
+
+export const createGym = (data: GymCreateData): Promise<Gym> => {
+    return apiFetch<Gym>('/gyms', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
 };
