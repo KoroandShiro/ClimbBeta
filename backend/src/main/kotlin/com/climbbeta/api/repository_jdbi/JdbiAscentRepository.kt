@@ -5,6 +5,10 @@ import com.climbbeta.api.repository.AscentRepository
 import org.jdbi.v3.core.Jdbi
 import org.springframework.stereotype.Repository
 import java.time.LocalDate
+import kotlin.collections.List
+import com.climbbeta.api.domain.FeedItem
+import java.sql.ResultSet
+
 
 @Repository
 class JdbiAscentRepository(private val jdbi: Jdbi) : AscentRepository {
@@ -60,4 +64,47 @@ class JdbiAscentRepository(private val jdbi: Jdbi) : AscentRepository {
                 .execute() > 0
         }
     }
+
+    override fun getFeedForClimber(climberId: Int): List<FeedItem> {
+        return jdbi.withHandle<List<FeedItem>, Exception> { handle ->
+            handle.createQuery(
+                """
+                SELECT 
+                    a.id, a.climber_id, a.boulder_id, a.outdoor_route_id,
+                    a.freelog_gym_name, a.freelog_grade, a.date, a.attempts, a.style, a.notes,
+                    u.username as author_username, 
+                    cp.avatar_url as author_avatar
+                FROM ascents a
+                JOIN follows_climber f ON f.followed_id = a.climber_id
+                JOIN users u ON u.id = a.climber_id
+                LEFT JOIN climber_profiles cp ON cp.user_id = u.id
+                WHERE f.follower_id = :climberId
+                ORDER BY a.date DESC
+                LIMIT 200
+                """
+            )
+                .bind("climberId", climberId)
+                .map { rs, _ ->
+                    val ascent = Ascent(
+                        id = rs.getInt("id"),
+                        climberId = rs.getInt("climber_id"),
+                        boulderId = rs.getObject("boulder_id")?.let { rs.getInt("boulder_id") },
+                        outdoorRouteId = rs.getObject("outdoor_route_id")?.let { rs.getInt("outdoor_route_id") },
+                        freelogGymName = rs.getString("freelog_gym_name"),
+                        freelogGrade = rs.getString("freelog_grade"),
+                        date = rs.getDate("date").toLocalDate(),
+                        attempts = rs.getInt("attempts"),
+                        style = rs.getString("style"),
+                        notes = rs.getString("notes")
+                    )
+                    FeedItem(
+                        ascent = ascent,
+                        authorUsername = rs.getString("author_username"),
+                        authorAvatarUrl = rs.getString("author_avatar")
+                    )
+                }
+                .list()
+        }
+    }
+
 }

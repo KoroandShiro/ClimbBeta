@@ -4,6 +4,8 @@ import com.climbbeta.api.domain.Ascent
 import com.climbbeta.api.repository.AscentRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import com.climbbeta.api.domain.FeedItem
+
 
 @Service
 class AscentService(private val ascentRepository: AscentRepository) {
@@ -31,4 +33,7 @@ class AscentService(private val ascentRepository: AscentRepository) {
     fun getAscentById(id: Int): Ascent? = ascentRepository.getById(id)
 
     fun removeAscent(id: Int, climberId: Int) = ascentRepository.delete(id, climberId)
+
+    fun getFeedForClimber(climberId: Int) = ascentRepository.getFeedForClimber(climberId)
+
 }
