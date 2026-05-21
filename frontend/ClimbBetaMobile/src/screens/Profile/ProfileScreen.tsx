@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Image,
   ActivityIndicator,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { getMyAscents, Ascent } from '../../services/ascentService';
@@ -21,38 +22,40 @@ export default function ProfileScreen({ navigation }: any) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let mounted = true;
+  useFocusEffect(
+      React.useCallback(() => {
+        let mounted = true;
 
-    async function load() {
-      setLoading(true);
-      setError(null);
+        async function load() {
+          setLoading(true);
+          setError(null);
 
-      try {
-        const [profileData, ascentsData] = await Promise.all([
-          getMyProfile(),
-          getMyAscents(),
-        ]);
+          try {
+            const [profileData, ascentsData] = await Promise.all([
+              getMyProfile(),
+              getMyAscents(),
+            ]);
 
-        if (!mounted) return;
+            if (!mounted) return;
 
-        setProfile(profileData);
-        setAscents(ascentsData ?? []);
-      } catch (err: any) {
-        console.error('Erro ao carregar perfil/logbook', err);
-        if (!mounted) return;
-        setError(err?.message ?? 'Erro ao carregar o perfil.');
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    }
+            setProfile(profileData);
+            setAscents(ascentsData ?? []);
+          } catch (err: any) {
+            console.error('Erro ao carregar perfil/logbook', err);
+            if (!mounted) return;
+            setError(err?.message ?? 'Erro ao carregar o perfil.');
+          } finally {
+            if (mounted) setLoading(false);
+          }
+        }
 
-    load();
+        load();
 
-    return () => {
-      mounted = false;
-    };
-  }, []);
+        return () => {
+          mounted = false;
+        };
+      }, [])
+  );
 
   if (loading) {
     return (
