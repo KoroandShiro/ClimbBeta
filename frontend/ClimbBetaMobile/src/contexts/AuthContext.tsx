@@ -15,9 +15,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        getStoredToken().then(stored => {
-            setToken(stored);
-            setIsLoading(false);
+        logout().then(() => {
+            getStoredToken().then(stored => {
+                setToken(stored);
+                setIsLoading(false);
+            });
         });
     }, []);
 

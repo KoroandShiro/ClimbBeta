@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -18,12 +19,13 @@ export default function ExploreScreen({ navigation }: any) {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadGyms = async () => {
-      try {
-        setIsLoading(true);
-        setErrorMsg(null);
-        const data = await getGyms();
+  useFocusEffect(
+    useCallback(() => {
+      const loadGyms = async () => {
+        try {
+          setIsLoading(true);
+          setErrorMsg(null);
+          const data = await getGyms();
         setGyms(data);
       } catch (error: any) {
         setErrorMsg(error?.message ?? 'Não foi possível carregar os ginásios.');
@@ -33,7 +35,7 @@ export default function ExploreScreen({ navigation }: any) {
     };
 
     loadGyms();
-  }, []);
+  }, []));
 
   const filteredGyms = useMemo(() => {
     const q = query.trim().toLowerCase();
