@@ -1,130 +1,164 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import { getFeed, FeedItem } from '../../services/ascentService';
 
-// Dados falsos (Mock Data) para gerar o Feed
-const FEED_POSTS = [
-  {
-    id: '1',
-    user: { name: 'Rúben Duarte', username: '@ruben_d', avatar: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' },
-    location: 'Vertical Wall',
-    time: 'Há 2 horas',
-    route: 'Vermelho Inclinado',
-    grade: 'V4',
-    style: 'Flash',
-    notes: 'Aquela presa no final escorregou um bocado, mas deu para segurar! 💪',
-    imageUrl: 'https://images.unsplash.com/photo-1522163182402-834f871fd851?auto=format&fit=crop&w=600&q=80',
-    likes: 12,
-  },
-  {
-    id: '2',
-    user: { name: 'Ana Silva', username: '@anaclimbs', avatar: 'https://cdn-icons-png.flaticon.com/512/4140/4140048.png' },
-    location: 'Sintra (Outdoor)',
-    time: 'Ontem',
-    route: 'O Grande Teto',
-    grade: '7a',
-    style: '3 Tentativas',
-    notes: 'Finalmente encadeei o meu projeto! A rocha estava perfeita hoje. 🧗‍♀️',
-    imageUrl: 'https://images.unsplash.com/photo-1522163182402-834f871fd851?auto=format&fit=crop&w=600&q=80',
-    likes: 34,
-  }
-];
+const { width } = Dimensions.get('window');
 
 export default function FeedScreen({ navigation }: any) {
+  const [feed, setFeed] = useState<FeedItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+      const loadFeed = async () => {
+        try {
+          setLoading(true);
+          setError(null);
+          const data = await getFeed();
+          if (isActive) setFeed(data);
+        } catch (err: any) {
+          if (isActive) setError(err?.message ?? 'Erro ao carregar o feed da comunidade.');
+        } finally {
+          if (isActive) setLoading(false);
+        }
+      };
+      loadFeed();
+      return () => { isActive = false; };
+    }, [])
+  );
+
   return (
-    <ScrollView style={styles.container}>
-      
-      {/* Cabeçalho da App (Feed) */}
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      {/* Cabeçalho Fixo */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>ClimbBeta</Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          {/* Lupa para pesquisar utilizadores */}
-          <TouchableOpacity onPress={() => navigation.navigate('UserSearch')} style={{ marginRight: 15 }}>
-            <Ionicons name="search" size={24} color="#333" />
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={() => navigation.navigate('UserSearch')}>
+          <Ionicons name="search" size={26} color="#111" />
+        </TouchableOpacity>
       </View>
 
+      {/* Estados */}
+      {loading && <View style={styles.centerContainer}><ActivityIndicator size="large" color="#2E7D32" /></View>}
+      {!loading && error && <View style={styles.centerContainer}><Text style={styles.errorText}>{error}</Text></View>}
+      {!loading && !error && feed.length === 0 && (
+        <View style={styles.centerContainer}>
+          <Text style={styles.emptyText}>O teu feed está vazio. Usa a pesquisa para seguires novos escaladores!</Text>
+        </View>
+      )}
+
       {/* Lista de Publicações */}
-      {FEED_POSTS.map((post) => (
-        <View key={post.id} style={styles.postCard}>
+      {!loading && !error && feed.map((post) => (
+        <View key={post.ascent.id} style={styles.postCard}>
           
-          {/* 1. Info do Utilizador */}
+          {/* 1. Cabeçalho do Post (SEM os 3 pontinhos) */}
           <View style={styles.postHeader}>
-            <Image source={{ uri: post.user.avatar }} style={styles.avatar} />
+            <Image 
+              source={{ uri: post.authorAvatarUrl ?? 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }} 
+              style={styles.avatar} 
+            />
             <View style={styles.userInfo}>
-              <Text style={styles.userName}>{post.user.name}</Text>
-              <Text style={styles.postTime}>{post.location} • {post.time}</Text>
-            </View>
-            <TouchableOpacity>
-              <Ionicons name="ellipsis-horizontal" size={20} color="#777" />
-            </TouchableOpacity>
-          </View>
-
-          {/* 2. Info da Subida (Grau e Estilo) */}
-          <View style={styles.ascentInfo}>
-            <Text style={styles.routeText}>
-              <Text style={{ fontWeight: 'bold' }}>{post.route}</Text> ({post.grade})
-            </Text>
-            <View style={styles.styleChip}>
-              <Text style={styles.styleText}>{post.style}</Text>
+              <Text style={styles.userName}>{post.authorUsername}</Text>
+              <Text style={styles.postLocation}>
+                {post.ascent.gymName ?? post.ascent.freelogGymName ?? 'Outdoor'}
+              </Text>
             </View>
           </View>
 
-          {/* 3. Notas / Descrição */}
-          <Text style={styles.notes}>{post.notes}</Text>
-
-          {/* 4. Imagem / Vídeo do Beta */}
-          <TouchableOpacity activeOpacity={0.9} onPress={() => navigation.navigate('AscentDetails')}>
-            <Image source={{ uri: post.imageUrl }} style={styles.postImage} />
+          {/* 2. Imagem Principal */}
+          <TouchableOpacity activeOpacity={0.9} onPress={() => navigation.navigate('AscentDetails', { ascentId: post.ascent.id })}>
+            <Image 
+              source={{ uri: post.postImageUrl ?? 'https://images.unsplash.com/photo-1522163182402-834f871fd851?auto=format&fit=crop&w=800&q=80' }} 
+              style={styles.postImage} 
+              resizeMode="cover"
+            />
           </TouchableOpacity>
 
-          {/* 5. Barra de Interação (Likes/Comments) */}
-          <View style={styles.interactionBar}>
-            <TouchableOpacity style={styles.interactionButton}>
-              <Ionicons name="heart-outline" size={24} color="#333" />
-              <Text style={styles.interactionText}>{post.likes}</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity style={styles.interactionButton}>
-              <Ionicons name="chatbubble-outline" size={22} color="#333" />
-              <Text style={styles.interactionText}>Comentar</Text>
+          {/* 3. Barra de Interações (Apenas Like, Comment e Save planeados na API) */}
+          <View style={styles.actionRow}>
+            <View style={styles.leftActions}>
+              <TouchableOpacity style={styles.actionButton}>
+                <Ionicons name="heart-outline" size={28} color="#111" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.actionButton}>
+                <Ionicons name="chatbubble-outline" size={26} color="#111" />
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity style={styles.saveButton}>
+              <Ionicons name="bookmark-outline" size={26} color="#111" />
             </TouchableOpacity>
           </View>
 
+          {/* 4. Detalhes (COM o Grau e Nome reias) */}
+          <View style={styles.postFooter}>
+            <Text style={styles.likesText}>0 gostos</Text>
+            
+            <View style={styles.detailsRow}>
+              <Text style={styles.boulderName}>
+                Via {post.routeName ?? 'Registada'}
+                {post.routeGrade ? <Text style={styles.gradeText}> ({post.routeGrade})</Text> : ''}
+              </Text>
+              {post.ascent.style && (
+                <View style={styles.styleChip}>
+                  <Text style={styles.styleText}>{post.ascent.style}</Text>
+                </View>
+              )}
+            </View>
+
+            {post.ascent.notes && (
+              <Text style={styles.captionText}>
+                <Text style={styles.captionUsername}>{post.authorUsername} </Text>
+                {post.ascent.notes}
+              </Text>
+            )}
+
+            <Text style={styles.dateText}>{new Date(post.ascent.date).toLocaleDateString('pt-PT')}</Text>
+          </View>
         </View>
       ))}
-      
-      {/* Espaço extra no fundo para não colar na Tab Bar */}
-      <View style={{ height: 20 }} /> 
+      <View style={{ height: 40 }} /> 
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f0f2f5' },
+  container: { flex: 1, backgroundColor: '#fff' },
+  centerContainer: { padding: 40, alignItems: 'center', justifyContent: 'center', flex: 1 },
+  errorText: { color: '#c62828', textAlign: 'center' },
+  emptyText: { color: '#666', textAlign: 'center', fontSize: 16, lineHeight: 24 },
   
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 15, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e0e0e0' },
-  headerTitle: { fontSize: 22, fontWeight: '900', color: '#2E7D32', fontStyle: 'italic' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 15, paddingVertical: 12, backgroundColor: '#fff', borderBottomWidth: 0.5, borderBottomColor: '#dbdbdb' },
+  headerTitle: { fontSize: 24, fontWeight: '700', color: '#111', fontStyle: 'italic' },
   
-  postCard: { backgroundColor: '#fff', marginTop: 10, paddingVertical: 15 },
+  postCard: { backgroundColor: '#fff', marginBottom: 15 },
   
-  postHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, marginBottom: 10 },
-  avatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#e0e0e0', marginRight: 10 },
-  userInfo: { flex: 1 },
-  userName: { fontSize: 16, fontWeight: 'bold', color: '#333' },
-  postTime: { fontSize: 12, color: '#777', marginTop: 2 },
+  postHeader: { flexDirection: 'row', alignItems: 'center', padding: 12 },
+  avatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#e0e0e0', marginRight: 10 },
+  userInfo: { flex: 1, justifyContent: 'center' },
+  userName: { fontSize: 14, fontWeight: '600', color: '#111' },
+  postLocation: { fontSize: 12, color: '#666', marginTop: 1 },
   
-  ascentInfo: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, marginBottom: 8 },
-  routeText: { fontSize: 16, color: '#333', flex: 1 },
-  styleChip: { backgroundColor: '#E8F5E9', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
-  styleText: { color: '#2E7D32', fontSize: 12, fontWeight: 'bold' },
+  postImage: { width: width, height: width, backgroundColor: '#fafafa' },
   
-  notes: { paddingHorizontal: 15, fontSize: 14, color: '#444', marginBottom: 12, lineHeight: 20 },
+  actionRow: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 12, paddingVertical: 10 },
+  leftActions: { flexDirection: 'row', alignItems: 'center' },
+  actionButton: { marginRight: 16 },
+  saveButton: { marginLeft: 'auto' },
   
-  postImage: { width: '100%', height: 350, backgroundColor: '#e0e0e0' },
+  postFooter: { paddingHorizontal: 15, paddingBottom: 10 },
+  likesText: { fontWeight: '600', fontSize: 14, color: '#111', marginBottom: 6 },
   
-  interactionBar: { flexDirection: 'row', paddingHorizontal: 15, paddingTop: 12, marginTop: 5 },
-  interactionButton: { flexDirection: 'row', alignItems: 'center', marginRight: 20 },
-  interactionText: { marginLeft: 6, fontSize: 14, color: '#555', fontWeight: '500' },
+  detailsRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },
+  boulderName: { fontSize: 15, fontWeight: '700', color: '#111', marginRight: 10 },
+  gradeText: { fontWeight: '700', color: '#2563EB' }, // Azul mais forte para o grau destacar
+  styleChip: { backgroundColor: '#E8F5E9', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4 },
+  styleText: { color: '#2E7D32', fontSize: 11, fontWeight: '700', textTransform: 'uppercase' },
+  
+  captionText: { fontSize: 14, color: '#111', lineHeight: 20 },
+  captionUsername: { fontWeight: '600' },
+  
+  dateText: { fontSize: 12, color: '#888', marginTop: 8 }
 });

@@ -20,7 +20,5 @@ interface AscentRepository {
     fun getByClimberId(climberId: Int): List<Ascent>
     fun getById(id: Int): Ascent?
     fun delete(id: Int, climberId: Int): Boolean
-
-    // Novo para o feed
     fun getFeedForClimber(climberId: Int): List<FeedItem>
 }

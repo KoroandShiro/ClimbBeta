@@ -21,7 +21,6 @@ export interface Ascent {
     attempts: number;
     style: string | null;
     notes: string | null;
-    // campos adicionais que o backend possa devolver
     boulderName?: string | null;
     gymName?: string | null;
 }
@@ -36,4 +35,18 @@ export async function logAscent(data: AscentInput): Promise<{ id: number }> {
 
 export async function getMyAscents(): Promise<Ascent[]> {
     return apiFetch<Ascent[]>('/ascents/me');
+}
+
+export interface FeedItem {
+    ascent: Ascent;
+    authorUsername: string;
+    authorAvatarUrl?: string | null;
+    postImageUrl?: string | null; 
+    routeName?: string | null;
+    routeGrade?: string | null;
+}
+
+// Nova função para ir buscar o feed
+export async function getFeed(): Promise<FeedItem[]> {
+    return apiFetch<FeedItem[]>('/feed');
 }
