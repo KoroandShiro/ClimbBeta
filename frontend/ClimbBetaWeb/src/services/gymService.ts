@@ -71,3 +71,14 @@ export const createGym = (data: GymCreateData): Promise<Gym> => {
         body: JSON.stringify(data),
     });
 };
+
+export interface UpdateBoulderStatusRequest {
+    isActive: boolean;
+}
+
+export const archiveBoulder = (boulderId: number): Promise<void> => {
+    return apiFetch(`/boulders/${boulderId}/status`, {
+        method: 'PUT',
+        body: JSON.stringify({ isActive: false }),
+    });
+};
