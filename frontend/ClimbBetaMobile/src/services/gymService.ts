@@ -28,3 +28,25 @@ export function getGyms(): Promise<Gym[]> {
 export function getActiveBoulders(gymId: number): Promise<Boulder[]> {
     return apiFetch<Boulder[]>(`/gyms/${gymId}/boulders`);
 }
+
+// Interface para o ranking
+export interface LeaderboardEntry {
+    climberId: number;
+    username: string;
+    avatarUrl: string | null;
+    attempts: number;
+    style: string;
+    date: string;
+}
+
+export function getBoulderById(boulderId: number): Promise<Boulder> {
+    return apiFetch<Boulder>(`/boulders/${boulderId}`);
+}
+
+export function getLeaderboard(boulderId: number): Promise<LeaderboardEntry[]> {
+    return apiFetch<LeaderboardEntry[]>(`/boulders/${boulderId}/leaderboard`);
+}
+
+export function saveProject(boulderId: number): Promise<void> {
+    return apiFetch<void>(`/boulders/${boulderId}/save`, { method: 'POST' });
+}
