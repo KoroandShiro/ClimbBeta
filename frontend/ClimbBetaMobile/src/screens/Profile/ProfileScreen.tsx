@@ -142,11 +142,18 @@ export default function ProfileScreen({ navigation }: any) {
           </TouchableOpacity>
         </View>
 
+        {/* Botão Editar Perfil */}
+        <TouchableOpacity style={styles.editProfileButton} onPress={() => navigation.navigate('EditProfile')}>
+          <Ionicons name="create-outline" size={18} color="#fff" />
+          <Text style={styles.editProfileButtonText}>Editar Perfil</Text>
+        </TouchableOpacity>
+
         {/* Logout */}
         <TouchableOpacity style={styles.logoutButton} onPress={logout}>
           <Ionicons name="log-out-outline" size={20} color="#c62828" />
           <Text style={styles.logoutText}>Terminar Sessão</Text>
         </TouchableOpacity>
+
 
         {/* Logbook */}
         <View style={styles.historySection}>
@@ -274,6 +281,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   actionSub: { fontSize: 12, color: '#777', marginTop: 4 },
+
+  editProfileButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: 16,
+    padding: 12,
+    backgroundColor: '#2E7D32',
+    borderRadius: 8,
+  },
+  editProfileButtonText: { color: '#fff', fontWeight: 'bold', marginLeft: 8 },
+
 
   logoutButton: {
     flexDirection: 'row',

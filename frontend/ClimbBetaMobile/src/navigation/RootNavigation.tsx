@@ -16,6 +16,7 @@ import ExploreScreen from '../screens/Explore/ExploreScreen';
 import LogbookEntryScreen from '../screens/Logbook/LogbookEntryScreen';
 import LogAscentScreen from '../screens/Logbook/LogAscentScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
+import EditProfileScreen from '../screens/Profile/EditProfileScreen'
 
 // Ecrãs Secundários
 import IndoorLogScreen from '../screens/Logbook/IndoorLogScreen';
@@ -76,13 +77,15 @@ function LogbookStackNavigator() {
 
 const ProfileStack = createNativeStackNavigator();
 function ProfileStackNavigator() {
-  return (
-    <ProfileStack.Navigator>
-      <ProfileStack.Screen name="MyProfile" component={ProfileScreen} options={{ title: 'O Meu Perfil' }} />
-      <ProfileStack.Screen name="MyProjects" component={MyProjectsScreen} options={{ title: 'Projetos Guardados' }} />
-    </ProfileStack.Navigator>
-  );
+    return (
+        <ProfileStack.Navigator>
+            <ProfileStack.Screen name="MyProfile" component={ProfileScreen} options={{ title: 'O Meu Perfil' }} />
+            <ProfileStack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Editar Perfil' }} />
+            <ProfileStack.Screen name="MyProjects" component={MyProjectsScreen} options={{ title: 'Projetos Guardados' }} />
+        </ProfileStack.Navigator>
+    );
 }
+
 
 function AppTabs() {
   return (
