@@ -69,4 +69,14 @@ class BoulderController(private val boulderService: BoulderService) {
             ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to e.message))
         }
     }
+
+    @GetMapping("/boulders/{boulderId}")
+    fun getBoulderById(@PathVariable boulderId: Int): ResponseEntity<Any> {
+        val boulder = boulderService.getBoulderById(boulderId)
+        return if (boulder != null) {
+            ResponseEntity.ok(boulder)
+        } else {
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "Via não encontrada."))
+        }
+    }
 }

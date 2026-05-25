@@ -61,4 +61,8 @@ class BoulderService(
 
         boulderRepository.updateBoulderStatus(boulderId, isActive)
     }
+
+    fun getBoulderById(boulderId: Int): Boulder? {
+        return boulderRepository.getBoulderById(boulderId)
+    }
 }
