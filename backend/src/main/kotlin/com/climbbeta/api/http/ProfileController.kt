@@ -27,12 +27,16 @@ class ProfileController(
 
         // 2. Se for um CLIMBER, devolvemos o perfil dele
         if (user.role == UserRole.CLIMBER) {
-            val profile = profileService.getClimberProfile(user.id)
+            val profile = profileService.getClimberProfileWithUser(user.id, user)
             return ResponseEntity.ok(profile)
         }
 
+        return ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
+            .body(mapOf("error" to "Apenas escaladores têm este tipo de perfi.l"))
+
         // (No futuro podemos adicionar o código para devolver o perfil do GYM_OWNER aqui)
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("error" to "Apenas escaladores têm este tipo de perfil."))
+        // return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("error" to "Apenas escaladores têm este tipo de perfil."))
     }
 
     @PutMapping("/me")

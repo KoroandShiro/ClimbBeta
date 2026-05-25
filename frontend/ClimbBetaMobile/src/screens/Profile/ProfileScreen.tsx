@@ -12,12 +12,15 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { getMyAscents, Ascent } from '../../services/ascentService';
-import { getMyProfile, Profile } from '../../services/profileService';
+import {
+  getMyProfile,
+  ClimberProfileWithUserDTO,
+} from '../../services/profileService';
 
 export default function ProfileScreen({ navigation }: any) {
   const { logout } = useAuth();
 
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useState<ClimberProfileWithUserDTO | null>(null);
   const [ascents, setAscents] = useState<Ascent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -85,12 +88,10 @@ export default function ProfileScreen({ navigation }: any) {
               }}
               style={styles.avatar}
           />
-          <Text style={styles.name}>
-            {profile?.name ?? profile?.username ?? 'Escalador'}
-          </Text>
-          <Text style={styles.username}>
-            @{profile?.username ?? 'username'}
-          </Text>
+
+          <Text style={styles.username}>{profile?.username || 'Carregando...'}</Text>
+          <Text style={styles.userHandle}>@{profile?.username || 'user'}</Text>
+
           {profile?.bio ? <Text style={styles.bio}>{profile.bio}</Text> : null}
         </View>
 
@@ -104,14 +105,18 @@ export default function ProfileScreen({ navigation }: any) {
           <View style={styles.statDivider} />
 
           <View style={styles.statBox}>
-            <Text style={styles.statNumber}>{profile?.maxGrade ?? '—'}</Text>
-            <Text style={styles.statLabel}>Grau Máx</Text>
+            <Text style={styles.statNumber}>
+              {profile?.height != null ? `${profile.height} cm` : '—'}
+            </Text>
+            <Text style={styles.statLabel}>Altura</Text>
           </View>
 
           <View style={styles.statDivider} />
 
           <View style={styles.statBox}>
-            <Text style={styles.statNumber}>{profile?.apeIndex ?? '—'}</Text>
+            <Text style={styles.statNumber}>
+              {profile?.apeIndex != null ? profile.apeIndex.toFixed(2) : '—'}
+            </Text>
             <Text style={styles.statLabel}>Ape Index</Text>
           </View>
         </View>
@@ -222,8 +227,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     backgroundColor: '#e0e0e0',
   },
-  name: { fontSize: 24, fontWeight: 'bold', color: '#333' },
-  username: { fontSize: 16, color: '#777', marginBottom: 5 },
+  username: { fontSize: 24, fontWeight: 'bold', color: '#333' },
+  userHandle: { fontSize: 16, color: '#777', marginBottom: 5 },
   bio: {
     fontSize: 15,
     color: '#555',

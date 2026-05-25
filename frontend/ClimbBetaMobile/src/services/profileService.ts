@@ -1,18 +1,15 @@
-// frontend/ClimbBetaMobile/src/services/profileService.ts
 import { apiFetch } from './api';
 
-export interface Profile {
-    id: number;
+export interface ClimberProfileWithUserDTO {
     userId: number;
-    maxGrade?: string | null;
-    apeIndex?: string | null;
-    // adicionar outros campos conforme o backend devolve
+    username: string;
+    email: string;
     bio?: string | null;
+    height?: number | null;
+    apeIndex?: number | null;
     avatarUrl?: string | null;
-    username?: string | null;
-    name?: string | null;
 }
 
-export async function getMyProfile(): Promise<Profile> {
-    return apiFetch<Profile>('/profiles/me');
+export async function getMyProfile(): Promise<ClimberProfileWithUserDTO> {
+    return apiFetch<ClimberProfileWithUserDTO>('/profiles/me');
 }
