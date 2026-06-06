@@ -1,11 +1,11 @@
 package com.climbbeta.api.services
 
-import com.climbbeta.api.domain.Token
 import com.climbbeta.api.domain.User
 import com.climbbeta.api.domain.UserRole
+import com.climbbeta.api.domain.UserStatus
+import com.climbbeta.api.repository.ActivationCodeRepository
 import com.climbbeta.api.repository.TokenRepository
 import com.climbbeta.api.repository.UserRepository
-import com.climbbeta.api.services.UserService
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,11 +26,14 @@ class UserServiceTests {
     @Mock
     private lateinit var tokenRepository: TokenRepository
 
+    @Mock
+    private lateinit var activationCodeRepository: ActivationCodeRepository
+
     private lateinit var userService: UserService
 
     @BeforeEach
     fun setup() {
-        userService = UserService(userRepository, tokenRepository)
+        userService = UserService(userRepository, tokenRepository, activationCodeRepository)
     }
 
     @Test
@@ -47,7 +50,7 @@ class UserServiceTests {
     fun `createUser deve criar utilizador com sucesso`() {
         `when`(userRepository.existsByEmail("novo@teste.com")).thenReturn(false)
         `when`(userRepository.existsByUsername("novo")).thenReturn(false)
-        
+
         val expectedUser = User(id = 1, username = "novo", email = "novo@teste.com", passwordHash = "hash", role = UserRole.CLIMBER)
         `when`(userRepository.createUser(any())).thenReturn(expectedUser)
 
@@ -69,15 +72,47 @@ class UserServiceTests {
 
     @Test
     fun `login deve gerar token com sucesso se a password for valida`() {
-        // Criamos um Hash verdadeiro para o teste passar no BCrypt.checkpw
         val realHash = BCrypt.hashpw("senhaCorreta", BCrypt.gensalt())
         val mockUser = User(id = 1, username = "user", email = "certo@teste.com", passwordHash = realHash, role = UserRole.CLIMBER)
 
         `when`(userRepository.getUserByEmail("certo@teste.com")).thenReturn(mockUser)
-        
+
         val token = userService.login("certo@teste.com", "senhaCorreta")
 
         assertNotNull(token)
         assertTrue(token.isNotEmpty())
+    }
+
+    @Test
+    fun `verifyActivationCode deve falhar com codigo invalido`() {
+        `when`(activationCodeRepository.getByCode("invalid-code")).thenReturn(null)
+
+        // Criamos um GYM_OWNER PENDING para passar pelas primeiras validações do método
+        val pendingOwner = User(id = 2, username = "owner", email = "o@test.com", passwordHash = "hash", role = UserRole.GYM_OWNER, status = UserStatus.PENDING)
+
+        // Corrigido para NoSuchElementException conforme o teu service
+        val exception = assertThrows<NoSuchElementException> {
+            userService.verifyActivationCode(pendingOwner, "invalid-code")
+        }
+        assertEquals("Código de ativação inválido.", exception.message)
+    }
+
+    @Test
+    fun `verifyActivationCode deve falhar com codigo ja usado`() {
+        val usedCode = com.climbbeta.api.domain.ActivationCode(
+            code = "used-code",
+            isUsed = true,
+            createdAt = java.time.LocalDateTime.now(),
+            usedBy = 1
+        )
+        `when`(activationCodeRepository.getByCode("used-code")).thenReturn(usedCode)
+
+        val pendingOwner = User(id = 2, username = "owner", email = "o@test.com", passwordHash = "hash", role = UserRole.GYM_OWNER, status = UserStatus.PENDING)
+
+        val exception = assertThrows<IllegalArgumentException> {
+            userService.verifyActivationCode(pendingOwner, "used-code")
+        }
+        // Mensagem corrigida para bater certo com a String do service
+        assertEquals("Este código já foi utilizado.", exception.message)
     }
 }
