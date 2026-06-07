@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:8080';
+export const BASE_URL = 'http://localhost:8080';
 
 // O <T> é um tipo genérico. Significa que quem chama a função decide o que ela devolve!
 export const apiFetch = async <T>(endpoint: string, options: RequestInit = {}): Promise<T> => {

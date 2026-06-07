@@ -47,6 +47,18 @@ export function getLeaderboard(boulderId: number): Promise<LeaderboardEntry[]> {
     return apiFetch<LeaderboardEntry[]>(`/boulders/${boulderId}/leaderboard`);
 }
 
-export function saveProject(boulderId: number): Promise<void> {
-    return apiFetch<void>(`/boulders/${boulderId}/save`, { method: 'POST' });
+// --- NOVOS ENDPOINTS DE SAVE / PROJECT ---
+
+// Substitui a que tens por esta (espera o JSON do backend):
+export function saveProject(boulderId: number): Promise<{ message: string }> {
+    return apiFetch<{ message: string }>(`/boulders/${boulderId}/save`, { method: 'POST' });
+}
+
+// Adiciona estas duas:
+export function unsaveProject(boulderId: number): Promise<{ message: string }> {
+    return apiFetch<{ message: string }>(`/boulders/${boulderId}/save`, { method: 'DELETE' });
+}
+
+export function checkSaveStatus(boulderId: number): Promise<{ isSaved: boolean }> {
+    return apiFetch<{ isSaved: boolean }>(`/boulders/${boulderId}/save-status`);
 }

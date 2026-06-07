@@ -85,4 +85,7 @@ class UserService(
         // 5. Devolver apenas a string ao utilizador
         return tokenString
     }
+
+    fun searchUsers(query: String, currentUserId: Int) =
+        userRepository.searchUsers(query, currentUserId)
 }

@@ -82,10 +82,13 @@ function ProfileStackNavigator() {
             <ProfileStack.Screen name="MyProfile" component={ProfileScreen} options={{ title: 'O Meu Perfil' }} />
             <ProfileStack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Editar Perfil' }} />
             <ProfileStack.Screen name="MyProjects" component={MyProjectsScreen} options={{ title: 'Projetos Guardados' }} />
+            
+            {/* Ecrãs partilhados inseridos diretamente nesta stack para evitar bloqueio do separador Explore */}
+            <ProfileStack.Screen name="BoulderDetails" component={BoulderDetailsScreen} options={{ title: 'Estatísticas da Via' }} />
+            <ProfileStack.Screen name="LogAscent" component={LogAscentScreen} options={{ title: 'Registar Subida' }} />
         </ProfileStack.Navigator>
     );
 }
-
 
 function AppTabs() {
   return (

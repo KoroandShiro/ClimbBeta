@@ -35,6 +35,7 @@ dependencies {
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("org.mindrot:jbcrypt:0.4")
+    implementation("io.minio:minio:8.6.0")
 
 	testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
     testImplementation("org.mockito:mockito-core:5.2.0")

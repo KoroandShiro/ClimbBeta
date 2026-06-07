@@ -2,6 +2,7 @@ package com.climbbeta.api.http
 
 import com.climbbeta.api.domain.User
 import com.climbbeta.api.domain.UserRole
+import com.climbbeta.api.repository_jdbi.JdbiSaveRepository
 import com.climbbeta.api.services.ProfileService
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
@@ -17,7 +18,8 @@ data class ProfileUpdateInput(
 @RestController
 @RequestMapping("/profiles")
 class ProfileController(
-    private val profileService: ProfileService
+    private val profileService: ProfileService,
+    private val saveRepository: JdbiSaveRepository
 ) {
 
     @GetMapping("/me")
@@ -49,5 +51,19 @@ class ProfileController(
         }
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("error" to "Apenas escaladores podem atualizar estes dados."))
+    }
+
+    @GetMapping("/me/projects")
+    fun getMySavedProjects(request: HttpServletRequest): ResponseEntity<Any> {
+        val user = request.getAttribute("authenticatedUser") as User
+
+        if (user.role == UserRole.CLIMBER) {
+            val projects = saveRepository.getSavedBoulders(user.id)
+            return ResponseEntity.ok(projects)
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
+            .body(mapOf("error" to "Apenas escaladores têm projetos guardados."))
     }
 }

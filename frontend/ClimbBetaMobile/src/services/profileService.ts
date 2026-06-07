@@ -26,3 +26,17 @@ export async function updateMyProfile(input: UpdateProfileInput): Promise<Climbe
         body: JSON.stringify(input),
     });
 }
+
+export interface SavedBoulderDTO {
+    id: number;
+    gymId: number;
+    color: string;
+    hexColor?: string;
+    grade: string;
+    setterName?: string;
+    imageUrl?: string | null;
+}
+
+export async function getMySavedProjects(): Promise<SavedBoulderDTO[]> {
+    return apiFetch<SavedBoulderDTO[]>('/profiles/me/projects');
+}

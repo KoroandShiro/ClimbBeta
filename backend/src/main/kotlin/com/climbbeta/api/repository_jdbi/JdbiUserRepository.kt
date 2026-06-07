@@ -9,6 +9,13 @@ import org.springframework.stereotype.Repository
 @Repository
 class JdbiUserRepository(private val jdbi: Jdbi) : UserRepository {
 
+    data class UserSearchDbModel(
+        val id: Int,
+        val username: String,
+        val avatarUrl: String?,
+        val isFollowing: Boolean
+    )
+
     override fun existsByEmail(email: String): Boolean {
         return jdbi.withHandle<Boolean, Exception> { handle ->
             handle.createQuery("SELECT COUNT(*) FROM users WHERE email = :email")
@@ -103,6 +110,28 @@ class JdbiUserRepository(private val jdbi: Jdbi) : UserRepository {
                 .bind("status", status.name)
                 .bind("id", userId)
                 .execute()
+        }
+    }
+
+    override fun searchUsers(query: String, currentUserId: Int): List<UserSearchDbModel> {
+        return jdbi.withHandle<List<UserSearchDbModel>, Exception> { handle ->
+            handle.createQuery(
+                """
+                SELECT 
+                    u.id, 
+                    u.username, 
+                    cp.avatar_url AS avatarUrl,
+                    EXISTS(SELECT 1 FROM follows_climber WHERE follower_id = :currentUserId AND followed_id = u.id) AS isFollowing
+                FROM users u
+                LEFT JOIN climber_profiles cp ON u.id = cp.user_id
+                WHERE u.username ILIKE :query AND u.id != :currentUserId AND u.role = 'CLIMBER'
+                LIMIT 20
+                """
+            )
+                .bind("query", "%$query%")
+                .bind("currentUserId", currentUserId)
+                .mapTo(UserSearchDbModel::class.java)
+                .list()
         }
     }
 

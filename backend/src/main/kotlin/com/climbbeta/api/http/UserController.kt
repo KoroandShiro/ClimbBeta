@@ -121,4 +121,20 @@ class UserController(
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to e.message))
         }
     }
+
+    @GetMapping("/search")
+    fun searchUsers(
+        @RequestParam q: String,
+        request: jakarta.servlet.http.HttpServletRequest
+    ): ResponseEntity<Any> {
+        val user = request.getAttribute("authenticatedUser") as? com.climbbeta.api.domain.User
+            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+
+        if (q.trim().length < 2) {
+            return ResponseEntity.ok(emptyList<Any>())
+        }
+
+        val results = userService.searchUsers(q, user.id)
+        return ResponseEntity.ok(results)
+    }
 }

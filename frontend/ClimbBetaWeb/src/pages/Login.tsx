@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom'; // <-- ADICIONADO O Link AQUI
 import { login as apiLogin } from '../services/authService';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -42,7 +42,7 @@ export default function Login() {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            style={{ width: '90%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
+                            style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc', boxSizing: 'border-box' }}
                             required
                         />
                     </div>
@@ -53,7 +53,7 @@ export default function Login() {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            style={{ width: '90%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
+                            style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc', boxSizing: 'border-box' }}
                             required
                         />
                     </div>
@@ -66,6 +66,15 @@ export default function Login() {
                         {isLoading ? 'A entrar...' : 'Entrar no Backoffice'}
                     </button>
                 </form>
+
+                {/* --- NOVA SECÇÃO DE REDIRECIONAMENTO PARA REGISTO --- */}
+                <div style={{ marginTop: '24px', textAlign: 'center', fontSize: '14px' }}>
+                    <span style={{ color: '#6b7280' }}>Ainda não tens uma conta de dono de ginásio? </span>
+                    <Link to="/register" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 'bold' }}>
+                        Cria conta aqui
+                    </Link>
+                </div>
+
             </div>
         </div>
     );

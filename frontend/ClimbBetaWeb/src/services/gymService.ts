@@ -1,6 +1,5 @@
-import { apiFetch } from './api';
+import { apiFetch, BASE_URL } from './api';
 
-// 1. Definimos os Tipos (As "Plantas" dos nossos objetos)
 export interface Gym {
     id: number;
     ownerId: number;
@@ -22,10 +21,8 @@ export interface Boulder {
     imageUrl: string | null;
 }
 
-// O Input para criar um Boulder novo (não precisa do ID nem do isActive)
 export type CreateBoulderInput = Omit<Boulder, 'id' | 'gymId' | 'isActive'>;
 
-// 2. Criamos as funções que o Dashboard vai usar
 export const getGyms = (): Promise<Gym[]> => {
     return apiFetch<Gym[]>('/gyms');
 };
@@ -40,7 +37,6 @@ export const createBoulder = (gymId: number, boulderData: CreateBoulderInput): P
         body: JSON.stringify(boulderData),
     });
 };
-
 
 export interface GymUpdateRequest {
     name: string;
@@ -81,4 +77,32 @@ export const archiveBoulder = (boulderId: number): Promise<void> => {
         method: 'PUT',
         body: JSON.stringify({ isActive: false }),
     });
+};
+
+// ---------------------------------------------------------
+// NOVA FUNÇÃO: UPLOAD PARA O MINIO (Corrigida com BASE_URL)
+// ---------------------------------------------------------
+export const uploadMedia = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    // Usa a chave exata que está no teu api.ts
+    const token = localStorage.getItem('climbbeta_token'); 
+    
+    // Forçamos o pedido para ir para o localhost:8080 em vez do localhost do Vite
+    const response = await fetch(`${BASE_URL}/media/upload`, {
+        method: 'POST',
+        headers: token ? {
+            'Authorization': `Bearer ${token}`
+        } : {},
+        body: formData,
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Falha ao fazer upload da imagem.');
+    }
+
+    const data = await response.json();
+    return data.url; 
 };

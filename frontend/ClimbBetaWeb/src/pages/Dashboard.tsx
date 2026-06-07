@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getGyms, getActiveBoulders, createBoulder, updateGym, archiveBoulder, type Gym, type Boulder } from '../services/gymService';
+import { getGyms, getActiveBoulders, createBoulder, updateGym, archiveBoulder, uploadMedia, type Gym, type Boulder } from '../services/gymService';
 import { useAuth } from '../contexts/AuthContext';
 import ActivationWallCard from '../components/ActivationWallCard';
 import CreateGymModal from '../components/CreateGymModal';
@@ -19,15 +19,20 @@ export default function Dashboard() {
     const [editAddress, setEditAddress] = useState('');
     const [editCity, setEditCity] = useState('');
     const [editImageUrl, setEditImageUrl] = useState('');
+    const [editCoverFile, setEditCoverFile] = useState<File | null>(null);
+    const [isUpdating, setIsUpdating] = useState(false);
 
-    // --- ESTADOS DAS VIAS (NOVO FORMULÁRIO PROFISSIONAL) ---
+    // --- ESTADOS DAS VIAS ---
     const [boulders, setBoulders] = useState<Boulder[]>([]);
     const [newColorName, setNewColorName] = useState('Vermelho');
     const [newHexColor, setNewHexColor] = useState('#EF4444');
     const [newGrade, setNewGrade] = useState('V0');
     const [newSetterName, setNewSetterName] = useState('');
     const [newSetDate, setNewSetDate] = useState(new Date().toISOString().split('T')[0]);
-    const [newImageUrl, setNewImageUrl] = useState('');
+    
+    // NOVO ESTADO: Substituímos o newImageUrl por newImageFile
+    const [newImageFile, setNewImageFile] = useState<File | null>(null);
+    const [isAddingBoulder, setIsAddingBoulder] = useState(false); // Loading state para o upload da via
     
     const [isLoading, setIsLoading] = useState(true);
 
@@ -39,7 +44,9 @@ export default function Dashboard() {
         try {
             setIsLoading(true);
             const lista = await getGyms();
-            setGyms(lista);
+            // Filtro local: Mostra apenas os ginásios deste Owner
+            const meusGinasios = lista.filter(gym => gym.ownerId === user?.id);
+            setGyms(meusGinasios);
         } catch (error) {
             console.error("Erro a carregar ginásios", error);
             handleLogout();
@@ -54,6 +61,7 @@ export default function Dashboard() {
         setEditAddress(gym.address || '');
         setEditCity(gym.city);
         setEditImageUrl(gym.coverImageUrl || '');
+        setEditCoverFile(null);
         setIsEditingGym(false);
 
         try {
@@ -67,46 +75,68 @@ export default function Dashboard() {
     const handleUpdateGym = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!selectedGym) return;
+        setIsUpdating(true);
 
         try {
+            let finalImageUrl = editImageUrl;
+
+            if (editCoverFile) {
+                finalImageUrl = await uploadMedia(editCoverFile);
+            }
+
             const updatedGym = await updateGym(selectedGym.id, {
                 name: editName,
                 address: editAddress,
                 city: editCity,
-                coverImageUrl: editImageUrl
+                coverImageUrl: finalImageUrl
             });
 
             setSelectedGym(updatedGym);
             setGyms(gyms.map(g => g.id === updatedGym.id ? updatedGym : g));
+            setEditImageUrl(finalImageUrl);
+            setEditCoverFile(null);
             setIsEditingGym(false);
             alert('Ginásio atualizado com sucesso!');
         } catch (error: any) {
             alert('Erro ao atualizar ginásio: ' + error.message);
+        } finally {
+            setIsUpdating(false);
         }
     };
 
     const handleAddBoulder = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!selectedGym) return;
+        
+        setIsAddingBoulder(true);
 
         try {
+            let finalImageUrl: string | undefined = undefined;
+
+            // Faz o upload da foto da via para o MinIO se o Owner tiver selecionado uma
+            if (newImageFile) {
+                finalImageUrl = await uploadMedia(newImageFile);
+            }
+
             const novoBoulder = await createBoulder(selectedGym.id, {
                 color: newColorName,
                 hexColor: newHexColor,
                 grade: newGrade,
                 setterName: newSetterName || null,
                 setDate: newSetDate,
-                imageUrl: newImageUrl || null
+                imageUrl: finalImageUrl || null
             });
 
             setBoulders([novoBoulder, ...boulders]);
             
             // Reset parcial para facilitar a criação em massa
             setNewGrade('V0');
-            setNewImageUrl('');
+            setNewImageFile(null); // Limpar a foto selecionada
             alert('Via adicionada à parede!');
         } catch (error: any) {
             alert('Erro ao adicionar via: ' + error.message);
+        } finally {
+            setIsAddingBoulder(false);
         }
     };
 
@@ -128,7 +158,6 @@ export default function Dashboard() {
 
     if (authLoading || isLoading) return <h2 style={{ textAlign: 'center', marginTop: '50px' }}>A carregar o teu Império... 🏢</h2>;
 
-    // Array de graus V0 a V17 para o dropdown
     const vGrades = Array.from({ length: 18 }, (_, i) => `V${i}`);
 
     return (
@@ -169,9 +198,16 @@ export default function Dashboard() {
                         <div style={{ display: 'grid', gap: '15px', marginTop: '20px' }}>
                             {gyms.map(gym => (
                                 <div key={gym.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px', backgroundColor: 'white', border: '1px solid #d1d5db', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-                                    <div>
-                                        <strong style={{ fontSize: '20px', display: 'block' }}>{gym.name}</strong>
-                                        <span style={{ color: '#6b7280', fontSize: '14px' }}>📍 {gym.address || 'Sem morada registada'}</span>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                        {gym.coverImageUrl ? (
+                                            <img src={gym.coverImageUrl} alt="Capa" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '6px' }} />
+                                        ) : (
+                                            <div style={{ width: '60px', height: '60px', backgroundColor: '#e5e7eb', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: '20px' }}>🏢</div>
+                                        )}
+                                        <div>
+                                            <strong style={{ fontSize: '20px', display: 'block' }}>{gym.name}</strong>
+                                            <span style={{ color: '#6b7280', fontSize: '14px' }}>📍 {gym.address || 'Sem morada registada'} - {gym.city}</span>
+                                        </div>
                                     </div>
                                     <button
                                         onClick={() => handleSelectGym(gym)}
@@ -195,31 +231,71 @@ export default function Dashboard() {
 
                     {/* --- CABEÇALHO DO GINÁSIO --- */}
                     <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '8px', border: '1px solid #e5e7eb', marginBottom: '30px' }}>
+                        
                         {!isEditingGym ? (
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                <div>
-                                    <h2 style={{ fontSize: '28px', margin: '0 0 10px 0' }}>{selectedGym.name}</h2>
-                                    <p style={{ color: '#4b5563', margin: '0 0 5px 0' }}><strong>Morada:</strong> {selectedGym.address || 'Não definida'}</p>
-                                    <p style={{ color: '#4b5563', margin: '0' }}><strong>Cidade:</strong> {selectedGym.city}</p>
+                            <>
+                                {selectedGym.coverImageUrl && (
+                                    <img 
+                                        src={selectedGym.coverImageUrl} 
+                                        alt={`Capa de ${selectedGym.name}`} 
+                                        style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '6px', marginBottom: '20px' }} 
+                                    />
+                                )}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                    <div>
+                                        <h2 style={{ fontSize: '28px', margin: '0 0 10px 0' }}>{selectedGym.name}</h2>
+                                        <p style={{ color: '#4b5563', margin: '0 0 5px 0' }}><strong>Morada:</strong> {selectedGym.address || 'Não definida'}</p>
+                                        <p style={{ color: '#4b5563', margin: '0' }}><strong>Cidade:</strong> {selectedGym.city}</p>
+                                    </div>
+                                    <button onClick={() => setIsEditingGym(true)} style={{ padding: '8px 16px', backgroundColor: '#f59e0b', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                                        ✏️ Editar Dados
+                                    </button>
                                 </div>
-                                <button onClick={() => setIsEditingGym(true)} style={{ padding: '8px 16px', backgroundColor: '#f59e0b', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                                    ✏️ Editar Dados
-                                </button>
-                            </div>
+                            </>
                         ) : (
-                            // (O formulário de edição do ginásio manteve-se inalterado)
+                            // MODO EDIÇÃO
                             <form onSubmit={handleUpdateGym} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                                {/* ... [Código de edição omitido por brevidade mas funcional] ... */}
                                 <h3>Editar Detalhes do Ginásio</h3>
+                                
                                 <div>
                                     <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '5px' }}>Nome do Ginásio</label>
-                                    <input required value={editName} onChange={e => setEditName(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db', borderRadius: '4px' }} />
+                                    <input required value={editName} onChange={e => setEditName(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db', borderRadius: '4px', boxSizing: 'border-box' }} />
                                 </div>
+
+                                <div>
+                                    <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '5px' }}>Morada</label>
+                                    <input required value={editAddress} onChange={e => setEditAddress(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db', borderRadius: '4px', boxSizing: 'border-box' }} />
+                                </div>
+
+                                <div>
+                                    <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '5px' }}>Cidade</label>
+                                    <input required value={editCity} onChange={e => setEditCity(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db', borderRadius: '4px', boxSizing: 'border-box' }} />
+                                </div>
+
+                                <div>
+                                    <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '5px' }}>Alterar Imagem de Fundo</label>
+                                    {editImageUrl && !editCoverFile && (
+                                        <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '5px' }}>Já tens uma imagem. Fazer upload irá substituí-la.</p>
+                                    )}
+                                    <input 
+                                        type="file" 
+                                        accept="image/*"
+                                        onChange={e => {
+                                            if (e.target.files && e.target.files.length > 0) {
+                                                setEditCoverFile(e.target.files[0]);
+                                            } else {
+                                                setEditCoverFile(null);
+                                            }
+                                        }}
+                                        style={{ width: '100%', padding: '8px', border: '1px dashed #d1d5db', borderRadius: '4px', boxSizing: 'border-box' }} 
+                                    />
+                                </div>
+
                                 <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                                    <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
-                                        💾 Guardar
+                                    <button type="submit" disabled={isUpdating} style={{ padding: '10px 20px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '4px', cursor: isUpdating ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}>
+                                        {isUpdating ? 'A processar...' : '💾 Guardar'}
                                     </button>
-                                    <button type="button" onClick={() => setIsEditingGym(false)} style={{ padding: '10px 20px', backgroundColor: '#9ca3af', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                                    <button type="button" onClick={() => { setIsEditingGym(false); setEditCoverFile(null); }} style={{ padding: '10px 20px', backgroundColor: '#9ca3af', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
                                         Cancelar
                                     </button>
                                 </div>
@@ -227,7 +303,7 @@ export default function Dashboard() {
                         )}
                     </div>
 
-                    {/* --- ZONA DA PAREDE (NOVO FORMULÁRIO) --- */}
+                    {/* --- ZONA DA PAREDE --- */}
                     <div style={{ backgroundColor: '#f9fafb', padding: '25px', borderRadius: '8px', border: '1px solid #e5e7eb', marginBottom: '30px' }}>
                         <h3 style={{ marginTop: 0, marginBottom: '20px', color: '#1f2937' }}>➕ Adicionar Nova Via à Parede</h3>
                         
@@ -269,14 +345,32 @@ export default function Dashboard() {
                                 <input type="text" placeholder="Ex: João Silva" value={newSetterName} onChange={e => setNewSetterName(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db', borderRadius: '4px' }} />
                             </div>
 
+                            {/* --- NOVO INPUT DE FICHEIRO PARA A VIA --- */}
                             <div>
-                                <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', color: '#374151', marginBottom: '5px' }}>URL da Fotografia Oficial</label>
-                                <input type="url" placeholder="https://..." value={newImageUrl} onChange={e => setNewImageUrl(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db', borderRadius: '4px' }} />
+                                <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', color: '#374151', marginBottom: '5px' }}>Fotografia da Via (Opcional)</label>
+                                <input 
+                                    type="file" 
+                                    accept="image/*"
+                                    onChange={e => {
+                                        if (e.target.files && e.target.files.length > 0) {
+                                            setNewImageFile(e.target.files[0]);
+                                        } else {
+                                            setNewImageFile(null);
+                                        }
+                                    }}
+                                    // Adicionada uma key associada ao estado para forçar o input a limpar quando o state faz reset
+                                    key={newImageFile ? 'has-file' : 'empty'}
+                                    style={{ width: '100%', padding: '8px', border: '1px dashed #d1d5db', borderRadius: '4px', backgroundColor: '#f9fafb', boxSizing: 'border-box' }} 
+                                />
                             </div>
 
                             <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-                                <button type="submit" style={{ padding: '12px 24px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '15px' }}>
-                                    ✅ Publicar Via
+                                <button 
+                                    type="submit" 
+                                    disabled={isAddingBoulder}
+                                    style={{ padding: '12px 24px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '6px', cursor: isAddingBoulder ? 'not-allowed' : 'pointer', fontWeight: 'bold', fontSize: '15px' }}
+                                >
+                                    {isAddingBoulder ? '⏳ A processar imagem...' : '✅ Publicar Via'}
                                 </button>
                             </div>
                         </form>

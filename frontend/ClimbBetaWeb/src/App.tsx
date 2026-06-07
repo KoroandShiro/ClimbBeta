@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import type { JSX } from 'react';
+import Register from './pages/Register';
 
 // --- O GUARDIÃO DE ROTAS ---
 // Este componente abraça a Dashboard. Se o Owner não tiver token, é expulso para o Login.
@@ -23,6 +24,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           
           {/* A rota dos ginásios agora está PROTEGIDA */}
           <Route 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { createGym } from '../services/gymService';
+import { createGym, uploadMedia } from '../services/gymService';
 import { useAuth } from '../contexts/AuthContext';
 
 interface Props {
@@ -12,7 +12,7 @@ export default function CreateGymModal({ onCreated, onClose }: Props) {
     const [name, setName] = useState('');
     const [address, setAddress] = useState('');
     const [city, setCity] = useState('');
-    const [coverImageUrl, setCoverImageUrl] = useState('');
+    const [coverFile, setCoverFile] = useState<File | null>(null); // Estado alterado para ficheiro
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -21,14 +21,24 @@ export default function CreateGymModal({ onCreated, onClose }: Props) {
         if (!user) return;
         setError('');
         setIsLoading(true);
+
         try {
+            let finalImageUrl: string | undefined = undefined;
+
+            // 1. Se o utilizador escolheu uma foto, fazemos o upload para o MinIO primeiro
+            if (coverFile) {
+                finalImageUrl = await uploadMedia(coverFile);
+            }
+
+            // 2. Criamos o ginásio usando o URL devolvido pelo backend (se existir)
             await createGym({
                 ownerId: user.id,
                 name,
                 address,
                 city,
-                coverImageUrl: coverImageUrl || undefined,
+                coverImageUrl: finalImageUrl,
             });
+            
             onCreated();
         } catch (err: any) {
             setError(err.message || 'Erro ao criar ginásio. Tenta novamente.');
@@ -82,25 +92,33 @@ export default function CreateGymModal({ onCreated, onClose }: Props) {
                             style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db', borderRadius: '6px', boxSizing: 'border-box' }}
                         />
                     </div>
+                    
+                    {/* Campo de Upload de Ficheiro */}
                     <div>
                         <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '6px' }}>
-                            URL da Imagem de Capa{' '}
-                            <span style={{ fontWeight: 'normal', color: '#6b7280' }}>(opcional)</span>
+                            Imagem de Capa <span style={{ fontWeight: 'normal', color: '#6b7280' }}>(opcional)</span>
                         </label>
                         <input
-                            value={coverImageUrl}
-                            onChange={e => setCoverImageUrl(e.target.value)}
-                            placeholder="https://exemplo.com/foto.jpg"
-                            style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db', borderRadius: '6px', boxSizing: 'border-box' }}
+                            type="file"
+                            accept="image/*"
+                            onChange={e => {
+                                if (e.target.files && e.target.files.length > 0) {
+                                    setCoverFile(e.target.files[0]);
+                                } else {
+                                    setCoverFile(null);
+                                }
+                            }}
+                            style={{ width: '100%', padding: '8px', border: '1px dashed #d1d5db', borderRadius: '6px', boxSizing: 'border-box', backgroundColor: '#f9fafb' }}
                         />
                     </div>
+
                     <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
                         <button
                             type="submit"
                             disabled={isLoading}
                             style={{ flex: 1, padding: '12px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: isLoading ? 'not-allowed' : 'pointer' }}
                         >
-                            {isLoading ? 'A criar...' : 'Criar Ginásio'}
+                            {isLoading ? 'A guardar...' : 'Criar Ginásio'}
                         </button>
                         <button
                             type="button"

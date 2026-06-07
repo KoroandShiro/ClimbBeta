@@ -12,6 +12,14 @@ export interface UserProfile {
     status: 'PENDING' | 'VERIFIED';
 }
 
+export const register = async (username: string, email: string, passwordRaw: string, role: string): Promise<UserProfile> => {
+    const data = await apiFetch<UserProfile>('/users/register', {
+        method: 'POST',
+        body: JSON.stringify({ username, email, passwordRaw, role }),
+    });
+    return data;
+};
+
 export const login = async (email: string, passwordRaw: string): Promise<string> => {
     const data = await apiFetch<LoginResponse>('/users/login', {
         method: 'POST',
