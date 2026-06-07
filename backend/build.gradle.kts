@@ -36,6 +36,9 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("org.mindrot:jbcrypt:0.4")
 
+	// === ADICIONADO: GERADOR AUTOMÁTICO DO SWAGGER/OPENAPI ===
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5")
+
 	testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
     testImplementation("org.mockito:mockito-core:5.2.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
