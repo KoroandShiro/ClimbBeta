@@ -11,6 +11,7 @@ import java.util.UUID
 class MediaService(
     private val minioClient: MinioClient,
     @Value("\${minio.endpoint}") private val endpoint: String,
+    @Value("\${minio.public-url}") private val publicUrl: String,
     @Value("\${minio.bucket-name}") private val bucketName: String
 ) {
     fun uploadMedia(file: MultipartFile): String {
@@ -39,7 +40,7 @@ class MediaService(
             )
 
             // Construir e devolver o URL público para guardar no PostgreSQL
-            return "$endpoint/$bucketName/$fileName"
+            return "$publicUrl/$bucketName/$fileName"
 
         } catch (e: Exception) {
             // Lançar exceção para ser apanhada pelo ExceptionHandler global ou Controller
