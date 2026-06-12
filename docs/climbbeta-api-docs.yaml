@@ -1,0 +1,709 @@
+openapi: 3.1.0
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+paths:
+  /profiles/me:
+    get:
+      tags:
+      - profile-controller
+      operationId: getMyProfile
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+    put:
+      tags:
+      - profile-controller
+      operationId: updateMyProfile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileUpdateInput"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /gyms/{id}:
+    get:
+      tags:
+      - gym-controller
+      operationId: getGymById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+    put:
+      tags:
+      - gym-controller
+      operationId: updateGym
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GymUpdateInputModel"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /boulders/{boulderId}/status:
+    put:
+      tags:
+      - boulder-controller
+      operationId: updateBoulderStatus
+      parameters:
+      - name: boulderId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BoulderStatusInput"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /users/verify-code:
+    post:
+      tags:
+      - user-controller
+      operationId: verifyCode
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyCodeInputModel"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /users/register:
+    post:
+      tags:
+      - user-controller
+      operationId: registerUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreateInputModel"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /users/login:
+    post:
+      tags:
+      - user-controller
+      operationId: loginUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserLoginInputModel"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /outdoor-routes:
+    get:
+      tags:
+      - outdoor-route-controller
+      operationId: getAllRoutes
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OutdoorRoute"
+    post:
+      tags:
+      - outdoor-route-controller
+      operationId: createRoute
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OutdoorRouteCreateInput"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+  /gyms:
+    get:
+      tags:
+      - gym-controller
+      operationId: getGyms
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+    post:
+      tags:
+      - gym-controller
+      operationId: createGym
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GymCreateInputModel"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /gyms/{gymId}/boulders:
+    get:
+      tags:
+      - boulder-controller
+      operationId: getGymBoulders
+      parameters:
+      - name: gymId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+    post:
+      tags:
+      - boulder-controller
+      operationId: createBoulder
+      parameters:
+      - name: gymId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BoulderCreateInput"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /climbers/{id}/follow:
+    post:
+      tags:
+      - social-controller
+      operationId: follow
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content: {}
+    delete:
+      tags:
+      - social-controller
+      operationId: unfollow
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content: {}
+  /boulders/{id}/save:
+    post:
+      tags:
+      - gamification-controller
+      operationId: saveBoulder
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content: {}
+    delete:
+      tags:
+      - gamification-controller
+      operationId: unsaveBoulder
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content: {}
+  /ascents:
+    post:
+      tags:
+      - ascent-controller
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AscentInputModel"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+  /ascents/{id}/like:
+    post:
+      tags:
+      - gamification-controller
+      operationId: likeAscent
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content: {}
+    delete:
+      tags:
+      - gamification-controller
+      operationId: unlikeAscent
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content: {}
+  /admin/codes:
+    get:
+      tags:
+      - admin-controller
+      operationId: listCodes
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+    post:
+      tags:
+      - admin-controller
+      operationId: generateCode
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /users/me:
+    get:
+      tags:
+      - user-controller
+      operationId: getMyProfile_1
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /projects/me:
+    get:
+      tags:
+      - gamification-controller
+      operationId: getSavedBoulders
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /outdoor-routes/{id}:
+    get:
+      tags:
+      - outdoor-route-controller
+      operationId: getRouteById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/OutdoorRoute"
+  /feed:
+    get:
+      tags:
+      - social-controller
+      operationId: getFeed
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /boulders/{id}/leaderboard:
+    get:
+      tags:
+      - gamification-controller
+      operationId: getLeaderboard
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /boulders/{boulderId}:
+    get:
+      tags:
+      - boulder-controller
+      operationId: getBoulderById
+      parameters:
+      - name: boulderId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /ascents/{id}:
+    get:
+      tags:
+      - ascent-controller
+      operationId: getById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Ascent"
+    delete:
+      tags:
+      - ascent-controller
+      operationId: delete
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content: {}
+  /ascents/me:
+    get:
+      tags:
+      - ascent-controller
+      operationId: getMyLog
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ascent"
+components:
+  schemas:
+    ProfileUpdateInput:
+      type: object
+      properties:
+        bio:
+          type: string
+        height:
+          type: integer
+          format: int32
+        apeIndex:
+          type: number
+          format: double
+    GymUpdateInputModel:
+      type: object
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        coverImageUrl:
+          type: string
+    BoulderStatusInput:
+      type: object
+      properties:
+        active:
+          type: boolean
+    VerifyCodeInputModel:
+      type: object
+      properties:
+        code:
+          type: string
+    UserCreateInputModel:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        passwordRaw:
+          type: string
+        role:
+          type: string
+          enum:
+          - ADMIN
+          - CLIMBER
+          - GYM_OWNER
+    UserLoginInputModel:
+      type: object
+      properties:
+        email:
+          type: string
+        passwordRaw:
+          type: string
+    OutdoorRouteCreateInput:
+      type: object
+      properties:
+        name:
+          type: string
+        sector:
+          type: string
+        location:
+          type: string
+        grade:
+          type: string
+    GymCreateInputModel:
+      type: object
+      properties:
+        ownerId:
+          type: integer
+          format: int32
+        name:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        coverImageUrl:
+          type: string
+    BoulderCreateInput:
+      type: object
+      properties:
+        color:
+          type: string
+        hexColor:
+          type: string
+        grade:
+          type: string
+        setterName:
+          type: string
+        setDate:
+          type: string
+          format: date
+        imageUrl:
+          type: string
+    AscentInputModel:
+      type: object
+      properties:
+        boulderId:
+          type: integer
+          format: int32
+        outdoorRouteId:
+          type: integer
+          format: int32
+        freelogGymName:
+          type: string
+        freelogGrade:
+          type: string
+        date:
+          type: string
+          format: date
+        attempts:
+          type: integer
+          format: int32
+        style:
+          type: string
+        notes:
+          type: string
+    OutdoorRoute:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        creatorId:
+          type: integer
+          format: int32
+        name:
+          type: string
+        sector:
+          type: string
+        location:
+          type: string
+        grade:
+          type: string
+    Ascent:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        climberId:
+          type: integer
+          format: int32
+        boulderId:
+          type: integer
+          format: int32
+        outdoorRouteId:
+          type: integer
+          format: int32
+        freelogGymName:
+          type: string
+        freelogGrade:
+          type: string
+        date:
+          type: string
+          format: date
+        attempts:
+          type: integer
+          format: int32
+        style:
+          type: string
+        notes:
+          type: string

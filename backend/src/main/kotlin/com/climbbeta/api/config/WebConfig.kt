@@ -17,7 +17,13 @@ class WebConfig(
             .excludePathPatterns(   // ... EXCETO estas!
                 "/users/register",
                 "/users/login",
-                "/error"
+                "/error",
+
+                // === ADICIONADO: LIBERTAR O SWAGGER DA AUTENTICAÇÃO ===
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                "/v3/api-docs.yaml",
+                "/swagger-ui.html"
             )
     }
 
