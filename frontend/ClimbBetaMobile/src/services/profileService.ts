@@ -11,6 +11,7 @@ export interface ClimberProfileWithUserDTO {
 }
 
 export interface UpdateProfileInput {
+    username?: string | null;
     bio?: string | null;
     height?: number | null;
     apeIndex?: number | null;

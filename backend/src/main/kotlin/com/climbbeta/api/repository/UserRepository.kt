@@ -12,4 +12,5 @@ interface UserRepository {
     fun getUserById(id: Int): User?
     fun updateUserStatus(userId: Int, status: UserStatus)
     fun searchUsers(query: String, currentUserId: Int): List<JdbiUserRepository.UserSearchDbModel>
+    fun updateUsername(userId: Int, username: String)
 }

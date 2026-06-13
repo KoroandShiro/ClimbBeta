@@ -26,6 +26,8 @@ export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): 
         headers.set('Authorization', `Bearer ${token}`);
     }
 
+    console.log("A tentar chamar o URL:", `${BASE_URL}${endpoint}`);
+
     const response = await fetch(`${BASE_URL}${endpoint}`, {
         ...options,
         headers,

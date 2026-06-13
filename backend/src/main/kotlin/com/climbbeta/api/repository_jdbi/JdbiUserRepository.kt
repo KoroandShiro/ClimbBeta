@@ -135,4 +135,13 @@ class JdbiUserRepository(private val jdbi: Jdbi) : UserRepository {
         }
     }
 
+    override fun updateUsername(userId: Int, username: String) {
+        jdbi.withHandle<Unit, Exception> { handle ->
+            handle.createUpdate("UPDATE users SET username = :username WHERE id = :id")
+                .bind("username", username)
+                .bind("id", userId)
+                .execute()
+        }
+    }
+
 }

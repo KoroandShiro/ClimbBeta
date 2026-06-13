@@ -29,6 +29,9 @@ export default function LoginScreen({ navigation }: any) {
         try {
             await login(email.trim(), password);
         } catch (e) {
+
+            console.error("ERRO REAL APANHADO NO LOGIN:", e);
+
             if (e instanceof ApiError && e.status === 401) {
                 setError('Email ou palavra-passe incorretos.');
             } else {

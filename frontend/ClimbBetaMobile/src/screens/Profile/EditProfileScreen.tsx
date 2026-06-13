@@ -22,6 +22,7 @@ export default function EditProfileScreen() {
     const [profile, setProfile] = useState<ClimberProfileWithUserDTO | null>(null);
     const [loading, setLoading] = useState(true);
 
+    const [username, setUsername] = useState<string>('');
     const [bio, setBio] = useState<string>('');
     const [height, setHeight] = useState<string>('');
     const [apeIndex, setApeIndex] = useState<string>('');
@@ -36,6 +37,7 @@ export default function EditProfileScreen() {
                 const p = await getMyProfile();
                 if (!mounted) return;
                 setProfile(p);
+                setUsername(p.username ?? '');
                 setBio(p.bio ?? '');
                 setHeight(p.height != null ? String(p.height) : '');
                 setApeIndex(p.apeIndex != null ? String(p.apeIndex) : '');
@@ -51,8 +53,14 @@ export default function EditProfileScreen() {
     }, []);
 
     async function onSave() {
+        // --- VALIDAÇÃO DO USERNAME ---
+        if (username.trim().length < 3) {
+            Alert.alert('Username inválido', 'O username deve ter pelo menos 3 caracteres.');
+            return;
+        }
         const heightVal = height.trim() === '' ? null : Number(height);
-        const apeVal = apeIndex.trim() === '' ? null : Number(apeIndex);
+        const normalizedApe = apeIndex.trim().replace(',', '.');
+        const apeVal = normalizedApe === '' ? null : Number(normalizedApe);
 
         if (heightVal != null && (Number.isNaN(heightVal) || heightVal <= 0)) {
             Alert.alert('Altura inválida', 'Introduz uma altura válida em cm.');
@@ -66,6 +74,7 @@ export default function EditProfileScreen() {
         setSaving(true);
         try {
             await updateMyProfile({
+                username: username.trim(),
                 bio: bio.trim() === '' ? null : bio.trim(),
                 height: heightVal,
                 apeIndex: apeVal,
@@ -76,7 +85,14 @@ export default function EditProfileScreen() {
             navigation.goBack();
         } catch (err: any) {
             console.error('Erro ao guardar perfil', err);
-            Alert.alert('Erro', err?.message ?? 'Falha ao guardar perfil.');
+
+            // Procura a mensagem de erro específica enviada pelo Spring Boot (400 Bad Request)
+            const serverMessage = err?.response?.data?.error;
+
+            Alert.alert(
+                'Erro ao guardar',
+                serverMessage ?? err?.message ?? 'Falha ao guardar perfil.'
+            );
         } finally {
             setSaving(false);
         }
@@ -95,7 +111,15 @@ export default function EditProfileScreen() {
             <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
                 <View style={styles.formSection}>
                     <Text style={styles.label}>Username</Text>
-                    <Text style={styles.value}>{profile?.username ?? ''}</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="O teu nome de utilizador"
+                        value={username}
+                        onChangeText={setUsername}
+                        editable={!saving}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                    />
 
                     <Text style={styles.label}>Email</Text>
                     <Text style={styles.value}>{profile?.email ?? ''}</Text>
@@ -124,7 +148,7 @@ export default function EditProfileScreen() {
                     <TextInput
                         style={styles.input}
                         placeholder="Ex: 1.04"
-                        keyboardType="numeric"
+                        keyboardType="decimal-pad"
                         value={apeIndex}
                         onChangeText={setApeIndex}
                         editable={!saving}
@@ -161,6 +185,7 @@ const styles = StyleSheet.create({
         padding: 10,
         marginTop: 8,
         backgroundColor: '#fff',
+        color: '#333',
     },
 
     buttonsRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 },

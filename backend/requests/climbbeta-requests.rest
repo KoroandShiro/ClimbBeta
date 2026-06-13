@@ -1,0 +1,555 @@
+### =========================================================================
+### NOTA: Sempre que fizeres um Login, copia o token da resposta
+### e substitui nos cabeçalhos 'Authorization: Bearer ...' correspondentes.
+### =========================================================================
+
+### =========================================================================
+### FASE 1: IDENTIDADE (CRIAR CONTAS)
+### =========================================================================
+
+### 1.1 Registar Dono do Ginásio
+POST http://localhost:8080/users/register
+Content-Type: application/json
+
+{
+    "username": "admin1_climbup",
+    "email": "owner@climbup.pt",
+    "passwordRaw": "admin123",
+    "role": "GYM_OWNER"
+}
+
+### 1.2 Registar Escalador 1 (Koro)
+POST http://localhost:8080/users/register
+Content-Type: application/json
+
+{
+    "username": "koro_climbs",
+    "email": "koro@isel.pt",
+    "passwordRaw": "koro123",
+    "role": "CLIMBER"
+}
+
+### 1.3 Registar Escalador 2 (Mario)
+POST http://localhost:8080/users/register
+Content-Type: application/json
+
+{
+    "username": "mario_boulders",
+    "email": "mario@isel.pt",
+    "passwordRaw": "mario123",
+    "role": "CLIMBER"
+}
+
+### -------------------------------------------------------------------------
+### LOGINS (GERAR TOKENS)
+### -------------------------------------------------------------------------
+
+### 1.4 Login Owner -> COPIA ESTE TOKEN PARA O PASSO 2
+POST http://localhost:8080/users/login
+Content-Type: application/json
+
+{
+    "email": "owner@climbup.pt",
+    "passwordRaw": "admin123"
+}
+
+### 1.5 Login Climber (Koro) -> COPIA ESTE TOKEN PARA O PASSO 3
+POST http://localhost:8080/users/login
+Content-Type: application/json
+
+{
+    "email": "koro@isel.pt",
+    "passwordRaw": "koro123"
+}
+
+
+### =========================================================================
+### FASE 2: ECOSSISTEMA INDOOR (USAR O TOKEN DO OWNER)
+### =========================================================================
+
+### 2.1 Criar o Ginásio (Climb Up)
+POST http://localhost:8080/gyms
+Authorization: Bearer e585170b-52a8-4f3a-9b8a-3d0d81932f6c
+Content-Type: application/json
+
+{
+    "ownerId": 3,
+    "name": "Vertigo Marvilla",
+    "address": "Braço de Prata, 4",
+    "city": "Lisboa",
+    "coverImageUrl": "https://imgur.com/foto-ginasio.jpg"
+}
+
+### 2.2 Criar Boulder 1 (Amarelo) no Ginásio 1
+POST http://localhost:8080/gyms/1/boulders
+Authorization: Bearer e585170b-52a8-4f3a-9b8a-3d0d81932f6c
+Content-Type: application/json
+
+{
+    "color": "Amarelo",
+    "hexColor": "#FFFF00",
+    "grade": "V3",
+    "setterName": "João Setter",
+    "setDate": "2026-04-01",
+    "imageUrl": "https://imgur.com/foto-amarelo.jpg"
+}
+
+### 2.3 Criar Boulder 2 (Azul) no Ginásio 1
+POST http://localhost:8080/gyms/1/boulders
+Authorization: Bearer 57459812-5895-4d1e-a480-35e46980810c
+Content-Type: application/json
+
+{
+    "color": "Azul",
+    "hexColor": "#0000FF",
+    "grade": "V5",
+    "setterName": "João Setter",
+    "setDate": "2026-04-05",
+    "imageUrl": "https://imgur.com/foto-azul.jpg"
+}
+
+### 2.4 Criar Boulder 3 (Preto - Difícil) no Ginásio 1
+POST http://localhost:8080/gyms/1/boulders
+Authorization: Bearer 57459812-5895-4d1e-a480-35e46980810c
+Content-Type: application/json
+
+{
+    "color": "Preto",
+    "hexColor": "#000000",
+    "grade": "V8",
+    "setterName": "Ninja Setter",
+    "setDate": "2026-04-10",
+    "imageUrl": "https://imgur.com/foto-preto.jpg"
+}
+
+### 2.5 Listar todos os Ginásios (Público)
+GET http://localhost:8080/gyms
+Authorization: Bearer f42948f7-6773-4ee0-ba02-15e8c1f4c291
+
+### 2.6 Listar todos os Boulders do Ginásio 1
+GET http://localhost:8080/gyms/1/boulders
+Authorization: Bearer 57459812-5895-4d1e-a480-35e46980810c
+
+
+### =========================================================================
+### FASE 3: ECOSSISTEMA OUTDOOR (NOVIDADE!) (USAR O TOKEN DO KORO)
+### =========================================================================
+
+### 3.1 Registar uma Rocha descoberta na Natureza (Peninha)
+POST http://localhost:8080/outdoor-routes
+Authorization: Bearer 55ff12ba-c5f5-49a0-ab57-b9a9183013c3
+Content-Type: application/json
+
+{
+    "name": "Aresta Mágica",
+    "sector": "Setor dos Ventos",
+    "location": "Peninha, Sintra",
+    "grade": "V4"
+}
+
+### 3.2 Registar outra Rocha (Serra da Arrábida)
+POST http://localhost:8080/outdoor-routes
+Authorization: Bearer 55ff12ba-c5f5-49a0-ab57-b9a9183013c3
+Content-Type: application/json
+
+{
+    "name": "Fenda do Mar",
+    "sector": "Fenda",
+    "location": "Serra da Arrábida, Setúbal",
+    "grade": "V6"
+}
+
+### 3.3 Listar todas as vias Outdoor (O Mapa da Comunidade)
+GET http://localhost:8080/outdoor-routes
+Authorization: Bearer 55ff12ba-c5f5-49a0-ab57-b9a9183013c3
+
+### 3.4 Procurar Detalhes da Via Outdoor ID 1
+GET http://localhost:8080/outdoor-routes/1
+Authorization: Bearer 55ff12ba-c5f5-49a0-ab57-b9a9183013c3
+
+### =========================================================================
+### FASE 4: O LOGBOOK (O SUPER-ENDPOINT DE ASCENTS)
+### =========================================================================
+
+### 4.1 Registar Subida INDOOR (O Koro fez o Boulder Amarelo - ID 1)
+POST http://localhost:8080/ascents
+Authorization: Bearer 55ff12ba-c5f5-49a0-ab57-b9a9183013c3
+Content-Type: application/json
+
+{
+    "boulderId": 1,
+    "outdoorRouteId": null,
+    "freelogGymName": null,
+    "freelogGrade": null,
+    "date": "2026-04-26",
+    "attempts": 2,
+    "style": "Redpoint",
+    "notes": "Escorreguei na primeira tentativa, mas depois foi fácil."
+}
+
+### 4.2 Registar Subida OUTDOOR (O Koro fez a Aresta Mágica - ID 1)
+POST http://localhost:8080/ascents
+Authorization: Bearer 55ff12ba-c5f5-49a0-ab57-b9a9183013c3
+Content-Type: application/json
+
+{
+    "boulderId": null,
+    "outdoorRouteId": 1,
+    "freelogGymName": null,
+    "freelogGrade": null,
+    "date": "2026-04-26",
+    "attempts": 1,
+    "style": "Flash",
+    "notes": "A rocha estava perfeita hoje!"
+}
+
+### 4.3 Registar Subida FREE LOG (Ginásio não registado na app)
+POST http://localhost:8080/ascents
+Authorization: Bearer 9f0914c6-edb0-413e-9352-a25fecee64a3
+Content-Type: application/json
+
+{
+    "boulderId": null,
+    "outdoorRouteId": null,
+    "freelogGymName": "9.8 Gravity",
+    "freelogGrade": "V5",
+    "date": "2026-05-25",
+    "attempts": 5,
+    "style": "Project",
+    "notes": "Ginásio muito porreiro, mas os V5 deles são duros."
+}
+
+### 4.4 Ver o meu Diário de Escalada (Logbook do Koro)
+GET http://localhost:8080/ascents/me
+Authorization: Bearer 210ce3c5-add3-4769-bbd1-bf7010d8517b
+
+### 4.5 Apagar uma subida (Ex: apagar a subida ID 1)
+DELETE http://localhost:8080/ascents/1
+Authorization: Bearer 55ff12ba-c5f5-49a0-ab57-b9a9183013c3
+
+### =========================================================================
+### FASE 5: TICKET 4A - O GATEKEEPER (CÓDIGOS DE ATIVAÇÃO)
+### =========================================================================
+### ATENÇÃO: Recria a BD com o novo schema antes de correr estes pedidos!
+### =========================================================================
+
+### 5.1 Registar um utilizador ADMIN (único registo sem "PENDING")
+POST http://localhost:8080/users/register
+Content-Type: application/json
+
+{
+    "username": "super_admin",
+    "email": "admin@climbbeta.pt",
+    "passwordRaw": "admin123",
+    "role": "ADMIN"
+}
+
+###
+
+### 5.2 Login como ADMIN -> COPIA ESTE TOKEN PARA OS PASSOS 5.4 e 5.5
+POST http://localhost:8080/users/login
+Content-Type: application/json
+
+{
+    "email": "admin@climbbeta.pt",
+    "passwordRaw": "admin123"
+}
+
+###
+
+### 5.3 Registar um GYM_OWNER novo (fica PENDING automaticamente)
+POST http://localhost:8080/users/register
+Content-Type: application/json
+
+{
+    "username": "owner_vertigo",
+    "email": "owner@vertigo.pt",
+    "passwordRaw": "owner123",
+    "role": "GYM_OWNER"
+}
+
+###
+
+### 5.4 Login como GYM_OWNER -> COPIA ESTE TOKEN PARA OS PASSOS 5.6 e 5.7
+POST http://localhost:8080/users/login
+Content-Type: application/json
+
+{
+    "email": "owner@vertigo.pt",
+    "passwordRaw": "owner123"
+}
+
+###
+
+### 5.5 [OWNER PENDING] Tentar criar ginásio -> Deve dar 403 Forbidden
+POST http://localhost:8080/gyms
+Authorization: Bearer c2e055b9-6bdf-4071-b700-1e49986026fa
+Content-Type: application/json
+
+{
+    "ownerId": 2,
+    "name": "Vertigo Marvilla",
+    "address": "Braço de Prata, 4",
+    "city": "Lisboa",
+    "coverImageUrl": "https://imgur.com/foto-ginasio.jpg"
+}
+
+###
+
+### 5.6 [ADMIN] Gerar um código de ativação -> Copia o "code" da resposta
+POST http://localhost:8080/admin/codes
+Authorization: Bearer 0e33d85b-637d-431f-b83f-1ff6e3fce077
+
+
+###
+
+### 5.7 [ADMIN] Ver todos os códigos gerados
+GET http://localhost:8080/admin/codes
+Authorization: Bearer 7ec98298-9880-4f10-8bf0-06301c75ae7f
+
+###
+
+### 5.8 [OWNER] Verificar conta com o código gerado no passo 5.6
+### Substitui o valor de "code" pelo UUID que recebeste
+POST http://localhost:8080/users/verify-code
+Authorization: Bearer e585170b-52a8-4f3a-9b8a-3d0d81932f6c
+Content-Type: application/json
+
+{
+    "code": "c14a1107-b487-45d5-98f8-965802cbe58a"
+}
+
+###
+
+### 5.9 [OWNER VERIFIED] Criar ginásio agora -> Deve dar 201 Created
+POST http://localhost:8080/gyms
+Authorization: Bearer aed1ec9a-38e9-4fcd-b52d-8a63215588d2
+Content-Type: application/json
+
+{
+    "ownerId": 2,
+    "name": "Vertigo Marvilla",
+    "address": "Braço de Prata, 4",
+    "city": "Lisboa",
+    "coverImageUrl": "https://imgur.com/foto-ginasio.jpg"
+}
+
+###
+
+### 5.10 [EDGE CASE] Reutilizar o mesmo código -> Deve dar 400 Bad Request
+POST http://localhost:8080/users/verify-code
+Authorization: Bearer 720fbba4-cae9-492a-9c4f-894b3df89de8
+Content-Type: application/json
+
+{
+    "code": "935e863e-4d74-46de-936b-a06ee4c1fd97"
+}
+
+
+### =========================================================================
+### BÓNUS: DESATIVAR UM BOULDER (Ticket 2C - Soft Delete)
+### =========================================================================
+### (Usa o token do Owner que já criou boulders nos passos 2.x)
+
+### B.1 Desativar o Boulder ID 1 (Soft Delete - fica is_active = false)
+PUT http://localhost:8080/boulders/1/status
+Authorization: Bearer 0722846f-da78-47c3-a5aa-f4c8aafa863e
+Content-Type: application/json
+
+{
+    "isActive": false
+}
+
+###
+
+### B.2 Confirmar que o boulder desapareceu da listagem (só devolve ativos)
+GET http://localhost:8080/gyms/1/boulders
+Authorization: Bearer TOKEN_DO_OWNER_AQUI
+
+###
+
+### B.3 Reativar o Boulder ID 1
+PUT http://localhost:8080/boulders/1/status
+Authorization: Bearer TOKEN_DO_OWNER_AQUI
+Content-Type: application/json
+
+{
+    "isActive": true
+}
+
+### =========================================================================
+### FASE 6: TICKET 4C - GAMIFICAÇÃO (LIKES, SAVES E LEADERBOARD)
+### =========================================================================
+
+### 6.1 Login do Climber 1 (Koro) -> copia o token da resposta
+POST http://localhost:8080/users/login
+Content-Type: application/json
+
+{
+  "email": "koro@isel.pt",
+  "passwordRaw": "koro123"
+}
+
+###
+
+### 6.2 Login do Climber 2 (Mario) -> copia o token da resposta
+POST http://localhost:8080/users/login
+Content-Type: application/json
+
+{
+  "email": "mario@isel.pt",
+  "passwordRaw": "mario123"
+}
+
+###
+
+### 6.3 Like à subida ID 2 pelo Koro
+POST http://localhost:8080/ascents/2/like
+Authorization: Bearer 5cf76368-4e72-48df-860f-f57ee70f124e
+
+
+###
+
+### 6.4 Repetir o like à mesma subida
+### Deve continuar a responder OK (idempotente)
+POST http://localhost:8080/ascents/2/like
+Authorization: Bearer 5cf76368-4e72-48df-860f-f57ee70f124e
+
+
+###
+
+### 6.5 Remover o like da subida ID 2
+DELETE http://localhost:8080/ascents/2/like
+Authorization: Bearer 5cf76368-4e72-48df-860f-f57ee70f124e
+
+
+###
+
+### 6.6 Guardar o boulder ID 1 nos projetos do Koro
+POST http://localhost:8080/boulders/1/save
+Authorization: Bearer 5cf76368-4e72-48df-860f-f57ee70f124e
+###
+
+### 6.7 Repetir o save ao mesmo boulder
+### Deve continuar a responder OK
+POST http://localhost:8080/boulders/1/save
+Authorization: Bearer 5cf76368-4e72-48df-860f-f57ee70f124e
+
+###
+
+### 6.8 Ver os meus projetos guardados
+GET http://localhost:8080/projects/me
+Authorization: Bearer 5cf76368-4e72-48df-860f-f57ee70f124e
+
+###
+
+### 6.9 Remover o save do boulder ID 1
+DELETE http://localhost:8080/boulders/1/save
+Authorization: Bearer 5cf76368-4e72-48df-860f-f57ee70f124e
+
+###
+
+### 6.10 Ver o leaderboard do boulder ID 1
+GET http://localhost:8080/boulders/1/leaderboard
+Authorization: Bearer 5cf76368-4e72-48df-860f-f57ee70f124e
+
+
+
+### 6.11 Criar uma ascent FLASH
+POST http://localhost:8080/ascents
+Authorization: Bearer 5cf76368-4e72-48df-860f-f57ee70f124e
+Content-Type: application/json
+
+{
+  "boulderId": 1,
+  "outdoorRouteId": null,
+  "freelogGymName": null,
+  "freelogGrade": null,
+  "date": "2026-05-18",
+  "attempts": 1,
+  "style": "flash",
+  "notes": "Feito à primeira."
+}
+
+###
+
+### 6.12 Criar uma ascent ONSIGHT
+POST http://localhost:8080/ascents
+Authorization: Bearer eed51647-d34a-44db-a68f-fadf1e8b9ce0
+Content-Type: application/json
+
+{
+  "boulderId": 1,
+  "outdoorRouteId": null,
+  "freelogGymName": null,
+  "freelogGrade": null,
+  "date": "2026-05-18",
+  "attempts": 2,
+  "style": "onsight",
+  "notes": "Sem quedas."
+}
+
+###
+
+### 6.13 Criar uma ascent PROJECT
+POST http://localhost:8080/ascents
+Authorization: Bearer 5cf76368-4e72-48df-860f-f57ee70f124e
+Content-Type: application/json
+
+{
+  "boulderId": 1,
+  "outdoorRouteId": null,
+  "freelogGymName": null,
+  "freelogGrade": null,
+  "date": "2026-05-18",
+  "attempts": 5,
+  "style": "project",
+  "notes": "Ainda em progresso."
+}
+
+###
+
+### 6.14 Ver leaderboard do boulder 1
+GET http://localhost:8080/boulders/1/leaderboard
+Authorization: Bearer 5cf76368-4e72-48df-860f-f57ee70f124e
+
+
+###
+GET http://localhost:8080/users/me
+Authorization: Bearer e585170b-52a8-4f3a-9b8a-3d0d81932f6c
+
+###
+GET http://localhost:8080/gyms/1/boulders
+Authorization: Bearer e585170b-52a8-4f3a-9b8a-3d0d81932f6c
+
+### 6.15 Atualizar o meu perfil
+PUT http://localhost:8080/profiles/me
+Authorization: Bearer 9f0914c6-edb0-413e-9352-a25fecee64a3
+Content-Type: application/json
+
+{
+  "bio": "Escalador de boulder",
+  "height": 180,
+  "apeIndex": 1.05
+}
+
+###
+
+### 6.16 Ver o meu perfil atualizado
+GET http://localhost:8080/profiles/me
+Authorization: Bearer 9f0914c6-edb0-413e-9352-a25fecee64a3
+
+###
+
+### 6.17 [TESTE DE ERRO] Tentar roubar o username do Koro estando logado como Mario
+### 1. Faz o login do Mario (passo 6.2) e copia o token dele para aqui:
+PUT http://localhost:8080/profiles/me
+Authorization: Bearer cbc4ef94-6871-4dd4-bb25-4227092ef352
+Content-Type: application/json
+
+{
+  "username": "koro_climbs",
+  "bio": "A tentar dar o nó no backend...",
+  "height": 175,
+  "apeIndex": 1.00
+}

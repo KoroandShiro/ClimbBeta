@@ -2,6 +2,7 @@ package com.climbbeta.api.http
 
 import com.climbbeta.api.domain.User
 import com.climbbeta.api.domain.UserRole
+import com.climbbeta.api.repository.UserRepository
 import com.climbbeta.api.repository_jdbi.JdbiSaveRepository
 import com.climbbeta.api.services.ProfileService
 import jakarta.servlet.http.HttpServletRequest
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 data class ProfileUpdateInput(
+    val username: String?,
     val bio: String?,
     val height: Int?,
     val apeIndex: Double?
@@ -19,7 +21,8 @@ data class ProfileUpdateInput(
 @RequestMapping("/profiles")
 class ProfileController(
     private val profileService: ProfileService,
-    private val saveRepository: JdbiSaveRepository
+    private val saveRepository: JdbiSaveRepository,
+    private val userRepository: UserRepository
 ) {
 
     @GetMapping("/me")
@@ -46,6 +49,20 @@ class ProfileController(
         val user = request.getAttribute("authenticatedUser") as User
 
         if (user.role == UserRole.CLIMBER) {
+
+            if (input.username != null && input.username.trim().isNotEmpty()) {
+                val newUsername = input.username.trim()
+
+                if (newUsername != user.username) {
+                    if (userRepository.existsByUsername(newUsername)) {
+                        return ResponseEntity
+                            .status(HttpStatus.BAD_REQUEST)
+                            .body(mapOf("error" to "Este username já está em uso por outro utilizador."))
+                    }
+                    userRepository.updateUsername(user.id, newUsername)
+                }
+            }
+
             profileService.updateClimberProfile(user.id, input.bio, input.height, input.apeIndex)
             return ResponseEntity.ok(mapOf("message" to "Perfil atualizado com sucesso!"))
         }
