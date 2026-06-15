@@ -41,3 +41,14 @@ export interface SavedBoulderDTO {
 export async function getMySavedProjects(): Promise<SavedBoulderDTO[]> {
     return apiFetch<SavedBoulderDTO[]>('/profiles/me/projects');
 }
+
+/**
+ * Envia o ficheiro da nova foto de perfil para o servidor.
+ * O 'FormData' transporta o ficheiro binário obtido da galeria/câmara.
+ */
+export async function uploadMyAvatar(formData: FormData): Promise<{ avatarUrl: string }> {
+    return apiFetch<{ avatarUrl: string }>('/profiles/me/avatar', {
+        method: 'POST',
+        body: formData,
+    });
+}
