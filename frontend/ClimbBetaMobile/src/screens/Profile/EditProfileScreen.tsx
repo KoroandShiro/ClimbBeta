@@ -242,12 +242,22 @@ export default function EditProfileScreen() {
                     />
 
                     <View style={styles.buttonsRow}>
-                        <TouchableOpacity style={[styles.btn, { backgroundColor: '#2E7D32' }]} onPress={onSave} disabled={saving}>
-                            {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.btnText}>Guardar</Text>}
+                        {/* Cancelar agora fica à ESQUERDA */}
+                        <TouchableOpacity
+                            style={[styles.btn, { backgroundColor: '#9E9E9E' }]}
+                            onPress={() => navigation.goBack()}
+                            disabled={saving}
+                        >
+                            <Text style={styles.btnText}>Cancelar</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={[styles.btn, { backgroundColor: '#9E9E9E' }]} onPress={() => navigation.goBack()} disabled={saving}>
-                            <Text style={styles.btnText}>Cancelar</Text>
+                        {/* Guardar agora fica à DIREITA */}
+                        <TouchableOpacity
+                            style={[styles.btn, { backgroundColor: '#2E7D32' }]}
+                            onPress={onSave}
+                            disabled={saving}
+                        >
+                            {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.btnText}>Guardar</Text>}
                         </TouchableOpacity>
                     </View>
                 </View>
