@@ -70,6 +70,36 @@ class ProfileController(
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("error" to "Apenas escaladores podem atualizar estes dados."))
     }
 
+    @PostMapping("/me/avatar")
+    fun updateMyAvatar(
+        @RequestParam("file") file: org.springframework.web.multipart.MultipartFile,
+        request: HttpServletRequest
+    ): ResponseEntity<Any> {
+        // 1. Ir buscar o utilizador autenticado pelo Interceptor
+        val user = request.getAttribute("authenticatedUser") as User
+
+        // 2. Só escaladores podem ter avatar de perfil
+        if (user.role == UserRole.CLIMBER) {
+            if (file.isEmpty) {
+                return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(mapOf("error" to "O ficheiro enviado está vazio."))
+            }
+
+            // 3. Chamar o serviço para guardar no MinIO e atualizar o caminho na Base de Dados
+            val avatarUrl = profileService.updateClimberAvatar(user.id, file)
+
+            return ResponseEntity.ok(mapOf(
+                "message" to "Foto de perfil atualizada com sucesso!",
+                "avatarUrl" to avatarUrl
+            ))
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
+            .body(mapOf("error" to "Apenas escaladores podem atualizar o avatar."))
+    }
+
     @GetMapping("/me/projects")
     fun getMySavedProjects(request: HttpServletRequest): ResponseEntity<Any> {
         val user = request.getAttribute("authenticatedUser") as User

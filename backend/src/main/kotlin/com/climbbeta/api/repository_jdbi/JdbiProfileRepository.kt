@@ -12,7 +12,7 @@ class JdbiProfileRepository(private val jdbi: Jdbi) : ProfileRepository {
         return jdbi.withHandle<ClimberProfile?, Exception> { handle ->
             handle.createQuery(
                 """
-                SELECT user_id AS userId, bio, height, ape_index AS apeIndex 
+                SELECT user_id AS userId, bio, height, ape_index AS apeIndex , avatar_url AS avatarUrl
                 FROM climber_profiles 
                 WHERE user_id = :userId
                 """
@@ -37,6 +37,21 @@ class JdbiProfileRepository(private val jdbi: Jdbi) : ProfileRepository {
                 .bind("height", profile.height)
                 .bind("apeIndex", profile.apeIndex)
                 .bind("userId", profile.userId)
+                .execute()
+        }
+    }
+
+    override fun updateAvatarUrl(userId: Int, avatarUrl: String?) {
+        jdbi.withHandle<Unit, Exception> { handle ->
+            handle.createUpdate(
+                """
+                UPDATE climber_profiles 
+                SET avatar_url = :avatarUrl 
+                WHERE user_id = :userId
+                """
+            )
+                .bind("avatarUrl", avatarUrl)
+                .bind("userId", userId)
                 .execute()
         }
     }
