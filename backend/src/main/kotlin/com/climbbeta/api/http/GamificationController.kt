@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping
 class GamificationController(private val gamificationService: GamificationService) {
 
-    // LIKE ENDPOINTS (Mantidos)
+    // LIKE ENDPOINTS
     @PostMapping("/ascents/{id}/like")
     fun likeAscent(
         @PathVariable id: Int,
@@ -37,7 +37,7 @@ class GamificationController(private val gamificationService: GamificationServic
         }
     }
 
-    // SAVE ENDPOINTS (Problema 1 resolvido: Agora devolvem JSON)
+    // SAVE ENDPOINTS (Returns JSON)
     @PostMapping("/boulders/{id}/save")
     fun saveBoulder(
         @PathVariable id: Int,
@@ -45,9 +45,9 @@ class GamificationController(private val gamificationService: GamificationServic
     ): ResponseEntity<Any> {
         val created = gamificationService.saveBoulder(user.id, id)
         return if (created) {
-            ResponseEntity.status(HttpStatus.CREATED).body(mapOf("message" to "Projeto guardado com sucesso!"))
+            ResponseEntity.status(HttpStatus.CREATED).body(mapOf("message" to "Project saved successfully!"))
         } else {
-            ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to "Projeto já estava guardado."))
+            ResponseEntity.status(HttpStatus.OK).body(mapOf("message" to "Project was already saved."))
         }
     }
 
@@ -58,13 +58,13 @@ class GamificationController(private val gamificationService: GamificationServic
     ): ResponseEntity<Any> {
         val deleted = gamificationService.unsaveBoulder(user.id, id)
         return if (deleted) {
-            ResponseEntity.ok(mapOf("message" to "Projeto removido com sucesso!"))
+            ResponseEntity.ok(mapOf("message" to "Project removed successfully!"))
         } else {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "Projeto não encontrado."))
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "Project not found."))
         }
     }
 
-    // NOVO ENDPOINT (Problema 3: Saber se o botão deve estar ativo)
+    // Check if the save button should be active
     @GetMapping("/boulders/{id}/save-status")
     fun checkSaveStatus(
         @PathVariable id: Int,
@@ -74,7 +74,7 @@ class GamificationController(private val gamificationService: GamificationServic
         return ResponseEntity.ok(mapOf("isSaved" to isSaved))
     }
 
-    // MANTIDOS (Leaderboard e Projetos Guardados)
+    // Leaderboard and Saved Projects
     @GetMapping("/projects/me")
     fun getSavedBoulders(
         @RequestAttribute("authenticatedUser") user: User

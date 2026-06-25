@@ -26,7 +26,7 @@ export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): 
         headers.set('Authorization', `Bearer ${token}`);
     }
 
-    console.log("A tentar chamar o URL:", `${BASE_URL}${endpoint}`);
+    console.log("Attempting to call URL:", `${BASE_URL}${endpoint}`);
 
     const response = await fetch(`${BASE_URL}${endpoint}`, {
         ...options,
@@ -34,7 +34,7 @@ export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): 
     });
 
     if (!response.ok) {
-        let errorMessage = 'Erro de comunicação com o servidor.';
+        let errorMessage = 'Server communication error.';
         try {
             const errorData = await response.json();
             if (errorData?.error) errorMessage = errorData.error;

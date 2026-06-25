@@ -18,41 +18,41 @@ class AuthenticationInterceptor(
         if (request.method == "OPTIONS") {
             return true // temporary
         }
-        // 1. Procurar o cabeçalho "Authorization"
+        // 1. Look for the "Authorization" header
         val authHeader = request.getHeader("Authorization")
 
-        // Se não houver cabeçalho ou não começar por "Bearer ", barramos a entrada!
+        // If there is no header or it doesn't start with "Bearer ", block access!
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             response.status = 401
-            response.writer.write("""{"error": "Falta o Token de Autenticação"}""")
+            response.writer.write("""{"error": "Missing Authentication Token"}""")
             response.contentType = "application/json"
-            return false // Interrompe o pedido!
+            return false // Interrupts the request!
         }
 
-        // 2. Extrair só a string do token (tirar a palavra "Bearer ")
+        // 2. Extract only the token string (remove the "Bearer " prefix)
         val tokenStr = authHeader.substring(7)
 
-        // 3. Ir à Base de Dados ver se o Token existe
+        // 3. Check the Database to see if the Token exists
         val token = tokenRepository.getTokenByHash(tokenStr)
         if (token == null) {
             response.status = 401
-            response.writer.write("""{"error": "Token inválido ou expirado"}""")
+            response.writer.write("""{"error": "Invalid or expired token"}""")
             response.contentType = "application/json"
             return false
         }
 
-        // 4. Se o token existe, vamos buscar o Utilizador a que ele pertence
+        // 4. If the token exists, fetch the User it belongs to
         val user = userRepository.getUserById(token.userId)
         if (user == null) {
             response.status = 401
             return false
         }
 
-        // 5. "Carimbar" a mão do utilizador. Guardamos o objeto User no Request
-        // para que os nossos Controllers (nas rotas seguintes) saibam quem fez o pedido!
+        // 5. Stamp the request. Save the User object in the Request attributes
+        // so that our Controllers (in subsequent routes) know who made the request!
         request.setAttribute("authenticatedUser", user)
 
-        // 6. Deixar entrar!
+        // 6. Allow entry!
         return true
     }
 }

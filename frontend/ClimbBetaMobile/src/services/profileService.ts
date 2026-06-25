@@ -43,8 +43,8 @@ export async function getMySavedProjects(): Promise<SavedBoulderDTO[]> {
 }
 
 /**
- * Envia o ficheiro da nova foto de perfil para o servidor.
- * O 'FormData' transporta o ficheiro binário obtido da galeria/câmara.
+ * Sends the new profile picture file to the server.
+ * The 'FormData' carries the binary file obtained from the gallery/camera.
  */
 export async function uploadMyAvatar(formData: FormData): Promise<{ avatarUrl: string }> {
     return apiFetch<{ avatarUrl: string }>('/profiles/me/avatar', {

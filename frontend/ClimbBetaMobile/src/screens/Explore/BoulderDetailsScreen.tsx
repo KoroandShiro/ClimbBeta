@@ -7,55 +7,55 @@ import { getBoulderById, getLeaderboard, saveProject, unsaveProject, checkSaveSt
 export default function BoulderDetailsScreen() {
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
-  
+
   const boulderId = route.params?.boulderId;
 
   const [boulder, setBoulder] = useState<Boulder | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [isSaved, setIsSaved] = useState(false); // Estado do botão (Problema 3)
+  const [isSaved, setIsSaved] = useState(false); // Button status (Problem 3)
 
   useFocusEffect(
-    useCallback(() => {
-      if (!boulderId) return;
-      
-      let isActive = true;
-      const loadData = async () => {
-        try {
-          setLoading(true);
-          
-          // 1. Carregar a Via e a Leaderboard (Se isto falhar, mostramos erro)
-          const [boulderData, leaderboardData] = await Promise.all([
-            getBoulderById(boulderId),
-            getLeaderboard(boulderId)
-          ]);
-          
-          if (isActive) {
-            setBoulder(boulderData);
-            setLeaderboard(leaderboardData);
-          }
+      useCallback(() => {
+        if (!boulderId) return;
 
-          // 2. Carregar o status do botão à parte. 
-          // Assim, se a rota não existir (404), não rebenta com a página inteira.
+        let isActive = true;
+        const loadData = async () => {
           try {
-            const status = await checkSaveStatus(boulderId);
-            if (isActive) setIsSaved(status.isSaved);
-          } catch (statusError) {
-            console.warn("Rota de verificação de projeto falhou", statusError);
+            setLoading(true);
+
+            // 1. Load Route and Leaderboard (If this fails, we show an error)
+            const [boulderData, leaderboardData] = await Promise.all([
+              getBoulderById(boulderId),
+              getLeaderboard(boulderId)
+            ]);
+
+            if (isActive) {
+              setBoulder(boulderData);
+              setLeaderboard(leaderboardData);
+            }
+
+            // 2. Load the save button status separately.
+            // This way, if the route doesn't exist (404), it won't crash the whole page.
+            try {
+              const status = await checkSaveStatus(boulderId);
+              if (isActive) setIsSaved(status.isSaved);
+            } catch (statusError) {
+              console.warn("Project verification route failed", statusError);
+            }
+
+          } catch (error) {
+            console.error("Error loading details:", error);
+            if (isActive) Alert.alert("Error", "Could not load the route details.");
+          } finally {
+            if (isActive) setLoading(false);
           }
+        };
 
-        } catch (error) {
-          console.error("Erro ao carregar detalhes:", error);
-          if (isActive) Alert.alert("Erro", "Não foi possível carregar os detalhes da via.");
-        } finally {
-          if (isActive) setLoading(false);
-        }
-      };
-
-      loadData();
-      return () => { isActive = false; };
-    }, [boulderId])
+        loadData();
+        return () => { isActive = false; };
+      }, [boulderId])
   );
 
   const handleToggleSave = async () => {
@@ -68,10 +68,10 @@ export default function BoulderDetailsScreen() {
       } else {
         await saveProject(boulderId);
         setIsSaved(true);
-        Alert.alert("Sucesso!", "Projeto guardado na tua lista.");
+        Alert.alert("Success!", "Project saved to your list.");
       }
     } catch (error: any) {
-      Alert.alert("Aviso", error.message || "Não foi possível atualizar o projeto.");
+      Alert.alert("Warning", error.message || "Could not update the project.");
     } finally {
       setSaving(false);
     }
@@ -79,93 +79,93 @@ export default function BoulderDetailsScreen() {
 
   if (loading) {
     return (
-      <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#2E7D32" />
-      </View>
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color="#2E7D32" />
+        </View>
     );
   }
 
   if (!boulder) {
     return (
-      <View style={styles.centerContainer}>
-        <Text style={styles.errorText}>Via não encontrada.</Text>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: 20 }}>
-          <Text style={{ color: '#2563eb', fontWeight: 'bold' }}>Voltar</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.centerContainer}>
+          <Text style={styles.errorText}>Route not found.</Text>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: 20 }}>
+            <Text style={{ color: '#2563eb', fontWeight: 'bold' }}>Go Back</Text>
+          </TouchableOpacity>
+        </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Imagem de Topo */}
-      <View style={styles.imageContainer}>
-        <Image 
-          source={{ uri: boulder.imageUrl || 'https://images.unsplash.com/photo-1522163182402-834f871fd851?auto=format&fit=crop&w=800&q=80' }} 
-          style={styles.heroImage} 
-        />
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-      </View>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        {/* Top Image */}
+        <View style={styles.imageContainer}>
+          <Image
+              source={{ uri: boulder.imageUrl || 'https://images.unsplash.com/photo-1522163182402-834f871fd851?auto=format&fit=crop&w=800&q=80' }}
+              style={styles.heroImage}
+          />
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+        </View>
 
-      {/* Informação Principal */}
-      <View style={styles.infoSection}>
-        <View style={styles.titleRow}>
-          <Text style={styles.title}>Via {boulder.color}</Text>
-          <View style={styles.gradeBadge}>
-            <Text style={styles.gradeText}>{boulder.grade}</Text>
+        {/* Main Info */}
+        <View style={styles.infoSection}>
+          <View style={styles.titleRow}>
+            <Text style={styles.title}>Route {boulder.color}</Text>
+            <View style={styles.gradeBadge}>
+              <Text style={styles.gradeText}>{boulder.grade}</Text>
+            </View>
+          </View>
+          <Text style={styles.setterText}>Setter: {boulder.setterName || 'Unknown'}</Text>
+
+          {/* Action Bar (Dynamic Button) */}
+          <View style={styles.actionRow}>
+            <TouchableOpacity
+                style={[styles.actionBtnOutline, isSaved && styles.actionBtnSaved]}
+                onPress={handleToggleSave}
+                disabled={saving}
+            >
+              <Ionicons name={saving ? "hourglass-outline" : (isSaved ? "bookmark" : "bookmark-outline")} size={20} color={isSaved ? "#555" : "#2563eb"} />
+              <Text style={[styles.actionBtnOutlineText, isSaved && styles.actionTextSaved]}>
+                {saving ? "Processing..." : (isSaved ? "Remove Project" : "Save Project")}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+                style={styles.actionBtnSolid}
+                onPress={() => navigation.navigate('LogAscent', { gymId: boulder.gymId, boulderId: boulder.id })}
+            >
+              <Ionicons name="checkmark-done" size={20} color="#fff" />
+              <Text style={styles.actionBtnSolidText}>Log Beta</Text>
+            </TouchableOpacity>
           </View>
         </View>
-        <Text style={styles.setterText}>Equipador: {boulder.setterName || 'Desconhecido'}</Text>
-        
-        {/* Barra de Ações (Botão Dinâmico) */}
-        <View style={styles.actionRow}>
-          <TouchableOpacity 
-             style={[styles.actionBtnOutline, isSaved && styles.actionBtnSaved]} 
-             onPress={handleToggleSave} 
-             disabled={saving}
-          >
-            <Ionicons name={saving ? "hourglass-outline" : (isSaved ? "bookmark" : "bookmark-outline")} size={20} color={isSaved ? "#555" : "#2563eb"} />
-            <Text style={[styles.actionBtnOutlineText, isSaved && styles.actionTextSaved]}>
-              {saving ? "A processar..." : (isSaved ? "Remover Projeto" : "Guardar Projeto")}
-            </Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={styles.actionBtnSolid} 
-            onPress={() => navigation.navigate('LogAscent', { gymId: boulder.gymId, boulderId: boulder.id })}
-          >
-            <Ionicons name="checkmark-done" size={20} color="#fff" />
-            <Text style={styles.actionBtnSolidText}>Registar Beta</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
 
-      {/* Leaderboard */}
-      <View style={styles.leaderboardSection}>
-        <Text style={styles.sectionTitle}>Leaderboard 🏆</Text>
-        
-        {leaderboard.length === 0 ? (
-          <Text style={styles.emptyText}>Sê o primeiro a encadear esta via!</Text>
-        ) : (
-          leaderboard.map((entry, index) => (
-            <View key={index} style={styles.leaderboardCard}>
-              <Text style={styles.rankText}>{index + 1}º</Text>
-              <Image 
-                source={{ uri: entry.avatarUrl || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }} 
-                style={styles.avatar} 
-              />
-              <View style={styles.climberInfo}>
-                <Text style={styles.climberName}>{entry.username}</Text>
-                <Text style={styles.climberStyle}>{entry.style} • {entry.attempts} {entry.attempts === 1 ? 'tentativa' : 'tentativas'}</Text>
-              </View>
-              <Text style={styles.dateText}>{new Date(entry.date).toLocaleDateString('pt-PT')}</Text>
-            </View>
-          ))
-        )}
-      </View>
-    </ScrollView>
+        {/* Leaderboard */}
+        <View style={styles.leaderboardSection}>
+          <Text style={styles.sectionTitle}>Leaderboard 🏆</Text>
+
+          {leaderboard.length === 0 ? (
+              <Text style={styles.emptyText}>Be the first to send this route!</Text>
+          ) : (
+              leaderboard.map((entry, index) => (
+                  <View key={index} style={styles.leaderboardCard}>
+                    <Text style={styles.rankText}>{index + 1}st</Text>
+                    <Image
+                        source={{ uri: entry.avatarUrl || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }}
+                        style={styles.avatar}
+                    />
+                    <View style={styles.climberInfo}>
+                      <Text style={styles.climberName}>{entry.username}</Text>
+                      <Text style={styles.climberStyle}>{entry.style} • {entry.attempts} {entry.attempts === 1 ? 'attempt' : 'attempts'}</Text>
+                    </View>
+                    <Text style={styles.dateText}>{new Date(entry.date).toLocaleDateString('en-US')}</Text>
+                  </View>
+              ))
+          )}
+        </View>
+      </ScrollView>
   );
 }
 

@@ -15,9 +15,9 @@ class AscentService(private val ascentRepository: AscentRepository) {
         freelogGymName: String?, freelogGrade: String?,
         date: LocalDate?, attempts: Int, style: String?, notes: String?
     ): Int {
-        // Validação de negócio: Não pode ser as duas coisas
+        // Business validation: Cannot be both types of route
         if (boulderId != null && outdoorRouteId != null) {
-            throw IllegalArgumentException("Uma subida não pode ser Indoor e Outdoor ao mesmo tempo.")
+            throw IllegalArgumentException("An ascent cannot be both Indoor and Outdoor at the same time.")
         }
 
         return ascentRepository.create(

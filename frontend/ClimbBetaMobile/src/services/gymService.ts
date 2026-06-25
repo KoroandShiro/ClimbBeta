@@ -29,7 +29,7 @@ export function getActiveBoulders(gymId: number): Promise<Boulder[]> {
     return apiFetch<Boulder[]>(`/gyms/${gymId}/boulders`);
 }
 
-// Interface para o ranking
+// Interface for the leaderboard ranking
 export interface LeaderboardEntry {
     climberId: number;
     username: string;
@@ -47,14 +47,14 @@ export function getLeaderboard(boulderId: number): Promise<LeaderboardEntry[]> {
     return apiFetch<LeaderboardEntry[]>(`/boulders/${boulderId}/leaderboard`);
 }
 
-// --- NOVOS ENDPOINTS DE SAVE / PROJECT ---
+// --- NEW SAVE / PROJECT ENDPOINTS ---
 
-// Substitui a que tens por esta (espera o JSON do backend):
+// Replace your existing one with this (expects JSON from the backend):
 export function saveProject(boulderId: number): Promise<{ message: string }> {
     return apiFetch<{ message: string }>(`/boulders/${boulderId}/save`, { method: 'POST' });
 }
 
-// Adiciona estas duas:
+// Add these two:
 export function unsaveProject(boulderId: number): Promise<{ message: string }> {
     return apiFetch<{ message: string }>(`/boulders/${boulderId}/save`, { method: 'DELETE' });
 }

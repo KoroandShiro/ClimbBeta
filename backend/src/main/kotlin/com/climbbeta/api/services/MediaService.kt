@@ -16,11 +16,11 @@ class MediaService(
 ) {
     fun uploadMedia(file: MultipartFile): String {
         try {
-            // Extrair a extensão original do ficheiro (ex: .png, .jpg)
+            // Extract original file extension (e.g., .png, .jpg)
             val originalFilename = file.originalFilename ?: "unknown"
             val extension = originalFilename.substringAfterLast('.', "")
 
-            // Gerar um nome único e seguro (ex: 123e4567-e89b-12d3-a456-426614174000.jpg)
+            // Generate a unique and secure filename (e.g., 123e4567-e89b-12d3-a456-426614174000.jpg)
             val fileName = if (extension.isNotEmpty()) {
                 "${UUID.randomUUID()}.$extension"
             } else {
@@ -29,7 +29,7 @@ class MediaService(
 
             val inputStream = file.inputStream
 
-            // Fazer o upload do fluxo de bytes para o MinIO
+            // Upload the byte stream to MinIO
             minioClient.putObject(
                 PutObjectArgs.builder()
                     .bucket(bucketName)
@@ -39,12 +39,12 @@ class MediaService(
                     .build()
             )
 
-            // Construir e devolver o URL público para guardar no PostgreSQL
+            // Construct and return the public URL to be stored in PostgreSQL
             return "$publicUrl/$bucketName/$fileName"
 
         } catch (e: Exception) {
-            // Lançar exceção para ser apanhada pelo ExceptionHandler global ou Controller
-            throw RuntimeException("Falha ao fazer upload do ficheiro multimédia: ${e.message}", e)
+            // Throw exception to be caught by the global ExceptionHandler or Controller
+            throw RuntimeException("Failed to upload media file: ${e.message}", e)
         }
     }
 }

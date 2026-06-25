@@ -25,7 +25,7 @@ class SocialController(
         return if (created) {
             ResponseEntity.status(HttpStatus.CREATED).build()
         } else {
-            ResponseEntity.status(HttpStatus.OK).build()  // Já estava a seguir
+            ResponseEntity.status(HttpStatus.OK).build()  // Already following
         }
     }
 

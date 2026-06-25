@@ -56,7 +56,7 @@ class GymController(
     ): ResponseEntity<Any> {
         val user = request.getAttribute("authenticatedUser") as? User
             ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(mapOf("error" to "Utilizador não autenticado."))
+                .body(mapOf("error" to "User not authenticated."))
 
         return try {
             val created = gymService.createGym(
@@ -70,9 +70,9 @@ class GymController(
 
             ResponseEntity.status(HttpStatus.CREATED).body(GymOutputModel.fromDomain(created))
         } catch (e: SecurityException) {
-            ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("error" to (e.message ?: "Acesso negado.")))
+            ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("error" to (e.message ?: "Access denied.")))
         } catch (e: IllegalArgumentException) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to (e.message ?: "Pedido inválido.")))
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to (e.message ?: "Invalid request.")))
         }
     }
 
@@ -80,7 +80,7 @@ class GymController(
     fun getGyms(request: HttpServletRequest): ResponseEntity<Any> {
         val user = request.getAttribute("authenticatedUser") as? User
             ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(mapOf("error" to "Utilizador não autenticado."))
+                .body(mapOf("error" to "User not authenticated."))
 
         val gyms = gymService.getGyms().map { GymOutputModel.fromDomain(it) }
         return ResponseEntity.ok(gyms)
@@ -93,15 +93,15 @@ class GymController(
     ): ResponseEntity<Any> {
         val user = request.getAttribute("authenticatedUser") as? User
             ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(mapOf("error" to "Utilizador não autenticado."))
+                .body(mapOf("error" to "User not authenticated."))
 
         return try {
             val gym = gymService.getGymById(id)
             ResponseEntity.ok(GymOutputModel.fromDomain(gym))
         } catch (e: NoSuchElementException) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to (e.message ?: "Ginásio não encontrado.")))
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to (e.message ?: "Gym not found.")))
         } catch (e: IllegalArgumentException) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to (e.message ?: "Pedido inválido.")))
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to (e.message ?: "Invalid request.")))
         }
     }
 
@@ -113,7 +113,7 @@ class GymController(
     ): ResponseEntity<Any> {
         val user = request.getAttribute("authenticatedUser") as? User
             ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(mapOf("error" to "Utilizador não autenticado."))
+                .body(mapOf("error" to "User not authenticated."))
 
         return try {
             gymService.updateGym(
@@ -125,13 +125,13 @@ class GymController(
                 coverImageUrl = input.coverImageUrl
             )
 
-            ResponseEntity.ok(mapOf("message" to "Ginásio atualizado com sucesso!"))
+            ResponseEntity.ok(mapOf("message" to "Gym updated successfully!"))
         } catch (e: SecurityException) {
-            ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("error" to (e.message ?: "Acesso negado.")))
+            ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("error" to (e.message ?: "Access denied.")))
         } catch (e: NoSuchElementException) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to (e.message ?: "Ginásio não encontrado.")))
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to (e.message ?: "Gym not found.")))
         } catch (e: IllegalArgumentException) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to (e.message ?: "Pedido inválido.")))
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to (e.message ?: "Invalid request.")))
         }
     }
 }

@@ -27,10 +27,10 @@ class ProfileController(
 
     @GetMapping("/me")
     fun getMyProfile(request: HttpServletRequest): ResponseEntity<Any> {
-        // 1. Quem é que o Interceptor deixou entrar?
+        // 1. Who did the Interceptor allow in?
         val user = request.getAttribute("authenticatedUser") as User
 
-        // 2. Se for um CLIMBER, devolvemos o perfil dele
+        // 2. If it is a CLIMBER, return their profile
         if (user.role == UserRole.CLIMBER) {
             val profile = profileService.getClimberProfileWithUser(user.id, user)
             return ResponseEntity.ok(profile)
@@ -38,10 +38,7 @@ class ProfileController(
 
         return ResponseEntity
             .status(HttpStatus.FORBIDDEN)
-            .body(mapOf("error" to "Apenas escaladores têm este tipo de perfi.l"))
-
-        // (No futuro podemos adicionar o código para devolver o perfil do GYM_OWNER aqui)
-        // return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("error" to "Apenas escaladores têm este tipo de perfil."))
+            .body(mapOf("error" to "Only climbers have this type of profile."))
     }
 
     @PutMapping("/me")
@@ -57,17 +54,17 @@ class ProfileController(
                     if (userRepository.existsByUsername(newUsername)) {
                         return ResponseEntity
                             .status(HttpStatus.BAD_REQUEST)
-                            .body(mapOf("error" to "Este username já está em uso por outro utilizador."))
+                            .body(mapOf("error" to "This username is already in use by another user."))
                     }
                     userRepository.updateUsername(user.id, newUsername)
                 }
             }
 
             profileService.updateClimberProfile(user.id, input.bio, input.height, input.apeIndex)
-            return ResponseEntity.ok(mapOf("message" to "Perfil atualizado com sucesso!"))
+            return ResponseEntity.ok(mapOf("message" to "Profile updated successfully!"))
         }
 
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("error" to "Apenas escaladores podem atualizar estes dados."))
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("error" to "Only climbers can update this data."))
     }
 
     @PostMapping("/me/avatar")
@@ -75,29 +72,27 @@ class ProfileController(
         @RequestParam("file") file: org.springframework.web.multipart.MultipartFile,
         request: HttpServletRequest
     ): ResponseEntity<Any> {
-        // 1. Ir buscar o utilizador autenticado pelo Interceptor
         val user = request.getAttribute("authenticatedUser") as User
 
-        // 2. Só escaladores podem ter avatar de perfil
         if (user.role == UserRole.CLIMBER) {
             if (file.isEmpty) {
                 return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(mapOf("error" to "O ficheiro enviado está vazio."))
+                    .body(mapOf("error" to "The uploaded file is empty."))
             }
 
-            // 3. Chamar o serviço para guardar no MinIO e atualizar o caminho na Base de Dados
+            // Call service to store in MinIO and update path in PostgreSQL
             val avatarUrl = profileService.updateClimberAvatar(user.id, file)
 
             return ResponseEntity.ok(mapOf(
-                "message" to "Foto de perfil atualizada com sucesso!",
+                "message" to "Profile picture updated successfully!",
                 "avatarUrl" to avatarUrl
             ))
         }
 
         return ResponseEntity
             .status(HttpStatus.FORBIDDEN)
-            .body(mapOf("error" to "Apenas escaladores podem atualizar o avatar."))
+            .body(mapOf("error" to "Only climbers can update the avatar."))
     }
 
     @GetMapping("/me/projects")
@@ -111,6 +106,6 @@ class ProfileController(
 
         return ResponseEntity
             .status(HttpStatus.FORBIDDEN)
-            .body(mapOf("error" to "Apenas escaladores têm projetos guardados."))
+            .body(mapOf("error" to "Only climbers have saved projects."))
     }
 }

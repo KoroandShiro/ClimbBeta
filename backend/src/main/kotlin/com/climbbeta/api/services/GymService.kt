@@ -25,26 +25,26 @@ class GymService(
         validateGymData(ownerId, name, address, city)
 
         if (authenticatedUser.role != UserRole.ADMIN && authenticatedUser.role != UserRole.GYM_OWNER) {
-            throw SecurityException("Apenas ADMIN ou GYM_OWNER podem criar ginásios.")
+            throw SecurityException("Only ADMIN or GYM_OWNER can create gyms.")
         }
 
         if (authenticatedUser.role == UserRole.GYM_OWNER && authenticatedUser.status != UserStatus.VERIFIED) {
-            throw SecurityException("A conta precisa de ser verificada antes de poder criar ginásios. Insira o código de ativação.")
+            throw SecurityException("Account must be verified before creating gyms. Please enter the activation code.")
         }
 
         if (authenticatedUser.role == UserRole.GYM_OWNER && authenticatedUser.id != ownerId) {
-            throw SecurityException("GYM_OWNER só pode criar ginásios com o próprio ownerId.")
+            throw SecurityException("GYM_OWNER can only create gyms using their own ownerId.")
         }
 
         if (!gymRepository.existsGymOwnerProfile(ownerId)) {
-            throw IllegalArgumentException("ownerId inválido: não existe perfil de gym owner.")
+            throw IllegalArgumentException("Invalid ownerId: gym owner profile does not exist.")
         }
 
         val ownerUser = userRepository.getUserById(ownerId)
-            ?: throw IllegalArgumentException("ownerId inválido: utilizador não encontrado.")
+            ?: throw IllegalArgumentException("Invalid ownerId: user not found.")
 
         if (ownerUser.role != UserRole.GYM_OWNER) {
-            throw IllegalArgumentException("ownerId inválido: o utilizador não tem role GYM_OWNER.")
+            throw IllegalArgumentException("Invalid ownerId: user does not have the GYM_OWNER role.")
         }
 
         val gym = Gym(
@@ -62,10 +62,10 @@ class GymService(
     fun getGyms(): List<Gym> = gymRepository.getGyms()
 
     fun getGymById(id: Int): Gym {
-        if (id <= 0) throw IllegalArgumentException("ID inválido.")
+        if (id <= 0) throw IllegalArgumentException("Invalid ID.")
 
         return gymRepository.getGymById(id)
-            ?: throw NoSuchElementException("Ginásio não encontrado.")
+            ?: throw NoSuchElementException("Gym not found.")
     }
 
     fun updateGym(
@@ -76,17 +76,17 @@ class GymService(
         city: String,
         coverImageUrl: String?
     ) {
-        if (id <= 0) throw IllegalArgumentException("ID inválido.")
+        if (id <= 0) throw IllegalArgumentException("Invalid ID.")
 
         val existingGym = gymRepository.getGymById(id)
-            ?: throw NoSuchElementException("Ginásio não encontrado.")
+            ?: throw NoSuchElementException("Gym not found.")
 
         if (authenticatedUser.role != UserRole.ADMIN && authenticatedUser.role != UserRole.GYM_OWNER) {
-            throw SecurityException("Apenas ADMIN ou GYM_OWNER podem atualizar ginásios.")
+            throw SecurityException("Only ADMIN or GYM_OWNER can update gyms.")
         }
 
         if (authenticatedUser.role == UserRole.GYM_OWNER && existingGym.ownerId != authenticatedUser.id) {
-            throw SecurityException("GYM_OWNER só pode atualizar o próprio ginásio.")
+            throw SecurityException("GYM_OWNER can only update their own gym.")
         }
 
         validateGymData(existingGym.ownerId, name, address, city)
@@ -100,14 +100,14 @@ class GymService(
 
         val updated = gymRepository.updateGym(updatedGym)
         if (!updated) {
-            throw NoSuchElementException("Ginásio não encontrado para atualização.")
+            throw NoSuchElementException("Gym not found for verification/update.")
         }
     }
 
     private fun validateGymData(ownerId: Int, name: String, address: String, city: String) {
-        if (ownerId <= 0) throw IllegalArgumentException("ownerId inválido.")
-        if (name.isBlank()) throw IllegalArgumentException("name é obrigatório.")
-        if (address.isBlank()) throw IllegalArgumentException("address é obrigatório.")
-        if (city.isBlank()) throw IllegalArgumentException("city é obrigatório.")
+        if (ownerId <= 0) throw IllegalArgumentException("Invalid ownerId.")
+        if (name.isBlank()) throw IllegalArgumentException("name is required.")
+        if (address.isBlank()) throw IllegalArgumentException("address is required.")
+        if (city.isBlank()) throw IllegalArgumentException("city is required.")
     }
 }

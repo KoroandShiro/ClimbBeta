@@ -29,7 +29,7 @@ export default function EditProfileScreen() {
     const [height, setHeight] = useState<string>('');
     const [apeIndex, setApeIndex] = useState<string>('');
 
-    // Estados para a foto de perfil
+    // Profile photo states
     const [avatarUri, setAvatarUri] = useState<string>('https://cdn-icons-png.flaticon.com/512/3135/3135715.png');
     const [isMenuVisible, setIsMenuVisible] = useState(false);
     const [isFullscreenVisible, setIsFullscreenVisible] = useState(false);
@@ -52,8 +52,8 @@ export default function EditProfileScreen() {
                     setAvatarUri(p.avatarUrl);
                 }
             } catch (err: any) {
-                console.error('Erro a carregar perfil', err);
-                Alert.alert('Erro', 'Não foi possível carregar o perfil.');
+                console.error('Error loading profile', err);
+                Alert.alert('Error', 'Could not load profile.');
             } finally {
                 if (mounted) setLoading(false);
             }
@@ -62,11 +62,11 @@ export default function EditProfileScreen() {
         return () => { mounted = false; };
     }, []);
 
-    // --- FUNÇÕES PARA FOTO (CÂMARA E GALERIA) ---
+    // --- PHOTO FUNCTIONS (CAMERA AND GALLERY) ---
     async function pickImageFromGallery() {
         const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (!permissionResult.granted) {
-            Alert.alert('Permissão necessária', 'Precisamos de acesso à tua galeria para escolher uma foto.');
+            Alert.alert('Permission required', 'We need access to your gallery to choose a photo.');
             return;
         }
 
@@ -86,7 +86,7 @@ export default function EditProfileScreen() {
     async function takePhotoWithCamera() {
         const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
         if (!permissionResult.granted) {
-            Alert.alert('Permissão necessária', 'Precisamos de acesso à câmara para tirar uma foto.');
+            Alert.alert('Permission required', 'We need camera access to take a photo.');
             return;
         }
 
@@ -103,10 +103,10 @@ export default function EditProfileScreen() {
     }
 
     async function onSave() {
-        if (saving) return; // Otimização 1: Curto-circuito contra cliques em duplicado
+        if (saving) return;
 
         if (username.trim().length < 3) {
-            Alert.alert('Nome de utilizador inválido', 'O nome de utilizador deve ter pelo menos 3 caracteres.');
+            Alert.alert('Invalid username', 'The username must be at least 3 characters long.');
             return;
         }
         const heightVal = height.trim() === '' ? null : Number(height);
@@ -114,17 +114,17 @@ export default function EditProfileScreen() {
         const apeVal = normalizedApe === '' ? null : Number(normalizedApe);
 
         if (heightVal != null && (Number.isNaN(heightVal) || heightVal <= 0)) {
-            Alert.alert('Altura inválida', 'Introduz uma altura válida em cm.');
+            Alert.alert('Invalid height', 'Please enter a valid height in cm.');
             return;
         }
         if (apeVal != null && Number.isNaN(apeVal)) {
-            Alert.alert('Ape Index inválido', 'Introduz um valor numérico para ape index.');
+            Alert.alert('Invalid Ape Index', 'Please enter a numerical value for ape index.');
             return;
         }
 
         setSaving(true);
         try {
-            // PASSO 1: Atualizar dados de texto
+            // STEP 1: Update text data
             await updateMyProfile({
                 username: username.trim(),
                 bio: bio.trim() === '' ? null : bio.trim(),
@@ -132,7 +132,7 @@ export default function EditProfileScreen() {
                 apeIndex: apeVal,
             });
 
-            // PASSO 2: Se o utilizador escolheu uma foto nova
+            // STEP 2: If the user chose a new photo
             if (avatarUri.startsWith('file:') || avatarUri.startsWith('content:')) {
                 const filename = avatarUri.split('/').pop() || 'avatar.jpg';
                 const match = /\.(\w+)$/.exec(filename);
@@ -147,13 +147,12 @@ export default function EditProfileScreen() {
 
                 try {
                     const response = await uploadMyAvatar(formData);
-                    console.log('Foto enviada com sucesso para o MinIO:', response.avatarUrl);
+                    console.log('Photo uploaded successfully to MinIO:', response.avatarUrl);
                 } catch (avatarErr) {
-                    console.warn('Erro no upload da foto:', avatarErr);
-                    // Otimização 2: Alerta contextual caso apenas a imagem falhe
+                    console.warn('Error uploading photo:', avatarErr);
                     Alert.alert(
-                        'Perfil Atualizado',
-                        'Os teus dados foram guardados com sucesso, mas ocorreu um problema ao processar a tua nova imagem.',
+                        'Profile Updated',
+                        'Your data was saved successfully, but there was a problem processing your new image.',
                         [{ text: 'OK', onPress: () => navigation.goBack() }]
                     );
                     return;
@@ -162,9 +161,9 @@ export default function EditProfileScreen() {
 
             navigation.goBack();
         } catch (err: any) {
-            console.error('Erro ao guardar perfil', err);
+            console.error('Error saving profile', err);
             const serverMessage = err?.response?.data?.error;
-            Alert.alert('Erro ao guardar', serverMessage ?? err?.message ?? 'Falha ao guardar perfil.');
+            Alert.alert('Error saving', serverMessage ?? err?.message ?? 'Failed to save profile.');
         } finally {
             setSaving(false);
         }
@@ -174,7 +173,7 @@ export default function EditProfileScreen() {
         return (
             <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#2E7D32" />
-                <Text style={{ marginTop: 10, color: '#777' }}>A carregar dados...</Text>
+                <Text style={{ marginTop: 10, color: '#777' }}>Loading data...</Text>
             </View>
         );
     }
@@ -183,7 +182,7 @@ export default function EditProfileScreen() {
         <KeyboardAvoidingView behavior={Platform.select({ ios: 'padding', android: undefined })} style={{ flex: 1 }}>
             <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
 
-                {/* Secção da foto de perfil interativa */}
+                {/* Interactive profile photo section */}
                 <View style={styles.avatarContainer}>
                     <TouchableOpacity activeOpacity={0.8} onPress={() => setIsMenuVisible(true)}>
                         <Image source={{ uri: avatarUri }} style={styles.avatarPreview} />
@@ -191,14 +190,14 @@ export default function EditProfileScreen() {
                             <Ionicons name="camera" size={16} color="#fff" />
                         </View>
                     </TouchableOpacity>
-                    <Text style={styles.avatarHint}>Toca na foto para alterar</Text>
+                    <Text style={styles.avatarHint}>Tap photo to change</Text>
                 </View>
 
                 <View style={styles.formSection}>
-                    <Text style={styles.label}>Nome de utilizador</Text>
+                    <Text style={styles.label}>Username</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="O teu nome de utilizador"
+                        placeholder="Your username"
                         value={username}
                         onChangeText={setUsername}
                         editable={!saving}
@@ -206,92 +205,88 @@ export default function EditProfileScreen() {
                         autoCorrect={false}
                     />
 
-                    <Text style={styles.label}>Correio eletrónico</Text>
+                    <Text style={styles.label}>Email Address</Text>
                     <Text style={styles.value}>{profile?.email ?? ''}</Text>
 
-                    <Text style={styles.label}>Biografia</Text>
+                    <Text style={styles.label}>Bio</Text>
                     <TextInput
                         style={[styles.input, { minHeight: 80 }]}
                         multiline
-                        placeholder="Escreve uma biografia..."
+                        placeholder="Write a bio..."
                         value={bio}
                         onChangeText={setBio}
                         editable={!saving}
                     />
 
-                    <Text style={styles.label}>Altura (cm)</Text>
+                    <Text style={styles.label}>Height (cm)</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="Ex: 180"
+                        placeholder="e.g., 180"
                         keyboardType="numeric"
                         value={height}
-                        // Otimização 3: Bloqueia caracteres não numéricos em tempo real
                         onChangeText={(txt) => setHeight(txt.replace(/[^0-9]/g, ''))}
                         editable={!saving}
                     />
 
-                    <Text style={styles.label}>Relação de envergadura (*Ape Index*)</Text>
+                    <Text style={styles.label}>Ape Index (Wingspan ratio)</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="Ex: 1.04"
+                        placeholder="e.g., 1.04"
                         keyboardType="decimal-pad"
                         value={apeIndex}
-                        // Otimização 3: Permite apenas dígitos, pontos e vírgulas
                         onChangeText={(txt) => setApeIndex(txt.replace(/[^0-9.,]/g, ''))}
                         editable={!saving}
                     />
 
                     <View style={styles.buttonsRow}>
-                        {/* Cancelar agora fica à ESQUERDA */}
                         <TouchableOpacity
                             style={[styles.btn, { backgroundColor: '#9E9E9E' }]}
                             onPress={() => navigation.goBack()}
                             disabled={saving}
                         >
-                            <Text style={styles.btnText}>Cancelar</Text>
+                            <Text style={styles.btnText}>Cancel</Text>
                         </TouchableOpacity>
 
-                        {/* Guardar agora fica à DIREITA */}
                         <TouchableOpacity
                             style={[styles.btn, { backgroundColor: '#2E7D32' }]}
                             onPress={onSave}
                             disabled={saving}
                         >
-                            {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.btnText}>Guardar</Text>}
+                            {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.btnText}>Save</Text>}
                         </TouchableOpacity>
                     </View>
                 </View>
             </ScrollView>
 
-            {/* --- Janela flutuante (*Dropdown* / *Bottom Sheet*) --- */}
+            {/* --- Dropdown / Bottom Sheet Modal --- */}
             <Modal visible={isMenuVisible} transparent animationType="slide" onRequestClose={() => setIsMenuVisible(false)}>
                 <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setIsMenuVisible(false)}>
                     <View style={styles.menuContainer}>
-                        <Text style={styles.menuTitle}>Foto de perfil</Text>
+                        <Text style={styles.menuTitle}>Profile Photo</Text>
 
                         <TouchableOpacity style={styles.menuItem} onPress={() => { setIsMenuVisible(false); setIsFullscreenVisible(true); }}>
                             <Ionicons name="eye-outline" size={22} color="#333" />
-                            <Text style={styles.menuItemText}>Ver foto em ponto grande</Text>
+                            <Text style={styles.menuItemText}>View full screen photo</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.menuItem} onPress={takePhotoWithCamera}>
                             <Ionicons name="camera-outline" size={22} color="#333" />
-                            <Text style={styles.menuItemText}>Tirar foto nova (Câmara)</Text>
+                            <Text style={styles.menuItemText}>Take new photo (Camera)</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.menuItem} onPress={pickImageFromGallery}>
                             <Ionicons name="image-outline" size={22} color="#333" />
-                            <Text style={styles.menuItemText}>Escolher da galeria</Text>
+                            <Text style={styles.menuItemText}>Choose from gallery</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity style={[styles.menuItem, styles.cancelItem]} onPress={() => setIsMenuVisible(false)}>
-                            <Text style={styles.cancelItemText}>Cancelar</Text>
+                            <Text style={styles.cancelItemText}>Cancel</Text>
                         </TouchableOpacity>
                     </View>
                 </TouchableOpacity>
             </Modal>
 
-            {/* --- Visualização em ecrã inteiro (*Fullscreen*) --- */}
+            {/* --- Fullscreen Visualization Modal --- */}
             <Modal visible={isFullscreenVisible} transparent animationType="fade" onRequestClose={() => setIsFullscreenVisible(false)}>
                 <View style={styles.fullscreenContainer}>
                     <TouchableOpacity style={styles.closeFullscreenButton} onPress={() => setIsFullscreenVisible(false)}>
@@ -305,36 +300,21 @@ export default function EditProfileScreen() {
     );
 }
 
+// O resto do ficheiro (styles) permanece igual
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#f5f5f5' },
     loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f5f5f5' },
-
-    // Estilos do avatar
     avatarContainer: { alignItems: 'center', marginTop: 20, marginBottom: 10 },
     avatarPreview: { width: 120, height: 120, borderRadius: 60, backgroundColor: '#e0e0e0', borderWidth: 3, borderColor: '#fff' },
     cameraIconBadge: { position: 'absolute', bottom: 2, right: 2, backgroundColor: '#2E7D32', width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#fff' },
     avatarHint: { fontSize: 12, color: '#777', marginTop: 8 },
-
     formSection: { padding: 20, backgroundColor: '#fff', margin: 12, borderRadius: 10 },
     label: { fontSize: 13, color: '#777', marginTop: 10 },
     value: { fontSize: 16, color: '#333', marginTop: 4 },
-
-    input: {
-        width: '100%',
-        borderColor: '#e0e0e0',
-        borderWidth: 1,
-        borderRadius: 8,
-        padding: 10,
-        marginTop: 8,
-        backgroundColor: '#fff',
-        color: '#333',
-    },
-
+    input: { width: '100%', borderColor: '#e0e0e0', borderWidth: 1, borderRadius: 8, padding: 10, marginTop: 8, backgroundColor: '#fff', color: '#333' },
     buttonsRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 },
     btn: { flex: 1, padding: 12, borderRadius: 8, alignItems: 'center', marginHorizontal: 6 },
     btnText: { color: '#fff', fontWeight: 'bold' },
-
-    // Estilos da janela flutuante
     modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
     menuContainer: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20, paddingBottom: Platform.OS === 'ios' ? 40 : 20 },
     menuTitle: { fontSize: 16, fontWeight: 'bold', color: '#666', marginBottom: 15, textAlign: 'center' },
@@ -342,8 +322,6 @@ const styles = StyleSheet.create({
     menuItemText: { fontSize: 16, color: '#333' },
     cancelItem: { justifyContent: 'center', borderBottomWidth: 0, marginTop: 10, backgroundColor: '#f5f5f5', borderRadius: 10 },
     cancelItemText: { fontSize: 16, fontWeight: 'bold', color: '#666' },
-
-    // Estilos de ecrã inteiro
     fullscreenContainer: { flex: 1, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' },
     fullscreenImage: { width: '100%', height: '80%' },
     closeFullscreenButton: { position: 'absolute', top: 50, right: 20, zIndex: 10 },

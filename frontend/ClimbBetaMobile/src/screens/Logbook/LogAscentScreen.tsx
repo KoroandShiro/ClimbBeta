@@ -5,7 +5,7 @@ import { logAscent } from '../../services/ascentService';
 
 export default function LogAscentScreen({ route, navigation }: any) {
     const boulderId = route.params?.boulderId;
-    const boulderColor = route.params?.boulderColor || 'Este Boulder';
+    const boulderColor = route.params?.boulderColor || 'This Boulder';
 
     const [attempts, setAttempts] = useState(1);
     const [style, setStyle] = useState('Top'); // Flash, Onsight, Top
@@ -15,7 +15,7 @@ export default function LogAscentScreen({ route, navigation }: any) {
     const handleSave = async () => {
         try {
             setIsLoading(true);
-            const today = new Date().toISOString().split('T')[0]; // Formato YYYY-MM-DD
+            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
 
             await logAscent({
                 boulderId: boulderId,
@@ -25,11 +25,11 @@ export default function LogAscentScreen({ route, navigation }: any) {
                 notes: notes,
             });
 
-            Alert.alert("Sucesso!", "Subida registada no teu Logbook com sucesso! 🧗‍♂️", [
-                { text: "Boa!", onPress: () => navigation.goBack() } // Volta ao ginásio
+            Alert.alert("Success!", "Ascent successfully logged in your Logbook! 🧗‍♂️", [
+                { text: "Awesome!", onPress: () => navigation.goBack() } // Goes back to the gym
             ]);
         } catch (error: any) {
-            Alert.alert("Erro ao gravar", error.message || "Tenta novamente.");
+            Alert.alert("Error saving", error.message || "Please try again.");
         } finally {
             setIsLoading(false);
         }
@@ -38,12 +38,12 @@ export default function LogAscentScreen({ route, navigation }: any) {
     return (
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
             <ScrollView contentContainerStyle={styles.scroll}>
-                <Text style={styles.title}>Registar Subida</Text>
+                <Text style={styles.title}>Log Ascent</Text>
                 <Text style={styles.subtitle}>Boulder {boulderColor}</Text>
 
-                {/* Secção de Tentativas */}
+                {/* Attempts Section */}
                 <View style={styles.section}>
-                    <Text style={styles.label}>Tentativas</Text>
+                    <Text style={styles.label}>Attempts</Text>
                     <View style={styles.counterRow}>
                         <TouchableOpacity style={styles.circleBtn} onPress={() => setAttempts(Math.max(1, attempts - 1))}>
                             <Ionicons name="remove" size={24} color="#333" />
@@ -55,9 +55,9 @@ export default function LogAscentScreen({ route, navigation }: any) {
                     </View>
                 </View>
 
-                {/* Secção de Estilo */}
+                {/* Style Section */}
                 <View style={styles.section}>
-                    <Text style={styles.label}>Estilo</Text>
+                    <Text style={styles.label}>Style</Text>
                     <View style={styles.styleRow}>
                         {['Flash', 'Onsight', 'Top'].map((s) => (
                             <TouchableOpacity
@@ -71,12 +71,12 @@ export default function LogAscentScreen({ route, navigation }: any) {
                     </View>
                 </View>
 
-                {/* Secção de Notas */}
+                {/* Notes Section */}
                 <View style={styles.section}>
-                    <Text style={styles.label}>Notas (Opcional)</Text>
+                    <Text style={styles.label}>Notes (Optional)</Text>
                     <TextInput
                         style={styles.textArea}
-                        placeholder="Ex: Escorreguei na saída, mas o crux foi fácil."
+                        placeholder="e.g., Slipped at the topout, but the crux felt easy."
                         multiline
                         numberOfLines={4}
                         value={notes}
@@ -84,9 +84,9 @@ export default function LogAscentScreen({ route, navigation }: any) {
                     />
                 </View>
 
-                {/* Botão de Gravar */}
+                {/* Save Button */}
                 <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={isLoading}>
-                    {isLoading ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveBtnText}>Gravar no Logbook</Text>}
+                    {isLoading ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveBtnText}>Save to Logbook</Text>}
                 </TouchableOpacity>
             </ScrollView>
         </KeyboardAvoidingView>
@@ -100,19 +100,15 @@ const styles = StyleSheet.create({
     subtitle: { fontSize: 16, color: '#666', marginBottom: 30 },
     section: { marginBottom: 25 },
     label: { fontSize: 16, fontWeight: '600', color: '#333', marginBottom: 10 },
-    
     counterRow: { flexDirection: 'row', alignItems: 'center' },
     circleBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#e0e0e0', justifyContent: 'center', alignItems: 'center' },
     counterText: { fontSize: 24, fontWeight: 'bold', marginHorizontal: 20, minWidth: 30, textAlign: 'center' },
-    
     styleRow: { flexDirection: 'row', justifyContent: 'space-between' },
     styleBtn: { flex: 1, paddingVertical: 10, borderWidth: 1, borderColor: '#ccc', borderRadius: 8, marginHorizontal: 4, alignItems: 'center' },
     styleBtnActive: { backgroundColor: '#2E7D32', borderColor: '#2E7D32' },
     styleBtnText: { color: '#666', fontWeight: '500' },
     styleBtnTextActive: { color: '#fff', fontWeight: 'bold' },
-    
     textArea: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 15, fontSize: 16, height: 100, textAlignVertical: 'top' },
-    
     saveBtn: { backgroundColor: '#2E7D32', padding: 16, borderRadius: 10, alignItems: 'center', marginTop: 10 },
     saveBtnText: { color: '#fff', fontSize: 18, fontWeight: 'bold' }
 });

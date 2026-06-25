@@ -62,7 +62,7 @@ class BoulderController(private val boulderService: BoulderService) {
         val user = request.getAttribute("authenticatedUser") as User
         return try {
             boulderService.updateBoulderStatus(user, boulderId, input.isActive)
-            ResponseEntity.ok(mapOf("message" to "Estado da via atualizado com sucesso!"))
+            ResponseEntity.ok(mapOf("message" to "Route status updated successfully!"))
         } catch (e: SecurityException) {
             ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("error" to e.message))
         } catch (e: IllegalArgumentException) {
@@ -76,7 +76,7 @@ class BoulderController(private val boulderService: BoulderService) {
         return if (boulder != null) {
             ResponseEntity.ok(boulder)
         } else {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "Via não encontrada."))
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "Route not found."))
         }
     }
 }

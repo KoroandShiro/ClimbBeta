@@ -21,7 +21,7 @@ export default function LoginScreen({ navigation }: any) {
 
     const handleLogin = async () => {
         if (!email.trim() || !password) {
-            setError('Preenche o email e a palavra-passe.');
+            setError('Please fill in both email and password.');
             return;
         }
         setLoading(true);
@@ -29,13 +29,12 @@ export default function LoginScreen({ navigation }: any) {
         try {
             await login(email.trim(), password);
         } catch (e) {
-
-            console.error("ERRO REAL APANHADO NO LOGIN:", e);
+            console.error("ACTUAL ERROR CAUGHT IN LOGIN:", e);
 
             if (e instanceof ApiError && e.status === 401) {
-                setError('Email ou palavra-passe incorretos.');
+                setError('Incorrect email or password.');
             } else {
-                setError('Não foi possível ligar ao servidor. Tenta novamente.');
+                setError('Could not connect to the server. Please try again.');
             }
         } finally {
             setLoading(false);
@@ -49,7 +48,7 @@ export default function LoginScreen({ navigation }: any) {
         >
             <View style={styles.inner}>
                 <Text style={styles.title}>ClimbBeta</Text>
-                <Text style={styles.subtitle}>Entra na tua conta</Text>
+                <Text style={styles.subtitle}>Log into your account</Text>
 
                 {error && <Text style={styles.error}>{error}</Text>}
 
@@ -64,7 +63,7 @@ export default function LoginScreen({ navigation }: any) {
                 />
                 <TextInput
                     style={styles.input}
-                    placeholder="Palavra-passe"
+                    placeholder="Password"
                     placeholderTextColor="#9E9E9E"
                     secureTextEntry
                     value={password}
@@ -74,12 +73,12 @@ export default function LoginScreen({ navigation }: any) {
                 <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
                     {loading
                         ? <ActivityIndicator color="#fff" />
-                        : <Text style={styles.buttonText}>Entrar</Text>
+                        : <Text style={styles.buttonText}>Log In</Text>
                     }
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-                    <Text style={styles.link}>Ainda não tens conta? <Text style={styles.linkBold}>Regista-te</Text></Text>
+                    <Text style={styles.link}>Don't have an account yet? <Text style={styles.linkBold}>Sign Up</Text></Text>
                 </TouchableOpacity>
             </View>
         </KeyboardAvoidingView>

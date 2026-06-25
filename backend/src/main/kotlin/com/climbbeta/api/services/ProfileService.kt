@@ -13,11 +13,11 @@ import java.util.UUID
 @Service
 class ProfileService(
     private val profileRepository: ProfileRepository,
-    private val minioClient: MinioClient // 🆕 Injeta o cliente do MinIO aqui
+    private val minioClient: MinioClient // 🆕 Inject MinIO client here
 ) {
     fun getClimberProfile(userId: Int): ClimberProfile {
         return profileRepository.getClimberProfile(userId)
-            ?: throw IllegalArgumentException("Perfil não encontrado.")
+            ?: throw IllegalArgumentException("Profile not found.")
     }
 
     fun getClimberProfileWithUser(userId: Int, user: User): ClimberProfileWithUserDTO {
@@ -29,7 +29,7 @@ class ProfileService(
             bio = profile.bio,
             height = profile.height,
             apeIndex = profile.apeIndex,
-            avatarUrl = profile.avatarUrl // 🆕 corrigido de 'null' para 'profile.avatarUrl'!
+            avatarUrl = profile.avatarUrl // 🆕 fixed from 'null' to 'profile.avatarUrl'!
         )
     }
 
@@ -43,14 +43,14 @@ class ProfileService(
         profileRepository.updateClimberProfile(updatedProfile)
     }
 
-    // 🆕 Adiciona a função que vai fazer a ponte com o teu MinIO dockerizado
+    // 🆕 Adds the bridging function to communicate with your Dockerized MinIO instance
     fun updateClimberAvatar(userId: Int, file: MultipartFile): String {
         val bucketName = "climbbeta-media"
 
-        // 1. Criar um nome de ficheiro único para evitar substituições acidentais
+        // 1. Create a unique filename to prevent accidental overrides
         val fileName = "$userId-${UUID.randomUUID()}-${file.originalFilename}"
 
-        // 2. Enviar o stream da imagem diretamente para o MinIO
+        // 2. Stream the image data directly to MinIO
         file.inputStream.use { inputStream ->
             minioClient.putObject(
                 PutObjectArgs.builder()
@@ -62,10 +62,10 @@ class ProfileService(
             )
         }
 
-        // 3. Gerar o URL público usando o IP da tua máquina para o telemóvel conseguir aceder
+        // 3. Generate public URL using your host IP so the mobile device can access it
         val avatarUrl = "http://192.168.1.141:9000/$bucketName/$fileName"
 
-        // 4. Atualizar o registo no PostgreSQL usando o métdo novo do JdbiProfileRepository
+        // 4. Update the record in PostgreSQL using the new method from JdbiProfileRepository
         profileRepository.updateAvatarUrl(userId, avatarUrl)
 
         return avatarUrl

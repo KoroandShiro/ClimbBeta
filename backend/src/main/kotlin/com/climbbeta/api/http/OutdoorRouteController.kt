@@ -24,7 +24,7 @@ class OutdoorRouteController(
     @PostMapping
     fun createRoute(
         @RequestBody input: OutdoorRouteCreateInput,
-        @RequestAttribute("authenticatedUser") user: User // Injetado automaticamente pelo AuthenticationInterceptor!
+        @RequestAttribute("authenticatedUser") user: User // Automatically injected by AuthenticationInterceptor!
     ): ResponseEntity<Map<String, Int>> {
         val routeId = outdoorRouteService.createRoute(
             creatorId = user.id,

@@ -19,15 +19,15 @@ class UserService(
 ) {
     fun createUser(username: String, email: String, passwordRaw: String, role: UserRole): User {
         if (userRepository.existsByEmail(email)) {
-            throw IllegalArgumentException("Este email já está registado!")
+            throw IllegalArgumentException("This email is already registered!")
         }
         if (userRepository.existsByUsername(username)) {
-            throw IllegalArgumentException("Este username já está em uso!")
+            throw IllegalArgumentException("This username is already in use!")
         }
 
         val hashedPw = BCrypt.hashpw(passwordRaw, BCrypt.gensalt())
 
-        // GYM_OWNER começa PENDING até inserir um código de ativação do Admin
+        // GYM_OWNER starts as PENDING until an Admin activation code is provided
         val initialStatus = if (role == UserRole.GYM_OWNER) UserStatus.PENDING else UserStatus.VERIFIED
 
         val newUser = User(
@@ -43,17 +43,17 @@ class UserService(
 
     fun verifyActivationCode(authenticatedUser: User, code: String): User {
         if (authenticatedUser.role != UserRole.GYM_OWNER) {
-            throw SecurityException("Apenas GYM_OWNER pode verificar um código de ativação.")
+            throw SecurityException("Only GYM_OWNER can verify an activation code.")
         }
         if (authenticatedUser.status == UserStatus.VERIFIED) {
-            throw IllegalStateException("A conta já está verificada.")
+            throw IllegalStateException("Account is already verified.")
         }
 
         val activation = activationCodeRepository.getByCode(code)
-            ?: throw NoSuchElementException("Código de ativação inválido.")
+            ?: throw NoSuchElementException("Invalid activation code.")
 
         if (activation.isUsed) {
-            throw IllegalArgumentException("Este código já foi utilizado.")
+            throw IllegalArgumentException("This code has already been used.")
         }
 
         activationCodeRepository.markAsUsed(code, authenticatedUser.id)
@@ -63,26 +63,26 @@ class UserService(
     }
 
     fun login(email: String, passwordRaw: String): String {
-        // 1. Procurar o user pelo email
+        // 1. Search user by email
         val user = userRepository.getUserByEmail(email)
-            ?: throw IllegalArgumentException("Credenciais inválidas.")
+            ?: throw IllegalArgumentException("Invalid credentials.")
 
-        // 2. Verificar a password usando o BCrypt
+        // 2. Verify password with BCrypt
         if (!BCrypt.checkpw(passwordRaw, user.passwordHash)) {
-            throw IllegalArgumentException("Credenciais inválidas.")
+            throw IllegalArgumentException("Invalid credentials.")
         }
 
-        // 3. Se chegou aqui, está autorizado! Vamos gerar um Token aleatório (UUID)
+        // 3. Authorized! Generate a random Token (UUID string representation)
         val tokenString = UUID.randomUUID().toString()
 
-        // 4. Guardar na Base de Dados
+        // 4. Save token to the database
         val token = Token(
             tokenHash = tokenString,
             userId = user.id
         )
         tokenRepository.createToken(token)
 
-        // 5. Devolver apenas a string ao utilizador
+        // 5. Return only the raw token string to the client
         return tokenString
     }
 

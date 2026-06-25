@@ -16,14 +16,14 @@ class MediaController(
     @PostMapping("/upload")
     fun uploadMedia(@RequestParam("file") file: MultipartFile): ResponseEntity<Map<String, String>> {
         if (file.isEmpty) {
-            return ResponseEntity.badRequest().body(mapOf("error" to "O ficheiro submetido está vazio."))
+            return ResponseEntity.badRequest().body(mapOf("error" to "The submitted file is empty."))
         }
 
         return try {
             val fileUrl = mediaService.uploadMedia(file)
             ResponseEntity.ok(mapOf("url" to fileUrl))
         } catch (e: Exception) {
-            ResponseEntity.internalServerError().body(mapOf("error" to (e.message ?: "Erro interno no servidor")))
+            ResponseEntity.internalServerError().body(mapOf("error" to (e.message ?: "Internal server error")))
         }
     }
 }

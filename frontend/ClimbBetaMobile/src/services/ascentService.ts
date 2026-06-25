@@ -5,7 +5,7 @@ export interface AscentInput {
     outdoorRouteId?: number | null;
     freelogGymName?: string | null;
     freelogGrade?: string | null;
-    date: string; // Formato: YYYY-MM-DD
+    date: string; // Format: YYYY-MM-DD
     attempts: number;
     style: string | null;
     notes: string | null;
@@ -25,7 +25,6 @@ export interface Ascent {
     gymName?: string | null;
 }
 
-
 export async function logAscent(data: AscentInput): Promise<{ id: number }> {
     return apiFetch<{ id: number }>('/ascents', {
         method: 'POST',
@@ -41,12 +40,12 @@ export interface FeedItem {
     ascent: Ascent;
     authorUsername: string;
     authorAvatarUrl?: string | null;
-    postImageUrl?: string | null; 
+    postImageUrl?: string | null;
     routeName?: string | null;
     routeGrade?: string | null;
 }
 
-// Nova função para ir buscar o feed
+// New function to fetch the feed
 export async function getFeed(): Promise<FeedItem[]> {
     return apiFetch<FeedItem[]>('/feed');
 }

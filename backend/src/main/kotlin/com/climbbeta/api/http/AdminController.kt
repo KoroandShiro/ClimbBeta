@@ -32,7 +32,7 @@ class AdminController(
 
         if (user.role != UserRole.ADMIN) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(mapOf("error" to "Apenas ADMIN pode gerar códigos de ativação."))
+                .body(mapOf("error" to "Only ADMIN can generate activation codes."))
         }
 
         val code = UUID.randomUUID().toString()
@@ -49,7 +49,7 @@ class AdminController(
 
         if (user.role != UserRole.ADMIN) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(mapOf("error" to "Apenas ADMIN pode ver os códigos de ativação."))
+                .body(mapOf("error" to "Only ADMIN can view activation codes."))
         }
 
         val codes = activationCodeRepository.getAllCodes().map {

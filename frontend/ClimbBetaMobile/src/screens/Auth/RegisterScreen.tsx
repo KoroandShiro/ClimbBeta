@@ -23,11 +23,11 @@ export default function RegisterScreen({ navigation }: any) {
 
     const handleRegister = async () => {
         if (!username.trim() || !email.trim() || !password || !confirm) {
-            setError('Preenche todos os campos.');
+            setError('Please fill in all fields.');
             return;
         }
         if (password !== confirm) {
-            setError('As palavras-passe não coincidem.');
+            setError('Passwords do not match.');
             return;
         }
         setLoading(true);
@@ -37,9 +37,9 @@ export default function RegisterScreen({ navigation }: any) {
             navigation.navigate('Login', { registered: true });
         } catch (e) {
             if (e instanceof ApiError && e.status === 400) {
-                setError('Email ou nome de utilizador já em uso.');
+                setError('Email or username already in use.');
             } else {
-                setError('Não foi possível criar a conta. Tenta novamente.');
+                setError('Could not create account. Please try again.');
             }
         } finally {
             setLoading(false);
@@ -52,14 +52,14 @@ export default function RegisterScreen({ navigation }: any) {
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
             <ScrollView contentContainerStyle={styles.inner} keyboardShouldPersistTaps="handled">
-                <Text style={styles.title}>Criar Conta</Text>
-                <Text style={styles.subtitle}>Junta-te à comunidade ClimbBeta</Text>
+                <Text style={styles.title}>Create Account</Text>
+                <Text style={styles.subtitle}>Join the ClimbBeta community</Text>
 
                 {error && <Text style={styles.error}>{error}</Text>}
 
                 <TextInput
                     style={styles.input}
-                    placeholder="Nome de utilizador"
+                    placeholder="Username"
                     placeholderTextColor="#9E9E9E"
                     autoCapitalize="none"
                     value={username}
@@ -76,7 +76,7 @@ export default function RegisterScreen({ navigation }: any) {
                 />
                 <TextInput
                     style={styles.input}
-                    placeholder="Palavra-passe"
+                    placeholder="Password"
                     placeholderTextColor="#9E9E9E"
                     secureTextEntry
                     value={password}
@@ -84,7 +84,7 @@ export default function RegisterScreen({ navigation }: any) {
                 />
                 <TextInput
                     style={styles.input}
-                    placeholder="Confirmar palavra-passe"
+                    placeholder="Confirm Password"
                     placeholderTextColor="#9E9E9E"
                     secureTextEntry
                     value={confirm}
@@ -94,12 +94,12 @@ export default function RegisterScreen({ navigation }: any) {
                 <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
                     {loading
                         ? <ActivityIndicator color="#fff" />
-                        : <Text style={styles.buttonText}>Criar Conta</Text>
+                        : <Text style={styles.buttonText}>Create Account</Text>
                     }
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                    <Text style={styles.link}>Já tens conta? <Text style={styles.linkBold}>Entra aqui</Text></Text>
+                    <Text style={styles.link}>Already have an account? <Text style={styles.linkBold}>Log in here</Text></Text>
                 </TouchableOpacity>
             </ScrollView>
         </KeyboardAvoidingView>

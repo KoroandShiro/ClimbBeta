@@ -4,44 +4,44 @@ import { Ionicons } from '@expo/vector-icons';
 
 export default function AscentDetailsScreen() {
   return (
-    <ScrollView style={styles.container}>
-      {/* Mídia em grande destaque */}
-      <Image 
-        source={{ uri: 'https://images.unsplash.com/photo-1522163182402-834f871fd851?auto=format&fit=crop&w=800&q=80' }} 
-        style={styles.heroImage} 
-      />
+      <ScrollView style={styles.container}>
+        {/* Featured Media */}
+        <Image
+            source={{ uri: 'https://images.unsplash.com/photo-1522163182402-834f871fd851?auto=format&fit=crop&w=800&q=80' }}
+            style={styles.heroImage}
+        />
 
-      <View style={styles.content}>
-        <Text style={styles.routeTitle}>Vermelho Inclinado <Text style={styles.grade}>(V4)</Text></Text>
-        <Text style={styles.location}>Vertical Wall • Rúben Duarte</Text>
+        <View style={styles.content}>
+          <Text style={styles.routeTitle}>Steep Red <Text style={styles.grade}>(V4)</Text></Text>
+          <Text style={styles.location}>Vertical Wall • Rúben Duarte</Text>
 
-        <View style={styles.styleChip}>
-          <Text style={styles.styleText}>✨ Estilo: Flash</Text>
+          <View style={styles.styleChip}>
+            <Text style={styles.styleText}>✨ Style: Flash</Text>
+          </View>
+
+          <Text style={styles.sectionTitle}>Notes / Beta</Text>
+          <Text style={styles.notes}>That hold at the finish slipped a bit, but I managed to hold on! The key is to place a high heel hook on the right from the very beginning. 💪</Text>
+
+          <View style={styles.divider} />
+
+          <Text style={styles.sectionTitle}>Comments (2)</Text>
+          <View style={styles.commentBox}>
+            <Text style={styles.commentAuthor}>Gonçalo Matos:</Text>
+            <Text style={styles.commentText}>Great heel hook technique! I'm going to try this project tomorrow.</Text>
+          </View>
+          <View style={styles.commentBox}>
+            <Text style={styles.commentAuthor}>Ana Silva:</Text>
+            <Text style={styles.commentText}>Machine! 🔥</Text>
+          </View>
+
+          <View style={styles.inputRow}>
+            <TextInput style={styles.input} placeholder="Add a comment..." />
+            <TouchableOpacity style={styles.sendBtn}>
+              <Ionicons name="send" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
         </View>
-
-        <Text style={styles.sectionTitle}>Notas / Beta</Text>
-        <Text style={styles.notes}>Aquela presa no final escorregou um bocado, mas deu para segurar! A chave é meter o calcanhar alto na direita logo de início. 💪</Text>
-
-        <View style={styles.divider} />
-
-        <Text style={styles.sectionTitle}>Comentários (2)</Text>
-        <View style={styles.commentBox}>
-          <Text style={styles.commentAuthor}>Gonçalo Matos:</Text>
-          <Text style={styles.commentText}>Bela técnica de calcanhar! Amanhã vou tentar esse projeto.</Text>
-        </View>
-        <View style={styles.commentBox}>
-          <Text style={styles.commentAuthor}>Ana Silva:</Text>
-          <Text style={styles.commentText}>Máquina! 🔥</Text>
-        </View>
-
-        <View style={styles.inputRow}>
-          <TextInput style={styles.input} placeholder="Adicionar comentário..." />
-          <TouchableOpacity style={styles.sendBtn}>
-            <Ionicons name="send" size={20} color="#fff" />
-          </TouchableOpacity>
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
   );
 }
 

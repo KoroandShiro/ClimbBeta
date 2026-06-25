@@ -25,11 +25,11 @@ class BoulderService(
         imageUrl: String?
     ): Boulder {
         val gym = gymRepository.getGymById(gymId)
-            ?: throw IllegalArgumentException("Ginásio não encontrado.")
+            ?: throw IllegalArgumentException("Gym not found.")
 
-        // Validação de segurança: apenas ADMIN ou o dono DESSE gym
+        // Security validation: only ADMIN or the owner of THIS gym
         if (user.role != UserRole.ADMIN && gym.ownerId != user.id) {
-            throw SecurityException("Apenas o dono do ginásio pode adicionar vias aqui.")
+            throw SecurityException("Only the gym owner can add routes here.")
         }
 
         val boulder = Boulder(
@@ -50,13 +50,13 @@ class BoulderService(
 
     fun updateBoulderStatus(user: User, boulderId: Int, isActive: Boolean) {
         val boulder = boulderRepository.getBoulderById(boulderId)
-            ?: throw IllegalArgumentException("Via não encontrada.")
+            ?: throw IllegalArgumentException("Route not found.")
 
         val gym = gymRepository.getGymById(boulder.gymId)
-            ?: throw IllegalArgumentException("Ginásio associado não encontrado.")
+            ?: throw IllegalArgumentException("Associated gym not found.")
 
         if (user.role != UserRole.ADMIN && gym.ownerId != user.id) {
-            throw SecurityException("Apenas o dono do ginásio pode desativar esta via.")
+            throw SecurityException("Only the gym owner can deactivate this route.")
         }
 
         boulderRepository.updateBoulderStatus(boulderId, isActive)

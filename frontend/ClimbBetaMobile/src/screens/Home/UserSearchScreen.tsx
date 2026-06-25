@@ -14,13 +14,13 @@ export default function UserSearchScreen() {
                 setUsers([]);
                 return;
             }
-            
+
             setLoading(true);
             try {
                 const results = await searchUsers(searchQuery);
                 setUsers(results);
             } catch (error) {
-                console.error('Erro na pesquisa:', error);
+                console.error('Search error:', error);
             } finally {
                 setLoading(false);
             }
@@ -34,7 +34,7 @@ export default function UserSearchScreen() {
     }, [searchQuery]);
 
     const handleToggleFollow = async (userId: number, currentlyFollowing: boolean) => {
-        setUsers(prevUsers => 
+        setUsers(prevUsers =>
             prevUsers.map(u => u.id === userId ? { ...u, isFollowing: !currentlyFollowing } : u)
         );
 
@@ -45,7 +45,7 @@ export default function UserSearchScreen() {
                 await followUser(userId);
             }
         } catch (error) {
-            setUsers(prevUsers => 
+            setUsers(prevUsers =>
                 prevUsers.map(u => u.id === userId ? { ...u, isFollowing: currentlyFollowing } : u)
             );
         }
@@ -63,12 +63,12 @@ export default function UserSearchScreen() {
             <View style={styles.userInfo}>
                 <Text style={styles.username}>@{item.username}</Text>
             </View>
-            <TouchableOpacity 
+            <TouchableOpacity
                 style={[styles.followBtn, item.isFollowing && styles.followingBtn]}
                 onPress={() => handleToggleFollow(item.id, item.isFollowing)}
             >
                 <Text style={[styles.followText, item.isFollowing && styles.followingText]}>
-                    {item.isFollowing ? 'A Seguir' : 'Seguir'}
+                    {item.isFollowing ? 'Following' : 'Follow'}
                 </Text>
             </TouchableOpacity>
         </View>
@@ -78,13 +78,13 @@ export default function UserSearchScreen() {
         <View style={styles.container}>
             <View style={styles.searchContainer}>
                 <Ionicons name="search" size={20} color="#777" style={styles.searchIcon} />
-                <TextInput 
-                    style={styles.searchInput} 
-                    placeholder="Procurar escaladores..." 
+                <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search climbers..."
                     value={searchQuery}
                     onChangeText={setSearchQuery}
                     autoCapitalize="none"
-                    autoFocus 
+                    autoFocus
                 />
             </View>
 
@@ -97,7 +97,7 @@ export default function UserSearchScreen() {
                     renderItem={renderUser}
                     ListEmptyComponent={
                         searchQuery.length >= 2 ? (
-                            <Text style={styles.emptyText}>Nenhum utilizador encontrado.</Text>
+                            <Text style={styles.emptyText}>No users found.</Text>
                         ) : null
                     }
                 />
@@ -107,19 +107,19 @@ export default function UserSearchScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', padding: 15 },
-  searchContainer: { flexDirection: 'row', backgroundColor: '#f0f0f0', borderRadius: 10, padding: 10, alignItems: 'center', marginBottom: 20 },
-  searchIcon: { marginRight: 10 },
-  searchInput: { flex: 1, fontSize: 16 },
-  userCard: { flexDirection: 'row', alignItems: 'center', marginBottom: 15, paddingBottom: 15, borderBottomWidth: 1, borderBottomColor: '#eee' },
-  avatarPlaceholder: { width: 50, height: 50, borderRadius: 25, backgroundColor: '#ccc', marginRight: 15, justifyContent: 'center', alignItems: 'center' },
-  avatar: { width: 50, height: 50, borderRadius: 25 },
-  avatarText: { fontSize: 20, color: '#fff', fontWeight: 'bold' },
-  userInfo: { flex: 1 },
-  username: { fontSize: 16, fontWeight: 'bold', color: '#333' },
-  followBtn: { backgroundColor: '#2E7D32', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 20 },
-  followingBtn: { backgroundColor: '#e0e0e0' },
-  followText: { color: '#fff', fontWeight: 'bold' },
-  followingText: { color: '#333' },
-  emptyText: { textAlign: 'center', color: '#777', marginTop: 20 }
+    container: { flex: 1, backgroundColor: '#fff', padding: 15 },
+    searchContainer: { flexDirection: 'row', backgroundColor: '#f0f0f0', borderRadius: 10, padding: 10, alignItems: 'center', marginBottom: 20 },
+    searchIcon: { marginRight: 10 },
+    searchInput: { flex: 1, fontSize: 16 },
+    userCard: { flexDirection: 'row', alignItems: 'center', marginBottom: 15, paddingBottom: 15, borderBottomWidth: 1, borderBottomColor: '#eee' },
+    avatarPlaceholder: { width: 50, height: 50, borderRadius: 25, backgroundColor: '#ccc', marginRight: 15, justifyContent: 'center', alignItems: 'center' },
+    avatar: { width: 50, height: 50, borderRadius: 25 },
+    avatarText: { fontSize: 20, color: '#fff', fontWeight: 'bold' },
+    userInfo: { flex: 1 },
+    username: { fontSize: 16, fontWeight: 'bold', color: '#333' },
+    followBtn: { backgroundColor: '#2E7D32', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 20 },
+    followingBtn: { backgroundColor: '#e0e0e0' },
+    followText: { color: '#fff', fontWeight: 'bold' },
+    followingText: { color: '#333' },
+    emptyText: { textAlign: 'center', color: '#777', marginTop: 20 }
 });
