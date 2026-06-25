@@ -14,6 +14,13 @@ import { useAuth } from '../../contexts/AuthContext';
 import { getMyAscents, Ascent } from '../../services/ascentService';
 import { getMyProfile, ClimberProfileWithUserDTO } from '../../services/profileService';
 
+/**
+ * Core User Profile Dashboard.
+ *
+ * Aggregates and surfaces climber performance metrics, physical profile specs,
+ * administrative access tools (logout, config entrypoints), and logs chronological data
+ * segments recording the personal history timeline of logged ascents.
+ */
 export default function ProfileScreen({ navigation }: any) {
   const { logout } = useAuth();
 
@@ -22,6 +29,10 @@ export default function ProfileScreen({ navigation }: any) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  /**
+   * Refreshes dashboard logs and user bio matrices in parallel blocks
+   * whenever the view focused navigation frame updates.
+   */
   useFocusEffect(
       React.useCallback(() => {
         let mounted = true;
@@ -194,22 +205,39 @@ export default function ProfileScreen({ navigation }: any) {
   );
 }
 
+/**
+ * Resolves appropriate visual iconography tokens mapped against performance styles.
+ *
+ * @param {string|null} style - Sent performance categorization string identifier.
+ * @returns {"flash" | "checkmark-done"} Explicit icon type key assigned to the layout.
+ */
 function getAscentIcon(style?: string | null) {
   const normalized = (style ?? '').toLowerCase();
   if (normalized === 'flash') return 'flash' as const;
   return 'checkmark-done' as const;
 }
 
+/**
+ * Text case formatter normalization layer.
+ *
+ * @param {string|null} style - Technical performance style identifier.
+ */
 function formatStyle(style?: string | null) {
   if (!style) return 'Ascent';
   return style.charAt(0).toUpperCase() + style.slice(1).toLowerCase();
 }
 
+/**
+ * Chronological timestamp formatter string compiler.
+ * Converts raw datetime data payloads into localized en-US regional structures.
+ *
+ * @param {string} date - Incoming date format signature from data models.
+ */
 function formatDate(date: string) {
   if (!date) return '';
   const d = new Date(date);
   if (Number.isNaN(d.getTime())) return date;
-  return d.toLocaleDateString('en-US'); // Mudado para en-US
+  return d.toLocaleDateString('en-US');
 }
 
 const styles = StyleSheet.create({

@@ -3,6 +3,12 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator
 import { Ionicons } from '@expo/vector-icons';
 import { getActiveBoulders, type Boulder } from '../../services/gymService';
 
+/**
+ * Detailed viewport for a specific commercial facility.
+ *
+ * Lists active in-house routes, technical setting allocations, and tracks catalog volume
+ * updates while providing shortcuts to log newly cleared accents.
+ */
 export default function GymDetailsScreen({ route, navigation }: any) {
   const gymId: number = route.params?.gymId;
   const gymName = route.params?.gymName || 'Unknown Gym';
@@ -11,6 +17,9 @@ export default function GymDetailsScreen({ route, navigation }: any) {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  /**
+   * Requests active routes linked to the facility identifier.
+   */
   const loadBoulders = async () => {
     try {
       setIsLoading(true);
@@ -33,6 +42,9 @@ export default function GymDetailsScreen({ route, navigation }: any) {
     loadBoulders();
   }, [gymId]);
 
+  /**
+   * Computes header text descriptions based on route metrics.
+   */
   const subtitle = useMemo(() => {
     if (isLoading) return 'Loading catalog...';
     return `Route Catalog • ${boulders.length} Active Boulders`;

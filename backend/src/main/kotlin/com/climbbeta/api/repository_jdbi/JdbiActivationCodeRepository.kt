@@ -5,9 +5,18 @@ import com.climbbeta.api.repository.ActivationCodeRepository
 import org.jdbi.v3.core.Jdbi
 import org.springframework.stereotype.Repository
 
+/**
+ * JDBI implementation of the [ActivationCodeRepository].
+ *
+ * Manages the lifecycle of single-use registration tokens used to onboard
+ * authorized gym operators into the system.
+ */
 @Repository
 class JdbiActivationCodeRepository(private val jdbi: Jdbi) : ActivationCodeRepository {
 
+    /**
+     * Inserts a new verification token and returns the full persistence state.
+     */
     override fun createCode(code: String): ActivationCode {
         return jdbi.withHandle<ActivationCode, Exception> { handle ->
             handle.createUpdate(
@@ -25,6 +34,9 @@ class JdbiActivationCodeRepository(private val jdbi: Jdbi) : ActivationCodeRepos
         }
     }
 
+    /**
+     * Locates a voucher record using its unique string token identifier.
+     */
     override fun getByCode(code: String): ActivationCode? {
         return jdbi.withHandle<ActivationCode?, Exception> { handle ->
             handle.createQuery(
@@ -37,6 +49,9 @@ class JdbiActivationCodeRepository(private val jdbi: Jdbi) : ActivationCodeRepos
         }
     }
 
+    /**
+     * Consumes an invitation token, linking it permanently to the activated user's primary key.
+     */
     override fun markAsUsed(code: String, userId: Int) {
         jdbi.withHandle<Unit, Exception> { handle ->
             handle.createUpdate(
@@ -48,6 +63,9 @@ class JdbiActivationCodeRepository(private val jdbi: Jdbi) : ActivationCodeRepos
         }
     }
 
+    /**
+     * Extracts all historical and active tokens ordered from newest to oldest.
+     */
     override fun getAllCodes(): List<ActivationCode> {
         return jdbi.withHandle<List<ActivationCode>, Exception> { handle ->
             handle.createQuery(

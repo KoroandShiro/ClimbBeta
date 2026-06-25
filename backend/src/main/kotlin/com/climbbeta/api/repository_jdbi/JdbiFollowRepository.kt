@@ -4,12 +4,21 @@ import com.climbbeta.api.repository.FollowRepository
 import org.jdbi.v3.core.Jdbi
 import org.springframework.stereotype.Repository
 
+/**
+ * JDBI implementation of the [FollowRepository].
+ *
+ * Resolves community subscription maps and profiles linkage, handling network bounds.
+ */
 @Repository
 class JdbiFollowRepository(private val jdbi: Jdbi) : FollowRepository {
 
+    /**
+     * Subscribes a user session to a target profile's public activity timeline.
+     * Blocks self-subscription actions and uses `ON CONFLICT DO NOTHING` to prevent key duplication.
+     */
     override fun follow(followerId: Int, followedId: Int): Boolean {
         if (followerId == followedId) {
-            return false  // não permite seguir a si mesmo
+            return false
         }
         return jdbi.withHandle<Boolean, Exception> { handle ->
             val updated = handle.createUpdate(

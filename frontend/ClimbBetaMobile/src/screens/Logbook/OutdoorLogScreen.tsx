@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ScrollView } from 'react-native';
 
+/**
+ * Data management ingestion system for natural rock terrain logging (Crags/Outdoor).
+ *
+ * Processes manual user field configurations suited for outdoor landscapes, including
+ * unique spatial properties such as Crag locations and custom grading systems (Fontainebleau/V Scale).
+ *
+ * @todo Implement data payload submission handlers wrapping this layout once backend endpoints drop.
+ */
 export default function OutdoorLogScreen({ navigation }: any) {
     return (
         <ScrollView style={styles.container}>

@@ -18,6 +18,13 @@ import * as ImagePicker from 'expo-image-picker';
 import { getMyProfile, updateMyProfile, uploadMyAvatar, ClimberProfileWithUserDTO } from '../../services/profileService';
 import { useNavigation } from '@react-navigation/native';
 
+/**
+ * Interactive profile management and configuration screen.
+ *
+ * Orchestrates multi-field state mutations covering personal metrics (height, ape index),
+ * biographical text metadata, and deep native image resolution pipelines via Expo APIs
+ * paired with multi-part asynchronous asset streaming to object storage buckets.
+ */
 export default function EditProfileScreen() {
     const navigation = useNavigation<any>();
 
@@ -36,6 +43,10 @@ export default function EditProfileScreen() {
 
     const [saving, setSaving] = useState(false);
 
+    /**
+     * Component mount initializer. Synchronizes remote climber records
+     * with the localized inputs, employing memory safety wrappers.
+     */
     useEffect(() => {
         let mounted = true;
         async function load() {
@@ -62,7 +73,10 @@ export default function EditProfileScreen() {
         return () => { mounted = false; };
     }, []);
 
-    // --- PHOTO FUNCTIONS (CAMERA AND GALLERY) ---
+    /**
+     * Resolves local OS media assets via the system photo library picker.
+     * Evaluates permission grants prior to launching intent instances.
+     */
     async function pickImageFromGallery() {
         const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (!permissionResult.granted) {
@@ -83,6 +97,10 @@ export default function EditProfileScreen() {
         }
     }
 
+    /**
+     * Invokes the system hardware camera to ingest raw image captures.
+     * Enforces explicit strict square cropping bounding configurations.
+     */
     async function takePhotoWithCamera() {
         const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
         if (!permissionResult.granted) {
@@ -102,6 +120,12 @@ export default function EditProfileScreen() {
         }
     }
 
+    /**
+     * Processes profile persistence requests.
+     * Runs localized technical sanitation steps, converts metrics strings to
+     * clean numerical structures, updates entity schemas, and handles multipart
+     * file transmissions to MinIO storage backends.
+     */
     async function onSave() {
         if (saving) return;
 
@@ -124,7 +148,7 @@ export default function EditProfileScreen() {
 
         setSaving(true);
         try {
-            // STEP 1: Update text data
+            // STEP 1: Update text metadata data structures
             await updateMyProfile({
                 username: username.trim(),
                 bio: bio.trim() === '' ? null : bio.trim(),
@@ -132,7 +156,7 @@ export default function EditProfileScreen() {
                 apeIndex: apeVal,
             });
 
-            // STEP 2: If the user chose a new photo
+            // STEP 2: Multi-part payload generation for newly selected binaries
             if (avatarUri.startsWith('file:') || avatarUri.startsWith('content:')) {
                 const filename = avatarUri.split('/').pop() || 'avatar.jpg';
                 const match = /\.(\w+)$/.exec(filename);
@@ -300,7 +324,6 @@ export default function EditProfileScreen() {
     );
 }
 
-// O resto do ficheiro (styles) permanece igual
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#f5f5f5' },
     loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f5f5f5' },

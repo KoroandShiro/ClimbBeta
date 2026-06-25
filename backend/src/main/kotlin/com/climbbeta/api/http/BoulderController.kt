@@ -18,9 +18,20 @@ data class BoulderCreateInput(
 )
 data class BoulderStatusInput(val isActive: Boolean)
 
+/**
+ * REST Controller directing indoor boulder route configurations and floor management.
+ *
+ * Handles creation maps for commercial routes, sector directory evaluations, and status resets.
+ */
 @RestController
 class BoulderController(private val boulderService: BoulderService) {
 
+    /**
+     * Registers a physical boulder track onto a commercial facility node mapping.
+     *
+     * @return Created entity response (201), 403 (Forbidden) if ownership verification tags mismatch,
+     * or 400 (Bad Request) if parameters are structurally malformed.
+     */
     @PostMapping("/gyms/{gymId}/boulders")
     fun createBoulder(
         @PathVariable gymId: Int,
@@ -30,14 +41,8 @@ class BoulderController(private val boulderService: BoulderService) {
         val user = request.getAttribute("authenticatedUser") as User
         return try {
             val boulder = boulderService.createBoulder(
-                user = user,
-                gymId = gymId,
-                color = input.color,
-                hexColor = input.hexColor,
-                grade = input.grade,
-                setterName = input.setterName,
-                setDate = input.setDate,
-                imageUrl = input.imageUrl
+                user = user, gymId = gymId, color = input.color, hexColor = input.hexColor,
+                grade = input.grade, setterName = input.setterName, setDate = input.setDate, imageUrl = input.imageUrl
             )
             ResponseEntity.status(HttpStatus.CREATED).body(boulder)
         } catch (e: SecurityException) {
@@ -47,12 +52,18 @@ class BoulderController(private val boulderService: BoulderService) {
         }
     }
 
+    /**
+     * Lists active boulder tracks available within a targeted facility node.
+     */
     @GetMapping("/gyms/{gymId}/boulders")
     fun getGymBoulders(@PathVariable gymId: Int): ResponseEntity<Any> {
         val boulders = boulderService.getActiveBoulders(gymId)
         return ResponseEntity.ok(boulders)
     }
 
+    /**
+     * Alters visibility parameters for a target route (e.g., stripping down worn tracks).
+     */
     @PutMapping("/boulders/{boulderId}/status")
     fun updateBoulderStatus(
         @PathVariable boulderId: Int,

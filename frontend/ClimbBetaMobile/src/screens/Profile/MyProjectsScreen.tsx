@@ -3,11 +3,22 @@ import { View, Text, StyleSheet, ScrollView, ImageBackground, TouchableOpacity, 
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { getMySavedProjects, type SavedBoulderDTO } from '../../services/profileService';
 
+/**
+ * Saved target climbing routes panel ("Projects").
+ *
+ * Fetches bookmarked route data parameters dynamically. Utilizes
+ * native focus side-effects to guarantee immediate synchronization with mutated lists
+ * whenever the user steps backward into the view stack context.
+ */
 export default function MyProjectsScreen() {
     const [projects, setProjects] = useState<SavedBoulderDTO[]>([]);
     const [loading, setLoading] = useState(true);
     const navigation = useNavigation<any>();
 
+    /**
+     * Viewport focus observer wrapper. Clears memory-allocated flags
+     * on component transitions to block stale asynchronous set state updates.
+     */
     useFocusEffect(
         useCallback(() => {
             let isActive = true;

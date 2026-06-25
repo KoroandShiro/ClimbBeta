@@ -8,11 +8,21 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 
+/**
+ * REST Gateway handling general binary media uploads.
+ *
+ * Interacts directly with MinIO storage providers to host images before saving references in PostgreSQL.
+ */
 @RestController
 @RequestMapping("/media")
 class MediaController(
     private val mediaService: MediaService
 ) {
+    /**
+     * Receives and processes a multipart binary file upload.
+     *
+     * @return Absolute asset link target path with status 200 (OK), or 400 if empty.
+     */
     @PostMapping("/upload")
     fun uploadMedia(@RequestParam("file") file: MultipartFile): ResponseEntity<Map<String, String>> {
         if (file.isEmpty) {

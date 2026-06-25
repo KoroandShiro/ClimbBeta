@@ -12,6 +12,10 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import { ApiError } from '../../services/api';
 
+/**
+ * UI View Component processing identity pass-through targets.
+ * Validates baseline text formatting constraints locally before dispatching requests downstream.
+ */
 export default function LoginScreen({ navigation }: any) {
     const { login } = useAuth();
     const [email, setEmail] = useState('');
@@ -19,6 +23,10 @@ export default function LoginScreen({ navigation }: any) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    /**
+     * Packages text entry state buffers and triggers authentication handshakes.
+     * Intercepts 401 exceptions to isolate bad payload alerts from dropped connections.
+     */
     const handleLogin = async () => {
         if (!email.trim() || !password) {
             setError('Please fill in both email and password.');

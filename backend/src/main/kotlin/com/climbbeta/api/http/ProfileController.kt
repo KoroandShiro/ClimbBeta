@@ -17,6 +17,11 @@ data class ProfileUpdateInput(
     val apeIndex: Double?
 )
 
+/**
+ * REST Controller administering custom climber bio mappings and biometric attributes.
+ *
+ * Restricts profile configuration capabilities solely to users under the CLIMBER role scope.
+ */
 @RestController
 @RequestMapping("/profiles")
 class ProfileController(
@@ -25,12 +30,13 @@ class ProfileController(
     private val userRepository: UserRepository
 ) {
 
+    /**
+     * Resolves the profile summary for the requesting user session.
+     */
     @GetMapping("/me")
     fun getMyProfile(request: HttpServletRequest): ResponseEntity<Any> {
-        // 1. Who did the Interceptor allow in?
         val user = request.getAttribute("authenticatedUser") as User
 
-        // 2. If it is a CLIMBER, return their profile
         if (user.role == UserRole.CLIMBER) {
             val profile = profileService.getClimberProfileWithUser(user.id, user)
             return ResponseEntity.ok(profile)
@@ -41,12 +47,16 @@ class ProfileController(
             .body(mapOf("error" to "Only climbers have this type of profile."))
     }
 
+    /**
+     * Modifies physical parameters, personal descriptions, or updates user handle structures.
+     *
+     * Automatically screens alternative handles to block duplicate usernames across the platform.
+     */
     @PutMapping("/me")
     fun updateMyProfile(@RequestBody input: ProfileUpdateInput, request: HttpServletRequest): ResponseEntity<Any> {
         val user = request.getAttribute("authenticatedUser") as User
 
         if (user.role == UserRole.CLIMBER) {
-
             if (input.username != null && input.username.trim().isNotEmpty()) {
                 val newUsername = input.username.trim()
 
@@ -67,6 +77,10 @@ class ProfileController(
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("error" to "Only climbers can update this data."))
     }
 
+    /**
+     * Uploads and attaches a custom profile avatar image.
+     * Streams the binary to the storage cluster and rewrites reference pathways in PostgreSQL.
+     */
     @PostMapping("/me/avatar")
     fun updateMyAvatar(
         @RequestParam("file") file: org.springframework.web.multipart.MultipartFile,
@@ -81,7 +95,6 @@ class ProfileController(
                     .body(mapOf("error" to "The uploaded file is empty."))
             }
 
-            // Call service to store in MinIO and update path in PostgreSQL
             val avatarUrl = profileService.updateClimberAvatar(user.id, file)
 
             return ResponseEntity.ok(mapOf(

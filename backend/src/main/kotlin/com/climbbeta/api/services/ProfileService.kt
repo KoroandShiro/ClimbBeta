@@ -10,47 +10,56 @@ import io.minio.PutObjectArgs
 import org.springframework.web.multipart.MultipartFile
 import java.util.UUID
 
+/**
+ * Service managing individual climber characteristics, metrics, and profile metadata.
+ *
+ * Oversees physical parameters (height, ape-index) and manages cloud interactions
+ * to handle custom profile avatar media assets.
+ */
 @Service
 class ProfileService(
     private val profileRepository: ProfileRepository,
-    private val minioClient: MinioClient // 🆕 Inject MinIO client here
+    private val minioClient: MinioClient
 ) {
     fun getClimberProfile(userId: Int): ClimberProfile {
         return profileRepository.getClimberProfile(userId)
             ?: throw IllegalArgumentException("Profile not found.")
     }
 
+    /**
+     * Aggregates base authentication credentials with custom physical attributes
+     * to compile a consolidated, presentation-ready DTO view.
+     */
     fun getClimberProfileWithUser(userId: Int, user: User): ClimberProfileWithUserDTO {
         val profile = getClimberProfile(userId)
         return ClimberProfileWithUserDTO(
-            userId = profile.userId,
-            username = user.username,
-            email = user.email,
-            bio = profile.bio,
-            height = profile.height,
-            apeIndex = profile.apeIndex,
-            avatarUrl = profile.avatarUrl // 🆕 fixed from 'null' to 'profile.avatarUrl'!
+            userId = profile.userId, username = user.username, email = user.email,
+            bio = profile.bio, height = profile.height, apeIndex = profile.apeIndex,
+            avatarUrl = profile.avatarUrl
         )
     }
 
     fun updateClimberProfile(userId: Int, bio: String?, height: Int?, apeIndex: Double?) {
         val updatedProfile = ClimberProfile(
-            userId = userId,
-            bio = bio,
-            height = height,
-            apeIndex = apeIndex
+            userId = userId, bio = bio, height = height, apeIndex = apeIndex
         )
         profileRepository.updateClimberProfile(updatedProfile)
     }
 
-    // 🆕 Adds the bridging function to communicate with your Dockerized MinIO instance
+    /**
+     * Streams a profile image directly to MinIO and links the generated public path to the user's profile.
+     *
+     * Combines binary file handling, unique name generation to avoid data overrides,
+     * and a final transactional database update.
+     *
+     * @param userId Primary key of the target climber profile.
+     * @param file Raw multipart upload image token.
+     * @return Accessible dynamic public asset network identifier route string.
+     */
     fun updateClimberAvatar(userId: Int, file: MultipartFile): String {
         val bucketName = "climbbeta-media"
-
-        // 1. Create a unique filename to prevent accidental overrides
         val fileName = "$userId-${UUID.randomUUID()}-${file.originalFilename}"
 
-        // 2. Stream the image data directly to MinIO
         file.inputStream.use { inputStream ->
             minioClient.putObject(
                 PutObjectArgs.builder()
@@ -62,10 +71,7 @@ class ProfileService(
             )
         }
 
-        // 3. Generate public URL using your host IP so the mobile device can access it
         val avatarUrl = "http://192.168.1.141:9000/$bucketName/$fileName"
-
-        // 4. Update the record in PostgreSQL using the new method from JdbiProfileRepository
         profileRepository.updateAvatarUrl(userId, avatarUrl)
 
         return avatarUrl

@@ -6,7 +6,6 @@ import com.climbbeta.api.services.OutdoorRouteService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.bind.annotation.RequestAttribute
 
 data class OutdoorRouteCreateInput(
     val name: String?,
@@ -15,23 +14,30 @@ data class OutdoorRouteCreateInput(
     val grade: String
 )
 
+/**
+ * REST Controller listing and indexing geographic outdoor crags.
+ *
+ * Manages entries submitted by the community for real-world sport routes or boulders.
+ */
 @RestController
 @RequestMapping("/outdoor-routes")
 class OutdoorRouteController(
     private val outdoorRouteService: OutdoorRouteService
 ) {
 
+    /**
+     * Indexes a new outdoor climbing route.
+     *
+     * @param user Automatically resolved by the interceptor from the security header context.
+     */
     @PostMapping
     fun createRoute(
         @RequestBody input: OutdoorRouteCreateInput,
-        @RequestAttribute("authenticatedUser") user: User // Automatically injected by AuthenticationInterceptor!
+        @RequestAttribute("authenticatedUser") user: User
     ): ResponseEntity<Map<String, Int>> {
         val routeId = outdoorRouteService.createRoute(
-            creatorId = user.id,
-            name = input.name,
-            sector = input.sector,
-            location = input.location,
-            grade = input.grade
+            creatorId = user.id, name = input.name, sector = input.sector,
+            location = input.location, grade = input.grade
         )
         return ResponseEntity.status(HttpStatus.CREATED).body(mapOf("id" to routeId))
     }

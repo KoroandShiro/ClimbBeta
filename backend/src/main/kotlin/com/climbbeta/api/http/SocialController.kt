@@ -7,12 +7,20 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
+/**
+ * REST Controller structuring social connectivity and follow relationships.
+ *
+ * Exposes social operations like profile subscription setups and tailored log feed aggregation.
+ */
 @RestController
 class SocialController(
     private val followService: FollowService,
     private val ascentService: AscentService
 ) {
 
+    /**
+     * Follows another climber. Prevents users from subscribing to themselves.
+     */
     @PostMapping("/climbers/{id}/follow")
     fun follow(
         @PathVariable id: Int,
@@ -25,7 +33,7 @@ class SocialController(
         return if (created) {
             ResponseEntity.status(HttpStatus.CREATED).build()
         } else {
-            ResponseEntity.status(HttpStatus.OK).build()  // Already following
+            ResponseEntity.status(HttpStatus.OK).build()
         }
     }
 
@@ -42,6 +50,9 @@ class SocialController(
         }
     }
 
+    /**
+     * Compiles a timeline of recent logs recorded by climbers the user follows.
+     */
     @GetMapping("/feed")
     fun getFeed(
         @RequestAttribute("authenticatedUser") user: User

@@ -34,13 +34,21 @@ data class UserLoginInputModel(
 data class TokenOutputModel(
     val token: String
 )
-
+/**
+ * REST Entry Gateway governing profile provisioning, discovery lookups, and session management.
+ *
+ * Implements public-facing entryways like BCrypt registration pathways and session generation.
+ */
 @RestController
 @RequestMapping("/users")
 class UserController(
     private val userService: UserService
 ) {
-
+    /**
+     * Provisions a new user account profile in the database system.
+     *
+     * Maps internal credentials securely to clean transmission objects to avoid exposing private information.
+     */
     @PostMapping("/register")
     fun registerUser(@RequestBody input: UserCreateInputModel): ResponseEntity<Any> {
         return try {
@@ -66,7 +74,11 @@ class UserController(
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to e.message))
         }
     }
-
+    /**
+     * Evaluates raw email credentials against secure records to instantiate a session token.
+     *
+     * @return Raw plaintext authorization token bound to status 200 (OK), or 401 if authentication fails.
+     */
     @PostMapping("/login")
     fun loginUser(@RequestBody input: UserLoginInputModel): ResponseEntity<Any> {
         return try {
@@ -78,7 +90,9 @@ class UserController(
         }
     }
 
-    // Helper endpoint to check if the Interceptor is functioning properly.
+    /**
+     * Diagnostic hook verifying operational pipeline middleware integrations.
+     */
     @GetMapping("/me")
     fun getMyProfile(request: jakarta.servlet.http.HttpServletRequest): ResponseEntity<Any> {
         val user = request.getAttribute("authenticatedUser") as? com.climbbeta.api.domain.User
@@ -88,6 +102,9 @@ class UserController(
         return ResponseEntity.ok(output)
     }
 
+    /**
+     * Processes admin activation coupons to unlock pending commercial gym manager capabilities.
+     */
     @PostMapping("/verify-code")
     fun verifyCode(
         @RequestBody input: VerifyCodeInputModel,
@@ -111,6 +128,9 @@ class UserController(
         }
     }
 
+    /**
+     * Performs a partial-match textual query scan over indexed usernames to locate peers.
+     */
     @GetMapping("/search")
     fun searchUsers(
         @RequestParam q: String,

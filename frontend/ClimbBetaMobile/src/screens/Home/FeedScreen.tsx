@@ -6,11 +6,21 @@ import { getFeed, FeedItem } from '../../services/ascentService';
 
 const { width } = Dimensions.get('window');
 
+/**
+ * Social dashboard feed component.
+ *
+ * Aggregates and renders a timeline of recent climbing ascents completed by the user's
+ * network. Automatically hooks into native focus events to refresh feed details.
+ */
 export default function FeedScreen({ navigation }: any) {
   const [feed, setFeed] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  /**
+   * Focus-driven lifecycle handler. Fetches active social posts asynchronously
+   * and tracks memory safety tags to discard late responses if the component unmounts.
+   */
   useFocusEffect(
       useCallback(() => {
         let isActive = true;

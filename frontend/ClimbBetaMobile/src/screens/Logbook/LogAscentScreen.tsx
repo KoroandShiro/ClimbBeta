@@ -3,6 +3,12 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator,
 import { Ionicons } from '@expo/vector-icons';
 import { logAscent } from '../../services/ascentService';
 
+/**
+ * Structured ascent ingestion logger.
+ *
+ * Connects directly to verified in-house gym boulders (`boulderId`) to record
+ * performance parameters, track technical ascent style metrics, and increment total attempts counts.
+ */
 export default function LogAscentScreen({ route, navigation }: any) {
     const boulderId = route.params?.boulderId;
     const boulderColor = route.params?.boulderColor || 'This Boulder';
@@ -12,10 +18,14 @@ export default function LogAscentScreen({ route, navigation }: any) {
     const [notes, setNotes] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    /**
+     * Submits technical climb data payloads to the API layer.
+     * Gracefully falls back to UI messaging alerts upon intercepting unexpected service failures.
+     */
     const handleSave = async () => {
         try {
             setIsLoading(true);
-            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD standard formatting
 
             await logAscent({
                 boulderId: boulderId,
@@ -26,7 +36,7 @@ export default function LogAscentScreen({ route, navigation }: any) {
             });
 
             Alert.alert("Success!", "Ascent successfully logged in your Logbook! 🧗‍♂️", [
-                { text: "Awesome!", onPress: () => navigation.goBack() } // Goes back to the gym
+                { text: "Awesome!", onPress: () => navigation.goBack() } // Clean context pop to previous view
             ]);
         } catch (error: any) {
             Alert.alert("Error saving", error.message || "Please try again.");

@@ -5,6 +5,12 @@ import com.climbbeta.api.repository.OutdoorRouteRepository
 import org.jdbi.v3.core.Jdbi
 import org.springframework.stereotype.Repository
 
+/**
+ * JDBI implementation of the [OutdoorRouteRepository].
+ *
+ * Provisions crag layouts, sector classifications, and technical grade mappings
+ * for natural rock lines documented outside commercial indoor environments.
+ */
 @Repository
 class JdbiOutdoorRouteRepository(
     private val jdbi: Jdbi

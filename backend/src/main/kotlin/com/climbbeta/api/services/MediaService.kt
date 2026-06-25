@@ -7,6 +7,12 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.util.UUID
 
+/**
+ * Infrastructure storage bridge wrapper managing asset distribution on a cluster storage.
+ *
+ * Connects directly to localized MinIO object cloud environments to dispatch incoming binary
+ * byte streams, generating universally unique resource locators (URLs).
+ */
 @Service
 class MediaService(
     private val minioClient: MinioClient,
@@ -14,13 +20,21 @@ class MediaService(
     @Value("\${minio.public-url}") private val publicUrl: String,
     @Value("\${minio.bucket-name}") private val bucketName: String
 ) {
+    /**
+     * Dispatches a raw HTTP multipart file into the configured MinIO bucket.
+     *
+     * Automatically randomizes object references using standard secure UUID tokens
+     * while preserving explicit original extension tags (.jpg, .png).
+     *
+     * @param file Incoming raw multipart multi-byte wrapper structure.
+     * @return Absolute accessible public URL target string mapped to the cluster network.
+     * @throws RuntimeException If streaming handshakes fail during transfer phases.
+     */
     fun uploadMedia(file: MultipartFile): String {
         try {
-            // Extract original file extension (e.g., .png, .jpg)
             val originalFilename = file.originalFilename ?: "unknown"
             val extension = originalFilename.substringAfterLast('.', "")
 
-            // Generate a unique and secure filename (e.g., 123e4567-e89b-12d3-a456-426614174000.jpg)
             val fileName = if (extension.isNotEmpty()) {
                 "${UUID.randomUUID()}.$extension"
             } else {
@@ -29,7 +43,6 @@ class MediaService(
 
             val inputStream = file.inputStream
 
-            // Upload the byte stream to MinIO
             minioClient.putObject(
                 PutObjectArgs.builder()
                     .bucket(bucketName)
@@ -39,11 +52,9 @@ class MediaService(
                     .build()
             )
 
-            // Construct and return the public URL to be stored in PostgreSQL
             return "$publicUrl/$bucketName/$fileName"
 
         } catch (e: Exception) {
-            // Throw exception to be caught by the global ExceptionHandler or Controller
             throw RuntimeException("Failed to upload media file: ${e.message}", e)
         }
     }

@@ -13,12 +13,21 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { getGyms, type Gym } from '../../services/gymService';
 
+/**
+ * Hub view managing exploration over commercial climbing centers.
+ *
+ * Provides structural lookups across partner facilities while executing optimized
+ * local client-side memory searching based on names or regional attributes.
+ */
 export default function ExploreScreen({ navigation }: any) {
   const [gyms, setGyms] = useState<Gym[]>([]);
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  /**
+   * Refreshes the global list of climbing facilities whenever the user focuses the view.
+   */
   useFocusEffect(
       useCallback(() => {
         const loadGyms = async () => {
@@ -38,6 +47,9 @@ export default function ExploreScreen({ navigation }: any) {
       }, [])
   );
 
+  /**
+   * Memoized lookup filter parsing gym properties against the clean text search buffer.
+   */
   const filteredGyms = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return gyms;

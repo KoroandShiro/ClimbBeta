@@ -3,11 +3,22 @@ import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity, FlatList, A
 import { Ionicons } from '@expo/vector-icons';
 import { searchUsers, followUser, unfollowUser, type UserSearchResult } from '../../services/socialService';
 
+/**
+ * Global application climber discovery portal.
+ *
+ * Provides an interface for profile lookups utilizing automated debounce mechanisms
+ * to throttle back-end API querying overhead during continuous keyboard streams.
+ */
 export default function UserSearchScreen() {
     const [searchQuery, setSearchQuery] = useState('');
     const [users, setUsers] = useState<UserSearchResult[]>([]);
     const [loading, setLoading] = useState(false);
 
+    /**
+     * Debounced lookup effect evaluating search query strings.
+     * Fires requests only when the user halts input actions for more than 500ms
+     * and guarantees a minimum character evaluation threshold.
+     */
     useEffect(() => {
         const fetchUsers = async () => {
             if (searchQuery.trim().length < 2) {
@@ -33,7 +44,16 @@ export default function UserSearchScreen() {
         return () => clearTimeout(delayDebounceFn);
     }, [searchQuery]);
 
+    /**
+     * Toggles the connection status between the user and a target climber.
+     * Performs an optimistic local state update to ensure interface responsiveness
+     * and rolls back changes transparently if network errors trigger failure.
+     *
+     * @param {number} userId - The target profile identifier to establish connections with.
+     * @param {boolean} currentlyFollowing - Current structural follow state.
+     */
     const handleToggleFollow = async (userId: number, currentlyFollowing: boolean) => {
+        // Optimistic mutation path
         setUsers(prevUsers =>
             prevUsers.map(u => u.id === userId ? { ...u, isFollowing: !currentlyFollowing } : u)
         );
@@ -45,12 +65,16 @@ export default function UserSearchScreen() {
                 await followUser(userId);
             }
         } catch (error) {
+            // Rollback strategy for request exceptions
             setUsers(prevUsers =>
                 prevUsers.map(u => u.id === userId ? { ...u, isFollowing: currentlyFollowing } : u)
             );
         }
     };
 
+    /**
+     * List element dynamic viewport adapter mapping profile data cards.
+     */
     const renderUser = ({ item }: { item: UserSearchResult }) => (
         <View style={styles.userCard}>
             <View style={styles.avatarPlaceholder}>

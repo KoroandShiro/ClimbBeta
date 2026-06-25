@@ -4,6 +4,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { getBoulderById, getLeaderboard, saveProject, unsaveProject, checkSaveStatus, LeaderboardEntry, Boulder } from '../../services/gymService';
 
+/**
+ * Detailed viewport for an individual indoor climbing route (Boulder).
+ *
+ * Displays route technical specifications, interactive management options to pin
+ * the path onto a user's target projects list, and handles real-time community placement leaderboards.
+ */
 export default function BoulderDetailsScreen() {
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
@@ -14,8 +20,13 @@ export default function BoulderDetailsScreen() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [isSaved, setIsSaved] = useState(false); // Button status (Problem 3)
+  const [isSaved, setIsSaved] = useState(false);
 
+  /**
+   * Screen lifecycle hook executing synchronous parallel lookups when focused.
+   * Safeguards against 404/not-found crashes by decoupling the core content loading
+   * from supplementary playlist validation routines.
+   */
   useFocusEffect(
       useCallback(() => {
         if (!boulderId) return;
@@ -25,7 +36,7 @@ export default function BoulderDetailsScreen() {
           try {
             setLoading(true);
 
-            // 1. Load Route and Leaderboard (If this fails, we show an error)
+            // Fetch core boulder layout details and competitive standings simultaneously
             const [boulderData, leaderboardData] = await Promise.all([
               getBoulderById(boulderId),
               getLeaderboard(boulderId)
@@ -36,8 +47,7 @@ export default function BoulderDetailsScreen() {
               setLeaderboard(leaderboardData);
             }
 
-            // 2. Load the save button status separately.
-            // This way, if the route doesn't exist (404), it won't crash the whole page.
+            // Verify project bookmarking status in isolation to protect view integrity
             try {
               const status = await checkSaveStatus(boulderId);
               if (isActive) setIsSaved(status.isSaved);
@@ -58,6 +68,9 @@ export default function BoulderDetailsScreen() {
       }, [boulderId])
   );
 
+  /**
+   * Toggles the bookmark status of the current route inside the user's project list.
+   */
   const handleToggleSave = async () => {
     if (!boulderId) return;
     try {

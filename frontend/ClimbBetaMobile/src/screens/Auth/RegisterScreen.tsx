@@ -13,6 +13,10 @@ import {
 import { register } from '../../services/authService';
 import { ApiError } from '../../services/api';
 
+/**
+ * Onboarding registration portal setup tracking account allocations.
+ * Dispatches raw details to initialize base DB profile maps upstream.
+ */
 export default function RegisterScreen({ navigation }: any) {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -21,6 +25,10 @@ export default function RegisterScreen({ navigation }: any) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    /**
+     * Asserts internal password equivalence matrices and requests account provision procedures.
+     * Automatically pipes users backward into the [LoginScreen] track upon successful creations.
+     */
     const handleRegister = async () => {
         if (!username.trim() || !email.trim() || !password || !confirm) {
             setError('Please fill in all fields.');

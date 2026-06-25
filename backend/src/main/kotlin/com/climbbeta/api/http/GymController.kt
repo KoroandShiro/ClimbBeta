@@ -43,12 +43,24 @@ data class GymOutputModel(
     }
 }
 
+/**
+ * REST Controller processing climbing facility metadata registries.
+ *
+ * Implements security maps checking company profiles and activation statuses
+ * before allowing facility adjustments.
+ */
 @RestController
 @RequestMapping("/gyms")
 class GymController(
     private val gymService: GymService
 ) {
 
+    /**
+     * Provisions a new facility onto the platform database index.
+     *
+     * @return Formatted DTO output with status 201 (Created), 403 if unverified,
+     * or 400 if validation parameters are violated.
+     */
     @PostMapping
     fun createGym(
         @RequestBody input: GymCreateInputModel,

@@ -1,6 +1,12 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 
+/**
+ * Navigation routing router dashboard gateway.
+ *
+ * Offers clear structural branch alternatives partitioning the session logging activity
+ * funnel between commercial indoor facility modules and raw outdoor rock locations.
+ */
 export default function LogbookEntryScreen({ navigation }: any) {
     return (
         <View style={styles.container}>

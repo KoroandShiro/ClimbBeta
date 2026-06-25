@@ -2,6 +2,14 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
+/**
+ * Presentation template for reviewing single specific user ascent log entries.
+ *
+ * Displays route details, beta details, historical notes, style metadata,
+ * and provides interactive comments layouts.
+ *
+ * * Note: Currently displays static structural sample information awaiting server wiring.
+ */
 export default function AscentDetailsScreen() {
   return (
       <ScrollView style={styles.container}>

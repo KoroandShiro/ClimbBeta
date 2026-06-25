@@ -4,9 +4,18 @@ import com.climbbeta.api.repository.LikeRepository
 import org.jdbi.v3.core.Jdbi
 import org.springframework.stereotype.Repository
 
+/**
+ * JDBI implementation of the [LikeRepository].
+ *
+ * Governs social reaction indices linked to user-submitted ascent elements.
+ */
 @Repository
 class JdbiLikeRepository(private val jdbi: Jdbi) : LikeRepository {
 
+    /**
+     * Flags an interaction index between a climber session and an activity post.
+     * Employs `ON CONFLICT DO NOTHING` to swallow redundant duplicate triggers gracefully.
+     */
     override fun like(climberId: Int, ascentId: Int): Boolean {
         return jdbi.withHandle<Boolean, Exception> { handle ->
             val updated = handle.createUpdate(

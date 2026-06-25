@@ -6,9 +6,18 @@ import com.climbbeta.api.repository.UserRepository
 import org.jdbi.v3.core.Jdbi
 import org.springframework.stereotype.Repository
 
+/**
+ * JDBI implementation of the [UserRepository].
+ *
+ * The foundational authority record engine managing system authentication mappings,
+ * identity verifications, user discovery searches, and multi-profile role orchestration.
+ */
 @Repository
 class JdbiUserRepository(private val jdbi: Jdbi) : UserRepository {
 
+    /**
+     * Internal database layout record for packing optimized network search queries.
+     */
     data class UserSearchDbModel(
         val id: Int,
         val username: String,
@@ -34,9 +43,13 @@ class JdbiUserRepository(private val jdbi: Jdbi) : UserRepository {
         }
     }
 
+    /**
+     * Registers identity profiles on Postgres and cascades downstream transactional mappings.
+     * * **Side-effects:** Forks initialization sequences creating a generic base profile inside
+     * `climber_profiles` or `gym_owner_profiles` matching the assigned corporate permission scope.
+     */
     override fun createUser(user: User): User {
         return jdbi.withHandle<User, Exception> { handle ->
-            // Fazemos o INSERT e pedimos ao Postgres para devolver o ID gerado!
             val generatedId = handle.createUpdate(
                 """
                 INSERT INTO users (username, email, password_hash, role, status)
@@ -52,8 +65,6 @@ class JdbiUserRepository(private val jdbi: Jdbi) : UserRepository {
                 .mapTo(Int::class.java)
                 .one()
 
-            // Criar o perfil vazio baseado na Role!
-
             if (user.role == com.climbbeta.api.domain.UserRole.CLIMBER) {
                 handle.createUpdate("INSERT INTO climber_profiles (user_id) VALUES (:id)")
                     .bind("id", generatedId)
@@ -65,7 +76,6 @@ class JdbiUserRepository(private val jdbi: Jdbi) : UserRepository {
                     .execute()
             }
 
-            // Devolvemos uma cópia do User original mas agora com o ID verdadeiro
             user.copy(id = generatedId)
         }
     }
@@ -74,15 +84,15 @@ class JdbiUserRepository(private val jdbi: Jdbi) : UserRepository {
         return jdbi.withHandle<User?, Exception> { handle ->
             handle.createQuery(
                 """
-            SELECT id, username, email, password_hash AS passwordHash, role, status, created_at AS createdAt
-            FROM users
-            WHERE email = :email
-            """
+                SELECT id, username, email, password_hash AS passwordHash, role, status, created_at AS createdAt
+                FROM users
+                WHERE email = :email
+                """
             )
                 .bind("email", email)
                 .mapTo(User::class.java)
                 .findOne()
-                .orElse(null) // Devolve null se não encontrar nenhum user com esse email
+                .orElse(null)
         }
     }
 
@@ -90,10 +100,10 @@ class JdbiUserRepository(private val jdbi: Jdbi) : UserRepository {
         return jdbi.withHandle<User?, Exception> { handle ->
             handle.createQuery(
                 """
-            SELECT id, username, email, password_hash AS passwordHash, role, status, created_at AS createdAt
-            FROM users
-            WHERE id = :id
-            """
+                SELECT id, username, email, password_hash AS passwordHash, role, status, created_at AS createdAt
+                FROM users
+                WHERE id = :id
+                """
             )
                 .bind("id", id)
                 .mapTo(User::class.java)
@@ -113,6 +123,10 @@ class JdbiUserRepository(private val jdbi: Jdbi) : UserRepository {
         }
     }
 
+    /**
+     * Executes a user directory lookup mapping relative follow connections in real-time.
+     * Uses `ILIKE` logic filtering for partial matches while dropping corporate owner accounts from results.
+     */
     override fun searchUsers(query: String, currentUserId: Int): List<UserSearchDbModel> {
         return jdbi.withHandle<List<UserSearchDbModel>, Exception> { handle ->
             handle.createQuery(
@@ -143,5 +157,4 @@ class JdbiUserRepository(private val jdbi: Jdbi) : UserRepository {
                 .execute()
         }
     }
-
 }

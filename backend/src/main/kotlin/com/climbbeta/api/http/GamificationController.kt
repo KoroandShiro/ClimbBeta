@@ -6,11 +6,19 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
+/**
+ * REST Controller handling community engagement mechanics.
+ *
+ * Processes social feedback loops such as ascent feed reactions,
+ * active bookmark tracking (saved projects), and scoreboard charts.
+ */
 @RestController
 @RequestMapping
 class GamificationController(private val gamificationService: GamificationService) {
 
-    // LIKE ENDPOINTS
+    /**
+     * Registers an appreciation mark (like) against a peer's public log entry.
+     */
     @PostMapping("/ascents/{id}/like")
     fun likeAscent(
         @PathVariable id: Int,
@@ -37,7 +45,9 @@ class GamificationController(private val gamificationService: GamificationServic
         }
     }
 
-    // SAVE ENDPOINTS (Returns JSON)
+    /**
+     * Saves a route to the user's personal project list.
+     */
     @PostMapping("/boulders/{id}/save")
     fun saveBoulder(
         @PathVariable id: Int,
@@ -64,7 +74,9 @@ class GamificationController(private val gamificationService: GamificationServic
         }
     }
 
-    // Check if the save button should be active
+    /**
+     * Checks if a specific route is bookmarked by the user. Used to toggle UI elements.
+     */
     @GetMapping("/boulders/{id}/save-status")
     fun checkSaveStatus(
         @PathVariable id: Int,
@@ -74,7 +86,6 @@ class GamificationController(private val gamificationService: GamificationServic
         return ResponseEntity.ok(mapOf("isSaved" to isSaved))
     }
 
-    // Leaderboard and Saved Projects
     @GetMapping("/projects/me")
     fun getSavedBoulders(
         @RequestAttribute("authenticatedUser") user: User
@@ -83,6 +94,9 @@ class GamificationController(private val gamificationService: GamificationServic
         return ResponseEntity.ok(boulders)
     }
 
+    /**
+     * Compiles top performance logs for a specific boulder layout.
+     */
     @GetMapping("/boulders/{id}/leaderboard")
     fun getLeaderboard(
         @PathVariable id: Int

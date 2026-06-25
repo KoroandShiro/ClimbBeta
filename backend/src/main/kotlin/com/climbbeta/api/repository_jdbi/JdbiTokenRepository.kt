@@ -5,6 +5,11 @@ import com.climbbeta.api.repository.TokenRepository
 import org.jdbi.v3.core.Jdbi
 import org.springframework.stereotype.Repository
 
+/**
+ * JDBI implementation of the [TokenRepository].
+ *
+ * Persists and validates cryptographic authentication session hashes mapped against active users.
+ */
 @Repository
 class JdbiTokenRepository(private val jdbi: Jdbi) : TokenRepository {
 

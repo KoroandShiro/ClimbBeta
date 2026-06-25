@@ -6,6 +6,12 @@ import org.jdbi.v3.core.Jdbi
 import org.springframework.stereotype.Repository
 import java.time.LocalDate
 
+/**
+ * JDBI implementation of the [SaveRepository].
+ *
+ * Handles logic mapping for personal project playlists ("Saves"), enabling users
+ * to pin active boulder instances for future send attempts.
+ */
 @Repository
 class JdbiSaveRepository(private val jdbi: Jdbi) : SaveRepository {
 
@@ -49,6 +55,10 @@ class JdbiSaveRepository(private val jdbi: Jdbi) : SaveRepository {
         }
     }
 
+    /**
+     * Resolves and maps the collection of active boulder paths pinned onto a user's checklist.
+     * Integrates an explicit mapping instruction pattern parsing data arrays out of SQL joins.
+     */
     override fun getSavedBoulders(climberId: Int): List<Boulder> {
         return jdbi.withHandle<List<Boulder>, Exception> { handle ->
             handle.createQuery(

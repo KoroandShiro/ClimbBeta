@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 
+/**
+ * Free-form capture form for custom indoor climbing sessions.
+ *
+ * Allows logging records in commercial facilities outside the pre-mapped
+ * structured gym boulder catalogs.
+ *
+ * @todo Wire form fields up to `ascentService` once the backend free-log schemas are ready.
+ */
 export default function IndoorLogScreen({ navigation }: any) {
     const [gymName, setGymName] = useState('');
     const [grade, setGrade] = useState('');

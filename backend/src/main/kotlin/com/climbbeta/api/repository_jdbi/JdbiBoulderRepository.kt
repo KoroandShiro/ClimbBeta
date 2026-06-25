@@ -7,6 +7,12 @@ import org.jdbi.v3.core.Jdbi
 import org.springframework.stereotype.Repository
 import java.time.LocalDate
 
+/**
+ * JDBI implementation of the [BoulderRepository].
+ *
+ * Directs individual indoor commercial setting indices and processes analytic query data structures
+ * to compute competitive boulder rankings.
+ */
 @Repository
 class JdbiBoulderRepository(private val jdbi: Jdbi) : BoulderRepository {
 
@@ -34,6 +40,9 @@ class JdbiBoulderRepository(private val jdbi: Jdbi) : BoulderRepository {
         }
     }
 
+    /**
+     * Collects all active boulder tracks configured inside a commercial facility.
+     */
     override fun getBouldersByGymId(gymId: Int): List<Boulder> {
         return jdbi.withHandle<List<Boulder>, Exception> { handle ->
             handle.createQuery(
@@ -80,6 +89,15 @@ class JdbiBoulderRepository(private val jdbi: Jdbi) : BoulderRepository {
         }
     }
 
+    /**
+     * Compiles an analytical performance scoreboard for a specific boulder track.
+     *
+     * Uses a `ROW_NUMBER() OVER` window function grouping performance metrics per climber.
+     * Performance priority ranks clean completion send styles over absolute attempt counts:
+     * 1. Flash
+     * 2. Onsight
+     * 3. Redpoint / Base Sent
+     */
     override fun getLeaderboard(boulderId: Int): List<LeaderboardEntry> {
         return jdbi.withHandle<List<LeaderboardEntry>, Exception> { handle ->
             handle.createQuery(

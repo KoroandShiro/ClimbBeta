@@ -5,6 +5,12 @@ import com.climbbeta.api.repository.GymRepository
 import org.jdbi.v3.core.Jdbi
 import org.springframework.stereotype.Repository
 
+/**
+ * JDBI implementation of the [GymRepository].
+ *
+ * Directs read and write operations for managing physical commercial climbing facilities,
+ * tracking allocations, metadata profiles, and structural ownership connections.
+ */
 @Repository
 class JdbiGymRepository(
     private val jdbi: Jdbi
@@ -97,6 +103,10 @@ class JdbiGymRepository(
         }
     }
 
+    /**
+     * Checks if a target user profile contains valid corporate credentials inside the
+     * business manager registries table.
+     */
     override fun existsGymOwnerProfile(userId: Int): Boolean {
         return jdbi.withHandle<Boolean, Exception> { handle ->
             handle.createQuery(

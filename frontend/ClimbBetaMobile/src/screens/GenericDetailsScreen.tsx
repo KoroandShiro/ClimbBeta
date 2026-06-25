@@ -1,6 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
+/**
+ * Development feature placeholder screen component.
+ * Serves as a structural fallback container during feature construction phases.
+ */
 export default function GenericDetailsScreen() {
     return (
         <View style={styles.container}>

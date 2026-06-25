@@ -6,19 +6,14 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { useAuth } from '../contexts/AuthContext';
 
-// Auth Screens
 import LoginScreen from '../screens/Auth/LoginScreen';
 import RegisterScreen from '../screens/Auth/RegisterScreen';
-
-// Import Main Screens
 import FeedScreen from '../screens/Home/FeedScreen';
 import ExploreScreen from '../screens/Explore/ExploreScreen';
 import LogbookEntryScreen from '../screens/Logbook/LogbookEntryScreen';
 import LogAscentScreen from '../screens/Logbook/LogAscentScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
-import EditProfileScreen from '../screens/Profile/EditProfileScreen'
-
-// Secondary Screens
+import EditProfileScreen from '../screens/Profile/EditProfileScreen';
 import IndoorLogScreen from '../screens/Logbook/IndoorLogScreen';
 import OutdoorLogScreen from '../screens/Logbook/OutdoorLogScreen';
 import GymDetailsScreen from '../screens/Explore/GymDetailsScreen';
@@ -27,8 +22,11 @@ import UserSearchScreen from '../screens/Home/UserSearchScreen';
 import BoulderDetailsScreen from '../screens/Explore/BoulderDetailsScreen';
 import MyProjectsScreen from '../screens/Profile/MyProjectsScreen';
 
-// --- AUTH STACK ---
 const AuthStack = createNativeStackNavigator();
+
+/**
+ * Isolated authentication navigation stack processing unverified sessions.
+ */
 function AuthStackNavigator() {
     return (
         <AuthStack.Navigator screenOptions={{ headerShown: false }}>
@@ -38,10 +36,11 @@ function AuthStackNavigator() {
     );
 }
 
-// --- APP STACKS ---
-const Tab = createBottomTabNavigator();
-
 const HomeStack = createNativeStackNavigator();
+
+/**
+ * Navigation wrapper for the primary community landing tab maps.
+ */
 function HomeStackNavigator() {
     return (
         <HomeStack.Navigator>
@@ -53,6 +52,10 @@ function HomeStackNavigator() {
 }
 
 const ExploreStack = createNativeStackNavigator();
+
+/**
+ * Navigation wrapper handling global facility search mappings and indoor statistics subviews.
+ */
 function ExploreStackNavigator() {
     return (
         <ExploreStack.Navigator>
@@ -65,6 +68,10 @@ function ExploreStackNavigator() {
 }
 
 const LogbookStack = createNativeStackNavigator();
+
+/**
+ * Entry portal stacks splitting paths between manual indoor logs and raw outdoor crag updates.
+ */
 function LogbookStackNavigator() {
     return (
         <LogbookStack.Navigator>
@@ -76,20 +83,27 @@ function LogbookStackNavigator() {
 }
 
 const ProfileStack = createNativeStackNavigator();
+
+/**
+ * User metrics deck dashboard stack handling personal settings overrides and saved target metrics lists.
+ */
 function ProfileStackNavigator() {
     return (
         <ProfileStack.Navigator>
             <ProfileStack.Screen name="MyProfile" component={ProfileScreen} options={{ title: 'My Profile' }} />
             <ProfileStack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile' }} />
             <ProfileStack.Screen name="MyProjects" component={MyProjectsScreen} options={{ title: 'Saved Projects' }} />
-
-            {/* Shared screens inserted directly into this stack to avoid blocking the Explore tab */}
             <ProfileStack.Screen name="BoulderDetails" component={BoulderDetailsScreen} options={{ title: 'Route Statistics' }} />
             <ProfileStack.Screen name="LogAscent" component={LogAscentScreen} options={{ title: 'Log Ascent' }} />
         </ProfileStack.Navigator>
     );
 }
 
+const Tab = createBottomTabNavigator();
+
+/**
+ * Core UI layout wrapper mapping container frames for primary dashboard activities.
+ */
 function AppTabs() {
     return (
         <Tab.Navigator
@@ -115,6 +129,11 @@ function AppTabs() {
     );
 }
 
+/**
+ * Critical Gateway Router for the mobile architecture hierarchy.
+ * Evaluates context tokens dynamically to branch between public [AuthStackNavigator] maps
+ * and authenticated [AppTabs] dashboards.
+ */
 export default function RootNavigation() {
     const { token, isLoading } = useAuth();
 

@@ -5,6 +5,12 @@ import com.climbbeta.api.repository.ProfileRepository
 import org.jdbi.v3.core.Jdbi
 import org.springframework.stereotype.Repository
 
+/**
+ * JDBI implementation of the [ProfileRepository].
+ *
+ * Processes personal bio statements, biometrics (height, ape index), and asset URL mappings
+ * for users configured under the system's climber scope.
+ */
 @Repository
 class JdbiProfileRepository(private val jdbi: Jdbi) : ProfileRepository {
 
