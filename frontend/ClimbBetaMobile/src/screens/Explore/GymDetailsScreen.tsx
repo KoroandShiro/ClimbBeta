@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getActiveBoulders, type Boulder } from '../../services/gymService';
+
+const FALLBACK_BOULDER_IMG = 'https://images.unsplash.com/photo-1522163182402-834f871fd851?auto=format&fit=crop&w=400&q=80';
 
 /**
  * Detailed viewport for a specific commercial facility.
@@ -91,10 +93,17 @@ export default function GymDetailsScreen({ route, navigation }: any) {
                       activeOpacity={0.7}
                       onPress={() => navigation.navigate('BoulderDetails', { boulderId: boulder.id })}
                   >
-                    <View style={[styles.colorIndicator, { backgroundColor: boulder.hexColor || '#9E9E9E' }]} />
+                    <Image
+                        source={{ uri: boulder.imageUrl || FALLBACK_BOULDER_IMG }}
+                        style={styles.boulderThumb}
+                        resizeMode="cover"
+                    />
 
                     <View style={styles.boulderInfo}>
-                      <Text style={styles.gradeText}>{boulder.grade}</Text>
+                      <View style={styles.gradeRow}>
+                        <Text style={styles.gradeText}>{boulder.grade}</Text>
+                        <View style={[styles.colorDot, { backgroundColor: boulder.hexColor || '#9E9E9E' }]} />
+                      </View>
                       <Text style={styles.detailsText}>
                         {boulder.color} • Setter: {boulder.setterName || 'N/A'}
                       </Text>
@@ -132,8 +141,10 @@ const styles = StyleSheet.create({
   retryButton: { backgroundColor: '#2E7D32', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8 },
   retryButtonText: { color: '#fff', fontWeight: 'bold' },
   boulderCard: { flexDirection: 'row', backgroundColor: '#fff', padding: 12, borderRadius: 10, marginBottom: 12, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 2 },
-  colorIndicator: { width: 20, height: 50, borderRadius: 10, marginRight: 15 },
+  boulderThumb: { width: 56, height: 56, borderRadius: 10, marginRight: 15, backgroundColor: '#e0e0e0' },
   boulderInfo: { flex: 1 },
+  gradeRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  colorDot: { width: 14, height: 14, borderRadius: 7, borderWidth: 1, borderColor: '#ddd' },
   gradeText: { fontSize: 18, fontWeight: 'bold', color: '#333' },
   detailsText: { fontSize: 13, color: '#777', marginTop: 2 },
   logButton: { flexDirection: 'row', backgroundColor: '#2E7D32', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, alignItems: 'center', zIndex: 10 },

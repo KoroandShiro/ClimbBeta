@@ -165,7 +165,7 @@ export default function BoulderDetailsScreen() {
           ) : (
               leaderboard.map((entry, index) => (
                   <View key={index} style={styles.leaderboardCard}>
-                    <Text style={styles.rankText}>{index + 1}{getOrdinalSuffix(index + 1)}</Text>
+                    <Text style={styles.rankText} numberOfLines={1}>{index + 1}{getOrdinalSuffix(index + 1)}</Text>
                     <Image
                         source={{ uri: entry.avatarUrl || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }}
                         style={styles.avatar}
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 20, fontWeight: 'bold', color: '#111', marginBottom: 15 },
   emptyText: { color: '#6b7280', fontStyle: 'italic', textAlign: 'center', marginTop: 10 },
   leaderboardCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', padding: 15, borderRadius: 8, marginBottom: 10, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 3, elevation: 2 },
-  rankText: { fontSize: 18, fontWeight: 'bold', color: '#f59e0b', width: 35 },
+  rankText: { fontSize: 16, fontWeight: 'bold', color: '#f59e0b', width: 46, flexShrink: 0, textAlign: 'center', marginRight: 6 },
   avatar: { width: 40, height: 40, borderRadius: 20, marginRight: 15, backgroundColor: '#f3f4f6' },
   climberInfo: { flex: 1 },
   climberName: { fontSize: 16, fontWeight: 'bold', color: '#111' },
