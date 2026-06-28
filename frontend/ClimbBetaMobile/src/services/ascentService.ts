@@ -106,6 +106,11 @@ export async function getFeed(): Promise<FeedItem[]> {
     return apiFetch<FeedItem[]>('/feed');
 }
 
+/** A climber's own ascents enriched as feed items (for the profile history). */
+export async function getClimberAscents(userId: number): Promise<FeedItem[]> {
+    return apiFetch<FeedItem[]>(`/climbers/${userId}/ascents`);
+}
+
 /** A comment on an ascent, already joined with its author. */
 export interface CommentItem {
     id: number;

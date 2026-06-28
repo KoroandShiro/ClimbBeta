@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository
 import java.time.LocalDate
 import kotlin.collections.List
 import com.climbbeta.api.domain.FeedItem
+import com.climbbeta.api.domain.ClimberStats
 import java.sql.ResultSet
 
 /**
@@ -190,35 +191,99 @@ class JdbiAscentRepository(private val jdbi: Jdbi) : AscentRepository {
             )
                 .bind("ascentId", ascentId)
                 .bind("viewerId", viewerId)
-                .map { rs, _ ->
-                    val ascent = Ascent(
-                        id = rs.getInt("id"),
-                        climberId = rs.getInt("climber_id"),
-                        boulderId = rs.getObject("boulder_id")?.let { rs.getInt("boulder_id") },
-                        outdoorRouteId = rs.getObject("outdoor_route_id")?.let { rs.getInt("outdoor_route_id") },
-                        freelogGymName = rs.getString("freelog_gym_name"),
-                        freelogGrade = rs.getString("freelog_grade"),
-                        date = rs.getDate("date").toLocalDate(),
-                        attempts = rs.getInt("attempts"),
-                        style = rs.getString("style"),
-                        notes = rs.getString("notes")
-                    )
-                    FeedItem(
-                        ascent = ascent,
-                        authorUsername = rs.getString("author_username"),
-                        authorAvatarUrl = rs.getString("author_avatar"),
-                        postImageUrl = rs.getString("post_image_url"),
-                        routeName = rs.getString("route_name"),
-                        routeGrade = rs.getString("route_grade"),
-                        logType = rs.getString("log_type"),
-                        gymName = rs.getString("gym_name"),
-                        likeCount = rs.getInt("like_count"),
-                        likedByMe = rs.getBoolean("liked_by_me"),
-                        commentCount = rs.getInt("comment_count")
-                    )
-                }
+                .map { rs, _ -> mapFeedItem(rs) }
                 .list()
                 .firstOrNull()
+        }
+    }
+
+    /** Builds a [FeedItem] from a row shaped by the enriched feed/detail SELECT. */
+    private fun mapFeedItem(rs: ResultSet): FeedItem {
+        val ascent = Ascent(
+            id = rs.getInt("id"),
+            climberId = rs.getInt("climber_id"),
+            boulderId = rs.getObject("boulder_id")?.let { rs.getInt("boulder_id") },
+            outdoorRouteId = rs.getObject("outdoor_route_id")?.let { rs.getInt("outdoor_route_id") },
+            freelogGymName = rs.getString("freelog_gym_name"),
+            freelogGrade = rs.getString("freelog_grade"),
+            date = rs.getDate("date").toLocalDate(),
+            attempts = rs.getInt("attempts"),
+            style = rs.getString("style"),
+            notes = rs.getString("notes")
+        )
+        return FeedItem(
+            ascent = ascent,
+            authorUsername = rs.getString("author_username"),
+            authorAvatarUrl = rs.getString("author_avatar"),
+            postImageUrl = rs.getString("post_image_url"),
+            routeName = rs.getString("route_name"),
+            routeGrade = rs.getString("route_grade"),
+            logType = rs.getString("log_type"),
+            gymName = rs.getString("gym_name"),
+            likeCount = rs.getInt("like_count"),
+            likedByMe = rs.getBoolean("liked_by_me"),
+            commentCount = rs.getInt("comment_count")
+        )
+    }
+
+    override fun getAscentsByClimber(climberId: Int, viewerId: Int): List<FeedItem> {
+        return jdbi.withHandle<List<FeedItem>, Exception> { handle ->
+            handle.createQuery(
+                """
+                SELECT
+                    a.id, a.climber_id, a.boulder_id, a.outdoor_route_id,
+                    a.freelog_gym_name, a.freelog_grade, a.date, a.attempts, a.style, a.notes,
+                    u.username as author_username,
+                    cp.avatar_url as author_avatar,
+                    COALESCE(m.media_url, b.image_url, g.cover_image_url) as post_image_url,
+                    COALESCE(b.color, o.name, 'Via Livre') as route_name,
+                    COALESCE(b.grade, o.grade, a.freelog_grade) as route_grade,
+                    CASE
+                        WHEN a.boulder_id IS NOT NULL THEN 'INDOOR'
+                        WHEN a.outdoor_route_id IS NOT NULL THEN 'OUTDOOR'
+                        ELSE 'FREELOG_GYM'
+                    END as log_type,
+                    g.name as gym_name,
+                    (SELECT COUNT(*) FROM likes lk WHERE lk.ascent_id = a.id) as like_count,
+                    EXISTS(SELECT 1 FROM likes lk WHERE lk.ascent_id = a.id AND lk.climber_id = :viewerId) as liked_by_me,
+                    (SELECT COUNT(*) FROM comments cm WHERE cm.ascent_id = a.id) as comment_count
+                FROM ascents a
+                JOIN users u ON u.id = a.climber_id
+                LEFT JOIN climber_profiles cp ON cp.user_id = u.id
+                LEFT JOIN media m ON m.ascent_id = a.id
+                LEFT JOIN boulders b ON b.id = a.boulder_id
+                LEFT JOIN outdoor_routes o ON o.id = a.outdoor_route_id
+                LEFT JOIN gyms g ON g.id = b.gym_id
+                WHERE a.climber_id = :climberId
+                ORDER BY a.date DESC
+                """
+            )
+                .bind("climberId", climberId)
+                .bind("viewerId", viewerId)
+                .map { rs, _ -> mapFeedItem(rs) }
+                .list()
+        }
+    }
+
+    override fun getClimberStats(climberId: Int): ClimberStats {
+        return jdbi.withHandle<ClimberStats, Exception> { handle ->
+            handle.createQuery(
+                """
+                SELECT
+                    (SELECT COUNT(*) FROM ascents WHERE climber_id = :id) AS totalAscents,
+                    (SELECT b.grade FROM ascents a JOIN boulders b ON b.id = a.boulder_id
+                     WHERE a.climber_id = :id
+                     ORDER BY NULLIF(regexp_replace(b.grade, '\D', '', 'g'), '')::int DESC NULLS LAST
+                     LIMIT 1) AS maxIndoorGrade,
+                    (SELECT o.grade FROM ascents a JOIN outdoor_routes o ON o.id = a.outdoor_route_id
+                     WHERE a.climber_id = :id
+                     ORDER BY NULLIF(regexp_replace(o.grade, '\D', '', 'g'), '')::int DESC NULLS LAST
+                     LIMIT 1) AS maxOutdoorGrade
+                """
+            )
+                .bind("id", climberId)
+                .mapTo(ClimberStats::class.java)
+                .one()
         }
     }
 }

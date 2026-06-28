@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import com.climbbeta.api.domain.ClimberProfileWithUserDTO
 import com.climbbeta.api.domain.User
+import com.climbbeta.api.repository.AscentRepository
 import com.climbbeta.api.repository.FollowRepository
 import io.minio.MinioClient
 import io.minio.PutObjectArgs
@@ -22,6 +23,7 @@ import java.util.UUID
 class ProfileService(
     private val profileRepository: ProfileRepository,
     private val followRepository: FollowRepository,
+    private val ascentRepository: AscentRepository,
     private val minioClient: MinioClient,
     @Value("\${minio.public-url}") private val publicUrl: String,
     @Value("\${minio.bucket-name}") private val bucketName: String
@@ -37,12 +39,16 @@ class ProfileService(
      */
     fun getClimberProfileWithUser(userId: Int, user: User): ClimberProfileWithUserDTO {
         val profile = getClimberProfile(userId)
+        val stats = ascentRepository.getClimberStats(userId)
         return ClimberProfileWithUserDTO(
             userId = profile.userId, username = user.username, email = user.email,
             bio = profile.bio, height = profile.height, apeIndex = profile.apeIndex,
             avatarUrl = profile.avatarUrl,
             followersCount = followRepository.getFollowersCount(userId),
-            followingCount = followRepository.getFollowingCount(userId)
+            followingCount = followRepository.getFollowingCount(userId),
+            totalAscents = stats.totalAscents,
+            maxIndoorGrade = stats.maxIndoorGrade,
+            maxOutdoorGrade = stats.maxOutdoorGrade
         )
     }
 

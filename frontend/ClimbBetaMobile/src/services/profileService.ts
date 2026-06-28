@@ -10,6 +10,9 @@ export interface ClimberProfileWithUserDTO {
     avatarUrl?: string | null;
     followersCount?: number;
     followingCount?: number;
+    totalAscents?: number;
+    maxIndoorGrade?: string | null;
+    maxOutdoorGrade?: string | null;
 }
 
 export interface UpdateProfileInput {

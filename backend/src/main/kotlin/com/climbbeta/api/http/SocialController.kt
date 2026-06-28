@@ -1,6 +1,7 @@
 package com.climbbeta.api.http
 
 import com.climbbeta.api.domain.ClimberSummary
+import com.climbbeta.api.domain.FeedItem
 import com.climbbeta.api.domain.User
 import com.climbbeta.api.services.AscentService
 import com.climbbeta.api.services.FollowService
@@ -66,6 +67,14 @@ class SocialController(
         @RequestAttribute("authenticatedUser") user: User
     ): ResponseEntity<List<ClimberSummary>> =
         ResponseEntity.ok(followService.getFollowing(id, user.id))
+
+    /** A climber's own ascents, enriched as feed items (for the profile history). */
+    @GetMapping("/climbers/{id}/ascents")
+    fun getClimberAscents(
+        @PathVariable id: Int,
+        @RequestAttribute("authenticatedUser") user: User
+    ): ResponseEntity<List<FeedItem>> =
+        ResponseEntity.ok(ascentService.getAscentsByClimber(id, user.id))
 
     /**
      * Compiles a timeline of recent logs recorded by climbers the user follows.

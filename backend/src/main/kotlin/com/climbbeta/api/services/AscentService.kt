@@ -57,6 +57,8 @@ class AscentService(
     fun removeAscent(id: Int, climberId: Int) = ascentRepository.delete(id, climberId)
     fun getFeedForClimber(climberId: Int) = ascentRepository.getFeedForClimber(climberId)
     fun getAscentDetail(ascentId: Int, viewerId: Int) = ascentRepository.getAscentDetail(ascentId, viewerId)
+    fun getAscentsByClimber(climberId: Int, viewerId: Int) = ascentRepository.getAscentsByClimber(climberId, viewerId)
+    fun getClimberStats(climberId: Int) = ascentRepository.getClimberStats(climberId)
 
     /**
      * Logs a "hybrid free log" ascent that is NOT tied to a partner gym's boulder.

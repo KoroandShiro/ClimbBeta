@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { logAscent } from '../../services/ascentService';
+import { checkSaveStatus, unsaveProject } from '../../services/gymService';
 
 /**
  * Structured ascent ingestion logger.
@@ -35,9 +36,34 @@ export default function LogAscentScreen({ route, navigation }: any) {
                 notes: notes,
             });
 
-            Alert.alert("Success!", "Ascent successfully logged in your Logbook! 🧗‍♂️", [
-                { text: "Awesome!", onPress: () => navigation.goBack() } // Clean context pop to previous view
-            ]);
+            // QoL: se este boulder estava nos Projetos guardados, oferecer removê-lo.
+            let isSaved = false;
+            try {
+                isSaved = (await checkSaveStatus(boulderId)).isSaved;
+            } catch {
+                // Se a verificação falhar, segue o caminho normal de sucesso.
+            }
+
+            if (isSaved) {
+                Alert.alert(
+                    "Boa subida! 🎉",
+                    "Queres remover esta via dos teus Projetos guardados?",
+                    [
+                        { text: "Não", style: "cancel", onPress: () => navigation.goBack() },
+                        {
+                            text: "Sim, remover",
+                            onPress: async () => {
+                                try { await unsaveProject(boulderId); } catch { /* ignora */ }
+                                navigation.goBack();
+                            },
+                        },
+                    ]
+                );
+            } else {
+                Alert.alert("Success!", "Ascent successfully logged in your Logbook! 🧗‍♂️", [
+                    { text: "Awesome!", onPress: () => navigation.goBack() } // Clean context pop to previous view
+                ]);
+            }
         } catch (error: any) {
             Alert.alert("Error saving", error.message || "Please try again.");
         } finally {
