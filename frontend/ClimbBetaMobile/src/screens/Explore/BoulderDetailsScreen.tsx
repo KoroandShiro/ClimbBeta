@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, ActivityIn
 import { Ionicons } from '@expo/vector-icons';
 import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { getBoulderById, getLeaderboard, saveProject, unsaveProject, checkSaveStatus, LeaderboardEntry, Boulder } from '../../services/gymService';
+import { getOrdinalSuffix } from '../../utils/ordinal';
 
 /**
  * Detailed viewport for an individual indoor climbing route (Boulder).
@@ -164,7 +165,7 @@ export default function BoulderDetailsScreen() {
           ) : (
               leaderboard.map((entry, index) => (
                   <View key={index} style={styles.leaderboardCard}>
-                    <Text style={styles.rankText}>{index + 1}st</Text>
+                    <Text style={styles.rankText}>{index + 1}{getOrdinalSuffix(index + 1)}</Text>
                     <Image
                         source={{ uri: entry.avatarUrl || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }}
                         style={styles.avatar}

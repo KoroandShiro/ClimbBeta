@@ -63,6 +63,13 @@ export default function FeedScreen({ navigation }: any) {
     }
   };
 
+  /** Atalho para a via: só navega em cartões de ginásio parceiro (INDOOR com boulderId). */
+  const goToBoulder = (post: FeedItem) => {
+    if (post.logType === 'INDOOR' && post.ascent.boulderId != null) {
+      navigation.navigate('BoulderDetails', { boulderId: post.ascent.boulderId });
+    }
+  };
+
   return (
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Fixed Header */}
@@ -104,11 +111,16 @@ export default function FeedScreen({ navigation }: any) {
                 </View>
                 {(() => {
                   const badge = LOG_TYPE_BADGE[post.logType ?? 'FREELOG_GYM'] ?? LOG_TYPE_BADGE.FREELOG_GYM;
+                  const isIndoor = post.logType === 'INDOOR' && post.ascent.boulderId != null;
+                  const Container: any = isIndoor ? TouchableOpacity : View;
                   return (
-                      <View style={[styles.typeBadge, { backgroundColor: badge.bg }]}>
+                      <Container
+                          style={[styles.typeBadge, { backgroundColor: badge.bg }]}
+                          onPress={isIndoor ? () => goToBoulder(post) : undefined}
+                      >
                         <Ionicons name={badge.icon} size={13} color={badge.color} />
                         <Text style={[styles.typeBadgeText, { color: badge.color }]}>{badge.label}</Text>
-                      </View>
+                      </Container>
                   );
                 })()}
               </View>
@@ -139,10 +151,22 @@ export default function FeedScreen({ navigation }: any) {
                 <Text style={styles.likesText}>{post.likeCount ?? 0} {(post.likeCount ?? 0) === 1 ? 'like' : 'likes'}</Text>
 
                 <View style={styles.detailsRow}>
-                  <Text style={styles.boulderName}>
-                    Route {post.routeName ?? 'Logged'}
-                    {post.routeGrade ? <Text style={styles.gradeText}> ({post.routeGrade})</Text> : ''}
-                  </Text>
+                  {(() => {
+                    const isIndoor = post.logType === 'INDOOR' && post.ascent.boulderId != null;
+                    const NameContainer: any = isIndoor ? TouchableOpacity : View;
+                    return (
+                        <NameContainer
+                            style={styles.routeNameWrap}
+                            onPress={isIndoor ? () => goToBoulder(post) : undefined}
+                        >
+                          <Text style={styles.boulderName}>
+                            Route {post.routeName ?? 'Logged'}
+                            {post.routeGrade ? <Text style={styles.gradeText}> ({post.routeGrade})</Text> : ''}
+                          </Text>
+                          {isIndoor && <Ionicons name="chevron-forward" size={16} color="#2563EB" />}
+                        </NameContainer>
+                    );
+                  })()}
                   {post.ascent.style && (
                       <View style={styles.styleChip}>
                         <Text style={styles.styleText}>{post.ascent.style}</Text>
@@ -194,7 +218,8 @@ const styles = StyleSheet.create({
   postFooter: { paddingHorizontal: 15, paddingBottom: 10 },
   likesText: { fontWeight: '600', fontSize: 14, color: '#111', marginBottom: 6 },
   detailsRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },
-  boulderName: { fontSize: 15, fontWeight: '700', color: '#111', marginRight: 10 },
+  boulderName: { fontSize: 15, fontWeight: '700', color: '#111' },
+  routeNameWrap: { flexDirection: 'row', alignItems: 'center', flexShrink: 1, marginRight: 10 },
   gradeText: { fontWeight: '700', color: '#2563EB' },
   styleChip: { backgroundColor: '#E8F5E9', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4 },
   styleText: { color: '#2E7D32', fontSize: 11, fontWeight: '700', textTransform: 'uppercase' },

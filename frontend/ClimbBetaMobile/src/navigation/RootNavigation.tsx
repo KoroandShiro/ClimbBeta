@@ -47,6 +47,8 @@ function HomeStackNavigator() {
             <HomeStack.Screen name="Feed" component={FeedScreen} options={{ title: 'Community' }} />
             <HomeStack.Screen name="AscentDetails" component={AscentDetailsScreen} options={{ title: 'Ascent Details' }} />
             <HomeStack.Screen name="UserSearch" component={UserSearchScreen} options={{ title: 'Search User' }} />
+            <HomeStack.Screen name="BoulderDetails" component={BoulderDetailsScreen} options={{ title: 'Route Statistics' }} />
+            <HomeStack.Screen name="LogAscent" component={LogAscentScreen} options={{ title: 'Log Ascent' }} />
         </HomeStack.Navigator>
     );
 }
