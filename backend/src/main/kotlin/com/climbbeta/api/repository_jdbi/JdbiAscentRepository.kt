@@ -104,7 +104,10 @@ class JdbiAscentRepository(private val jdbi: Jdbi) : AscentRepository {
                         WHEN a.outdoor_route_id IS NOT NULL THEN 'OUTDOOR'
                         ELSE 'FREELOG_GYM'
                     END as log_type,
-                    g.name as gym_name
+                    g.name as gym_name,
+                    (SELECT COUNT(*) FROM likes lk WHERE lk.ascent_id = a.id) as like_count,
+                    EXISTS(SELECT 1 FROM likes lk WHERE lk.ascent_id = a.id AND lk.climber_id = :climberId) as liked_by_me,
+                    (SELECT COUNT(*) FROM comments cm WHERE cm.ascent_id = a.id) as comment_count
                 FROM ascents a
                 JOIN follows_climber f ON f.followed_id = a.climber_id
                 JOIN users u ON u.id = a.climber_id
@@ -140,10 +143,82 @@ class JdbiAscentRepository(private val jdbi: Jdbi) : AscentRepository {
                         routeName = rs.getString("route_name"),
                         routeGrade = rs.getString("route_grade"),
                         logType = rs.getString("log_type"),
-                        gymName = rs.getString("gym_name")
+                        gymName = rs.getString("gym_name"),
+                        likeCount = rs.getInt("like_count"),
+                        likedByMe = rs.getBoolean("liked_by_me"),
+                        commentCount = rs.getInt("comment_count")
                     )
                 }
                 .list()
+        }
+    }
+
+    /**
+     * Single enriched ascent for the detail screen — same shape as a feed item, but fetched by id
+     * (no follow filter). [viewerId] resolves whether the requester already liked it.
+     */
+    override fun getAscentDetail(ascentId: Int, viewerId: Int): FeedItem? {
+        return jdbi.withHandle<FeedItem?, Exception> { handle ->
+            handle.createQuery(
+                """
+                SELECT
+                    a.id, a.climber_id, a.boulder_id, a.outdoor_route_id,
+                    a.freelog_gym_name, a.freelog_grade, a.date, a.attempts, a.style, a.notes,
+                    u.username as author_username,
+                    cp.avatar_url as author_avatar,
+                    COALESCE(m.media_url, b.image_url, g.cover_image_url) as post_image_url,
+                    COALESCE(b.color, o.name, 'Via Livre') as route_name,
+                    COALESCE(b.grade, o.grade, a.freelog_grade) as route_grade,
+                    CASE
+                        WHEN a.boulder_id IS NOT NULL THEN 'INDOOR'
+                        WHEN a.outdoor_route_id IS NOT NULL THEN 'OUTDOOR'
+                        ELSE 'FREELOG_GYM'
+                    END as log_type,
+                    g.name as gym_name,
+                    (SELECT COUNT(*) FROM likes lk WHERE lk.ascent_id = a.id) as like_count,
+                    EXISTS(SELECT 1 FROM likes lk WHERE lk.ascent_id = a.id AND lk.climber_id = :viewerId) as liked_by_me,
+                    (SELECT COUNT(*) FROM comments cm WHERE cm.ascent_id = a.id) as comment_count
+                FROM ascents a
+                JOIN users u ON u.id = a.climber_id
+                LEFT JOIN climber_profiles cp ON cp.user_id = u.id
+                LEFT JOIN media m ON m.ascent_id = a.id
+                LEFT JOIN boulders b ON b.id = a.boulder_id
+                LEFT JOIN outdoor_routes o ON o.id = a.outdoor_route_id
+                LEFT JOIN gyms g ON g.id = b.gym_id
+                WHERE a.id = :ascentId
+                """
+            )
+                .bind("ascentId", ascentId)
+                .bind("viewerId", viewerId)
+                .map { rs, _ ->
+                    val ascent = Ascent(
+                        id = rs.getInt("id"),
+                        climberId = rs.getInt("climber_id"),
+                        boulderId = rs.getObject("boulder_id")?.let { rs.getInt("boulder_id") },
+                        outdoorRouteId = rs.getObject("outdoor_route_id")?.let { rs.getInt("outdoor_route_id") },
+                        freelogGymName = rs.getString("freelog_gym_name"),
+                        freelogGrade = rs.getString("freelog_grade"),
+                        date = rs.getDate("date").toLocalDate(),
+                        attempts = rs.getInt("attempts"),
+                        style = rs.getString("style"),
+                        notes = rs.getString("notes")
+                    )
+                    FeedItem(
+                        ascent = ascent,
+                        authorUsername = rs.getString("author_username"),
+                        authorAvatarUrl = rs.getString("author_avatar"),
+                        postImageUrl = rs.getString("post_image_url"),
+                        routeName = rs.getString("route_name"),
+                        routeGrade = rs.getString("route_grade"),
+                        logType = rs.getString("log_type"),
+                        gymName = rs.getString("gym_name"),
+                        likeCount = rs.getInt("like_count"),
+                        likedByMe = rs.getBoolean("liked_by_me"),
+                        commentCount = rs.getInt("comment_count")
+                    )
+                }
+                .list()
+                .firstOrNull()
         }
     }
 }

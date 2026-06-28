@@ -20,6 +20,7 @@ import AscentDetailsScreen from '../screens/Home/AscentDetailsScreen';
 import UserSearchScreen from '../screens/Home/UserSearchScreen';
 import BoulderDetailsScreen from '../screens/Explore/BoulderDetailsScreen';
 import MyProjectsScreen from '../screens/Profile/MyProjectsScreen';
+import FollowListScreen from '../screens/Profile/FollowListScreen';
 
 const AuthStack = createNativeStackNavigator();
 
@@ -91,6 +92,7 @@ function ProfileStackNavigator() {
             <ProfileStack.Screen name="MyProfile" component={ProfileScreen} options={{ title: 'My Profile' }} />
             <ProfileStack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile' }} />
             <ProfileStack.Screen name="MyProjects" component={MyProjectsScreen} options={{ title: 'Saved Projects' }} />
+            <ProfileStack.Screen name="FollowList" component={FollowListScreen} options={{ title: 'Connections' }} />
             <ProfileStack.Screen name="BoulderDetails" component={BoulderDetailsScreen} options={{ title: 'Route Statistics' }} />
             <ProfileStack.Screen name="LogAscent" component={LogAscentScreen} options={{ title: 'Log Ascent' }} />
         </ProfileStack.Navigator>

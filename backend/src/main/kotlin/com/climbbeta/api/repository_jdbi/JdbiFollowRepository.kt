@@ -1,5 +1,6 @@
 package com.climbbeta.api.repository_jdbi
 
+import com.climbbeta.api.domain.ClimberSummary
 import com.climbbeta.api.repository.FollowRepository
 import org.jdbi.v3.core.Jdbi
 import org.springframework.stereotype.Repository
@@ -78,6 +79,49 @@ class JdbiFollowRepository(private val jdbi: Jdbi) : FollowRepository {
                 .bind("userId", userId)
                 .mapTo(Int::class.java)
                 .one()
+        }
+    }
+
+    /** Reuses the same `EXISTS(... :viewerId ...) AS isFollowing` pattern as user search. */
+    override fun getFollowers(userId: Int, viewerId: Int): List<ClimberSummary> {
+        return jdbi.withHandle<List<ClimberSummary>, Exception> { handle ->
+            handle.createQuery(
+                """
+                SELECT u.id, u.username,
+                       cp.avatar_url AS avatarUrl,
+                       EXISTS(SELECT 1 FROM follows_climber x WHERE x.follower_id = :viewerId AND x.followed_id = u.id) AS isFollowing
+                FROM follows_climber f
+                JOIN users u ON u.id = f.follower_id
+                LEFT JOIN climber_profiles cp ON cp.user_id = u.id
+                WHERE f.followed_id = :userId
+                ORDER BY u.username
+                """
+            )
+                .bind("userId", userId)
+                .bind("viewerId", viewerId)
+                .mapTo(ClimberSummary::class.java)
+                .list()
+        }
+    }
+
+    override fun getFollowing(userId: Int, viewerId: Int): List<ClimberSummary> {
+        return jdbi.withHandle<List<ClimberSummary>, Exception> { handle ->
+            handle.createQuery(
+                """
+                SELECT u.id, u.username,
+                       cp.avatar_url AS avatarUrl,
+                       EXISTS(SELECT 1 FROM follows_climber x WHERE x.follower_id = :viewerId AND x.followed_id = u.id) AS isFollowing
+                FROM follows_climber f
+                JOIN users u ON u.id = f.followed_id
+                LEFT JOIN climber_profiles cp ON cp.user_id = u.id
+                WHERE f.follower_id = :userId
+                ORDER BY u.username
+                """
+            )
+                .bind("userId", userId)
+                .bind("viewerId", viewerId)
+                .mapTo(ClimberSummary::class.java)
+                .list()
         }
     }
 }

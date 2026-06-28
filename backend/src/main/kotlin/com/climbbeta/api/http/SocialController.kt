@@ -1,5 +1,6 @@
 package com.climbbeta.api.http
 
+import com.climbbeta.api.domain.ClimberSummary
 import com.climbbeta.api.domain.User
 import com.climbbeta.api.services.AscentService
 import com.climbbeta.api.services.FollowService
@@ -49,6 +50,22 @@ class SocialController(
             ResponseEntity.status(HttpStatus.NOT_FOUND).build()
         }
     }
+
+    /** Climbers who follow user [id] (each flagged with whether the requester follows them back). */
+    @GetMapping("/climbers/{id}/followers")
+    fun getFollowers(
+        @PathVariable id: Int,
+        @RequestAttribute("authenticatedUser") user: User
+    ): ResponseEntity<List<ClimberSummary>> =
+        ResponseEntity.ok(followService.getFollowers(id, user.id))
+
+    /** Climbers that user [id] follows. */
+    @GetMapping("/climbers/{id}/following")
+    fun getFollowing(
+        @PathVariable id: Int,
+        @RequestAttribute("authenticatedUser") user: User
+    ): ResponseEntity<List<ClimberSummary>> =
+        ResponseEntity.ok(followService.getFollowing(id, user.id))
 
     /**
      * Compiles a timeline of recent logs recorded by climbers the user follows.

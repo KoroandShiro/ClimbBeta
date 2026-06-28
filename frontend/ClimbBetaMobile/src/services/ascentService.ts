@@ -37,6 +37,9 @@ export interface FeedItem {
     logType?: string;
     /** Partner gym name (for INDOOR logs). */
     gymName?: string | null;
+    likeCount?: number;
+    likedByMe?: boolean;
+    commentCount?: number;
 }
 
 /**
@@ -101,4 +104,38 @@ export async function getMyAscents(): Promise<Ascent[]> {
  */
 export async function getFeed(): Promise<FeedItem[]> {
     return apiFetch<FeedItem[]>('/feed');
+}
+
+/** A comment on an ascent, already joined with its author. */
+export interface CommentItem {
+    id: number;
+    authorId: number;
+    authorUsername: string;
+    authorAvatarUrl?: string | null;
+    text: string;
+    createdAt: string;
+}
+
+/** Enriched single ascent (author, image, route, like/comment counts) for the detail screen. */
+export async function getAscentDetail(id: number): Promise<FeedItem> {
+    return apiFetch<FeedItem>(`/ascents/${id}/details`);
+}
+
+export async function likeAscent(id: number): Promise<void> {
+    return apiFetch(`/ascents/${id}/like`, { method: 'POST' });
+}
+
+export async function unlikeAscent(id: number): Promise<void> {
+    return apiFetch(`/ascents/${id}/like`, { method: 'DELETE' });
+}
+
+export async function getComments(id: number): Promise<CommentItem[]> {
+    return apiFetch<CommentItem[]>(`/ascents/${id}/comments`);
+}
+
+export async function addComment(id: number, text: string): Promise<CommentItem> {
+    return apiFetch<CommentItem>(`/ascents/${id}/comments`, {
+        method: 'POST',
+        body: JSON.stringify({ text }),
+    });
 }

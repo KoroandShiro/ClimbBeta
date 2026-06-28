@@ -21,3 +21,13 @@ export const followUser = (userId: number): Promise<void> => {
 export const unfollowUser = (userId: number): Promise<void> => {
     return apiFetch(`/climbers/${userId}/follow`, { method: 'DELETE' });
 };
+
+/** Climbers who follow the given user (each flagged with whether I follow them back). */
+export const getFollowers = (userId: number): Promise<UserSearchResult[]> => {
+    return apiFetch<UserSearchResult[]>(`/climbers/${userId}/followers`);
+};
+
+/** Climbers that the given user follows. */
+export const getFollowing = (userId: number): Promise<UserSearchResult[]> => {
+    return apiFetch<UserSearchResult[]>(`/climbers/${userId}/following`);
+};

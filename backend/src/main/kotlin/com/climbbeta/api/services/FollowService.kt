@@ -34,4 +34,7 @@ class FollowService(private val followRepository: FollowRepository) {
 
     fun getFollowersCount(userId: Int): Int = followRepository.getFollowersCount(userId)
     fun getFollowingCount(userId: Int): Int = followRepository.getFollowingCount(userId)
+
+    fun getFollowers(userId: Int, viewerId: Int) = followRepository.getFollowers(userId, viewerId)
+    fun getFollowing(userId: Int, viewerId: Int) = followRepository.getFollowing(userId, viewerId)
 }

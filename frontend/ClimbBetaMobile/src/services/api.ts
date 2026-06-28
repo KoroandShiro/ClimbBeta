@@ -63,10 +63,11 @@ export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): 
         throw new ApiError(errorMessage, response.status);
     }
 
-    // HTTP 204 No Content não possui corpo interpretável por JSON
+    // HTTP 204 (ou respostas sem corpo, ex.: like/follow) não têm JSON para interpretar
     if (response.status === 204) {
         return null as T;
     }
 
-    return response.json() as Promise<T>;
+    const body = await response.text();
+    return (body ? JSON.parse(body) : null) as T;
 }

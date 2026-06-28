@@ -11,4 +11,10 @@ data class FeedItem(
     val logType: String = "FREELOG_GYM",
     /** Partner gym name (only present for INDOOR logs). */
     val gymName: String? = null,
+    /** Total likes on this ascent. */
+    val likeCount: Int = 0,
+    /** Whether the requesting climber has already liked it (drives the filled heart). */
+    val likedByMe: Boolean = false,
+    /** Total comments on this ascent. */
+    val commentCount: Int = 0,
 )

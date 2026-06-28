@@ -1,6 +1,7 @@
 package com.climbbeta.api.http
 
 import com.climbbeta.api.domain.Ascent
+import com.climbbeta.api.domain.FeedItem
 import com.climbbeta.api.domain.User
 import com.climbbeta.api.services.AscentService
 import org.springframework.http.HttpStatus
@@ -104,6 +105,19 @@ class AscentController(private val ascentService: AscentService) {
     fun getById(@PathVariable id: Int): ResponseEntity<Ascent> {
         val ascent = ascentService.getAscentById(id)
         return if (ascent != null) ResponseEntity.ok(ascent) else ResponseEntity.notFound().build()
+    }
+
+    /**
+     * Enriched single ascent for the detail screen: author, cover image, route descriptors and
+     * like/comment counts (plus whether the requester already liked it).
+     */
+    @GetMapping("/{id}/details")
+    fun getDetails(
+        @PathVariable id: Int,
+        @RequestAttribute("authenticatedUser") user: User
+    ): ResponseEntity<FeedItem> {
+        val detail = ascentService.getAscentDetail(id, user.id)
+        return if (detail != null) ResponseEntity.ok(detail) else ResponseEntity.notFound().build()
     }
 
     /**

@@ -8,6 +8,8 @@ export interface ClimberProfileWithUserDTO {
     height?: number | null;
     apeIndex?: number | null;
     avatarUrl?: string | null;
+    followersCount?: number;
+    followingCount?: number;
 }
 
 export interface UpdateProfileInput {

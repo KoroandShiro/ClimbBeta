@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import { getFeed, FeedItem } from '../../services/ascentService';
+import { getFeed, FeedItem, likeAscent, unlikeAscent } from '../../services/ascentService';
 
 const { width } = Dimensions.get('window');
 
@@ -47,6 +47,21 @@ export default function FeedScreen({ navigation }: any) {
         return () => { isActive = false; };
       }, [])
   );
+
+  /** Toggle otimista do like: atualiza o cartão na hora e depois sincroniza com o backend. */
+  const handleToggleLike = async (ascentId: number, wasLiked: boolean) => {
+    setFeed((prev) => prev.map((p) => p.ascent.id === ascentId
+        ? { ...p, likedByMe: !wasLiked, likeCount: (p.likeCount ?? 0) + (wasLiked ? -1 : 1) }
+        : p));
+    try {
+      if (wasLiked) await unlikeAscent(ascentId); else await likeAscent(ascentId);
+    } catch {
+      // Reverte se a chamada falhar
+      setFeed((prev) => prev.map((p) => p.ascent.id === ascentId
+          ? { ...p, likedByMe: wasLiked, likeCount: (p.likeCount ?? 0) + (wasLiked ? 1 : -1) }
+          : p));
+    }
+  };
 
   return (
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -110,21 +125,18 @@ export default function FeedScreen({ navigation }: any) {
               {/* 3. Interaction Bar */}
               <View style={styles.actionRow}>
                 <View style={styles.leftActions}>
-                  <TouchableOpacity style={styles.actionButton}>
-                    <Ionicons name="heart-outline" size={28} color="#111" />
+                  <TouchableOpacity style={styles.actionButton} onPress={() => handleToggleLike(post.ascent.id, post.likedByMe ?? false)}>
+                    <Ionicons name={post.likedByMe ? 'heart' : 'heart-outline'} size={28} color={post.likedByMe ? '#E0245E' : '#111'} />
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.actionButton}>
+                  <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('AscentDetails', { ascentId: post.ascent.id })}>
                     <Ionicons name="chatbubble-outline" size={26} color="#111" />
                   </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={styles.saveButton}>
-                  <Ionicons name="bookmark-outline" size={26} color="#111" />
-                </TouchableOpacity>
               </View>
 
               {/* 4. Details */}
               <View style={styles.postFooter}>
-                <Text style={styles.likesText}>0 likes</Text>
+                <Text style={styles.likesText}>{post.likeCount ?? 0} {(post.likeCount ?? 0) === 1 ? 'like' : 'likes'}</Text>
 
                 <View style={styles.detailsRow}>
                   <Text style={styles.boulderName}>
@@ -145,6 +157,11 @@ export default function FeedScreen({ navigation }: any) {
                     </Text>
                 )}
 
+                {(post.commentCount ?? 0) > 0 && (
+                    <TouchableOpacity onPress={() => navigation.navigate('AscentDetails', { ascentId: post.ascent.id })}>
+                      <Text style={styles.viewComments}>View {post.commentCount} comment{post.commentCount === 1 ? '' : 's'}</Text>
+                    </TouchableOpacity>
+                )}
                 <Text style={styles.dateText}>{new Date(post.ascent.date).toLocaleDateString('en-US')}</Text>
               </View>
             </View>
@@ -183,5 +200,6 @@ const styles = StyleSheet.create({
   styleText: { color: '#2E7D32', fontSize: 11, fontWeight: '700', textTransform: 'uppercase' },
   captionText: { fontSize: 14, color: '#111', lineHeight: 20 },
   captionUsername: { fontWeight: '600' },
-  dateText: { fontSize: 12, color: '#888', marginTop: 8 }
+  dateText: { fontSize: 12, color: '#888', marginTop: 8 },
+  viewComments: { fontSize: 13, color: '#666', marginTop: 4 }
 });
