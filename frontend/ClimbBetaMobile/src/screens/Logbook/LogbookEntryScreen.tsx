@@ -13,9 +13,9 @@ export default function LogbookEntryScreen({ navigation }: any) {
             <Text style={styles.title}>New Entry</Text>
             <Text style={{ marginBottom: 20 }}>Where did you climb today?</Text>
 
-            <Button title="🧗‍♂️ Gym (Indoor)" onPress={() => navigation.navigate('IndoorLog')} />
+            <Button title="🏢 Gym (Non-partner)" onPress={() => navigation.navigate('FreeLog', { initialMode: 'GYM' })} />
             <View style={{ height: 20 }} />
-            <Button title="⛰️ Rock (Outdoor)" onPress={() => navigation.navigate('OutdoorLog')} />
+            <Button title="⛰️ Rock (Outdoor)" onPress={() => navigation.navigate('FreeLog', { initialMode: 'ROCK' })} />
         </View>
     );
 }

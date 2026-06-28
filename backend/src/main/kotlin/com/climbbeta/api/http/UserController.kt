@@ -51,28 +51,25 @@ class UserController(
      */
     @PostMapping("/register")
     fun registerUser(@RequestBody input: UserCreateInputModel): ResponseEntity<Any> {
-        return try {
-            val createdUser = userService.createUser(
-                username = input.username,
-                email = input.email,
-                passwordRaw = input.passwordRaw,
-                role = input.role
-            )
+        val createdUser = userService.createUser(
+            username = input.username,
+            email = input.email,
+            passwordRaw = input.passwordRaw,
+            role = input.role
+        )
 
-            // Convert to OutputModel to NEVER return the password to the device!
-            val output = UserOutputModel(
-                id = createdUser.id,
-                username = createdUser.username,
-                email = createdUser.email,
-                role = createdUser.role,
-                status = createdUser.status
-            )
+        // Convert to OutputModel to NEVER return the password to the device!
+        val output = UserOutputModel(
+            id = createdUser.id,
+            username = createdUser.username,
+            email = createdUser.email,
+            role = createdUser.role,
+            status = createdUser.status
+        )
 
-            ResponseEntity.status(HttpStatus.CREATED).body(output)
-
-        } catch (e: IllegalArgumentException) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to e.message))
-        }
+        // Um email/username duplicado lança IllegalArgumentException no service,
+        // que o GlobalExceptionHandler traduz automaticamente para 400 Bad Request.
+        return ResponseEntity.status(HttpStatus.CREATED).body(output)
     }
     /**
      * Evaluates raw email credentials against secure records to instantiate a session token.
@@ -81,6 +78,10 @@ class UserController(
      */
     @PostMapping("/login")
     fun loginUser(@RequestBody input: UserLoginInputModel): ResponseEntity<Any> {
+        // EXCEÇÃO DELIBERADA ao handler global: credenciais inválidas devem dar 401
+        // (Unauthorized), e não o 400 que o GlobalExceptionHandler atribui ao
+        // IllegalArgumentException. Mantemos o try/catch LOCAL precisamente porque, ao
+        // apanhar a exceção aqui, ela nunca chega a propagar para o @ControllerAdvice.
         return try {
             val token = userService.login(input.email, input.passwordRaw)
             ResponseEntity.ok(TokenOutputModel(token))
@@ -113,19 +114,12 @@ class UserController(
         val user = request.getAttribute("authenticatedUser") as? com.climbbeta.api.domain.User
             ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
 
-        return try {
-            val updatedUser = userService.verifyActivationCode(user, input.code)
-            val output = UserOutputModel(updatedUser.id, updatedUser.username, updatedUser.email, updatedUser.role, updatedUser.status)
-            ResponseEntity.ok(output)
-        } catch (e: SecurityException) {
-            ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("error" to e.message))
-        } catch (e: IllegalStateException) {
-            ResponseEntity.status(HttpStatus.CONFLICT).body(mapOf("error" to e.message))
-        } catch (e: NoSuchElementException) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to e.message))
-        } catch (e: IllegalArgumentException) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to e.message))
-        }
+        // O service lança SecurityException / IllegalStateException / NoSuchElementException /
+        // IllegalArgumentException consoante o caso; o GlobalExceptionHandler traduz cada uma
+        // para 403 / 409 / 404 / 400 respetivamente.
+        val updatedUser = userService.verifyActivationCode(user, input.code)
+        val output = UserOutputModel(updatedUser.id, updatedUser.username, updatedUser.email, updatedUser.role, updatedUser.status)
+        return ResponseEntity.ok(output)
     }
 
     /**

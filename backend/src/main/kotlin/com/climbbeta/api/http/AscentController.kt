@@ -20,6 +20,26 @@ data class AscentInputModel(
 )
 
 /**
+ * Input for the hybrid free log (non-partner gym OR outdoor rock).
+ *
+ * @property mode "GYM" (uses [freelogGymName] + [grade]) or "ROCK" (uses [location] + [sector] + [grade]).
+ * @property mediaUrl Optional photo URL already uploaded to MinIO via /media/upload.
+ */
+data class FreelogInputModel(
+    val mode: String,
+    val freelogGymName: String?,
+    val grade: String?,
+    val routeName: String?,
+    val sector: String?,
+    val location: String?,
+    val date: LocalDate?,
+    val attempts: Int = 1,
+    val style: String?,
+    val notes: String?,
+    val mediaUrl: String?
+)
+
+/**
  * REST Controller processing climbing logbook entries (ascents).
  *
  * Exposes endpoints allowing users to submit tracking summaries for indoor commercial
@@ -47,6 +67,27 @@ class AscentController(private val ascentService: AscentService) {
             user.id, input.boulderId, input.outdoorRouteId,
             input.freelogGymName, input.freelogGrade,
             input.date, input.attempts, input.style, input.notes
+        )
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapOf("id" to id))
+    }
+
+    /**
+     * Commits a hybrid free log: a session at a non-partner gym ("GYM" mode) or an outdoor climb
+     * ("ROCK" mode, which reuses/creates an outdoor route). An optional photo URL is linked in `media`.
+     *
+     * @return Map with the new ascent id and status 201 (Created).
+     */
+    @PostMapping("/freelog")
+    fun createFreelog(
+        @RequestBody input: FreelogInputModel,
+        @RequestAttribute("authenticatedUser") user: User
+    ): ResponseEntity<Map<String, Int>> {
+        val id = ascentService.logFreelog(
+            climberId = user.id, mode = input.mode,
+            freelogGymName = input.freelogGymName, grade = input.grade,
+            routeName = input.routeName, sector = input.sector, location = input.location,
+            date = input.date, attempts = input.attempts, style = input.style,
+            notes = input.notes, mediaUrl = input.mediaUrl
         )
         return ResponseEntity.status(HttpStatus.CREATED).body(mapOf("id" to id))
     }

@@ -65,15 +65,15 @@ class BoulderService(
      *
      * Used mainly to strip down or archive routes that are no longer available on the wall.
      *
-     * @throws IllegalArgumentException If the route or its parent gym is untraceable.
+     * @throws NoSuchElementException If the route or its parent gym is untraceable (maps to 404).
      * @throws SecurityException If the user is neither an ADMIN nor the owner of the hosting gym.
      */
     fun updateBoulderStatus(user: User, boulderId: Int, isActive: Boolean) {
         val boulder = boulderRepository.getBoulderById(boulderId)
-            ?: throw IllegalArgumentException("Route not found.")
+            ?: throw NoSuchElementException("Route not found.")
 
         val gym = gymRepository.getGymById(boulder.gymId)
-            ?: throw IllegalArgumentException("Associated gym not found.")
+            ?: throw NoSuchElementException("Associated gym not found.")
 
         if (user.role != UserRole.ADMIN && gym.ownerId != user.id) {
             throw SecurityException("Only the gym owner can deactivate this route.")

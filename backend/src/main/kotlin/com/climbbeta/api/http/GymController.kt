@@ -70,22 +70,17 @@ class GymController(
             ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(mapOf("error" to "User not authenticated."))
 
-        return try {
-            val created = gymService.createGym(
-                authenticatedUser = user,
-                ownerId = input.ownerId,
-                name = input.name,
-                address = input.address,
-                city = input.city,
-                coverImageUrl = input.coverImageUrl
-            )
+        val created = gymService.createGym(
+            authenticatedUser = user,
+            ownerId = input.ownerId,
+            name = input.name,
+            address = input.address,
+            city = input.city,
+            coverImageUrl = input.coverImageUrl
+        )
 
-            ResponseEntity.status(HttpStatus.CREATED).body(GymOutputModel.fromDomain(created))
-        } catch (e: SecurityException) {
-            ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("error" to (e.message ?: "Access denied.")))
-        } catch (e: IllegalArgumentException) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to (e.message ?: "Invalid request.")))
-        }
+        // SecurityException -> 403 e IllegalArgumentException -> 400 são tratados no GlobalExceptionHandler.
+        return ResponseEntity.status(HttpStatus.CREATED).body(GymOutputModel.fromDomain(created))
     }
 
     @GetMapping
@@ -107,14 +102,8 @@ class GymController(
             ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(mapOf("error" to "User not authenticated."))
 
-        return try {
-            val gym = gymService.getGymById(id)
-            ResponseEntity.ok(GymOutputModel.fromDomain(gym))
-        } catch (e: NoSuchElementException) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to (e.message ?: "Gym not found.")))
-        } catch (e: IllegalArgumentException) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to (e.message ?: "Invalid request.")))
-        }
+        val gym = gymService.getGymById(id)
+        return ResponseEntity.ok(GymOutputModel.fromDomain(gym))
     }
 
     @PutMapping("/{id}")
@@ -127,23 +116,16 @@ class GymController(
             ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(mapOf("error" to "User not authenticated."))
 
-        return try {
-            gymService.updateGym(
-                authenticatedUser = user,
-                id = id,
-                name = input.name,
-                address = input.address,
-                city = input.city,
-                coverImageUrl = input.coverImageUrl
-            )
+        gymService.updateGym(
+            authenticatedUser = user,
+            id = id,
+            name = input.name,
+            address = input.address,
+            city = input.city,
+            coverImageUrl = input.coverImageUrl
+        )
 
-            ResponseEntity.ok(mapOf("message" to "Gym updated successfully!"))
-        } catch (e: SecurityException) {
-            ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("error" to (e.message ?: "Access denied.")))
-        } catch (e: NoSuchElementException) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to (e.message ?: "Gym not found.")))
-        } catch (e: IllegalArgumentException) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to (e.message ?: "Invalid request.")))
-        }
+        // Security -> 403, NoSuchElement -> 404, IllegalArgument -> 400 via GlobalExceptionHandler.
+        return ResponseEntity.ok(mapOf("message" to "Gym updated successfully!"))
     }
 }

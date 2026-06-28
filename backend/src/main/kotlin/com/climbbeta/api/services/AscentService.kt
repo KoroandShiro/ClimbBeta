@@ -2,6 +2,7 @@ package com.climbbeta.api.services
 
 import com.climbbeta.api.domain.Ascent
 import com.climbbeta.api.repository.AscentRepository
+import com.climbbeta.api.repository.MediaRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -15,7 +16,11 @@ import java.time.LocalDate
  * @see AscentController for the HTTP endpoints exposing these services.
  */
 @Service
-class AscentService(private val ascentRepository: AscentRepository) {
+class AscentService(
+    private val ascentRepository: AscentRepository,
+    private val outdoorRouteService: OutdoorRouteService,
+    private val mediaRepository: MediaRepository
+) {
 
     /**
      * Logs a new ascent for a climber.
@@ -51,4 +56,46 @@ class AscentService(private val ascentRepository: AscentRepository) {
     fun getAscentById(id: Int): Ascent? = ascentRepository.getById(id)
     fun removeAscent(id: Int, climberId: Int) = ascentRepository.delete(id, climberId)
     fun getFeedForClimber(climberId: Int) = ascentRepository.getFeedForClimber(climberId)
+
+    /**
+     * Logs a "hybrid free log" ascent that is NOT tied to a partner gym's boulder.
+     *
+     * Two modes:
+     *  - "GYM"  : a session at a non-partner gym -> stored in the freelog_* columns of `ascents`.
+     *  - "ROCK" : an outdoor climb -> reuses an existing `outdoor_routes` row (find-or-create) and
+     *             links the ascent to it via outdoor_route_id.
+     *
+     * An optional photo URL (already uploaded to MinIO via /media/upload) is persisted as a row in
+     * the `media` table, which the social feed query already reads.
+     *
+     * @throws IllegalArgumentException If the mode is unknown or required fields for that mode are missing.
+     */
+    fun logFreelog(
+        climberId: Int, mode: String, freelogGymName: String?, grade: String?,
+        routeName: String?, sector: String?, location: String?,
+        date: LocalDate?, attempts: Int, style: String?, notes: String?, mediaUrl: String?
+    ): Int {
+        val ascentDate = date ?: LocalDate.now()
+
+        val ascentId = when (mode.uppercase()) {
+            "GYM" -> {
+                require(!freelogGymName.isNullOrBlank()) { "freelogGymName is required for a non-partner gym log." }
+                require(!grade.isNullOrBlank()) { "grade is required." }
+                ascentRepository.create(climberId, null, null, freelogGymName, grade, ascentDate, attempts, style, notes)
+            }
+            "ROCK" -> {
+                require(!location.isNullOrBlank()) { "location is required for an outdoor log." }
+                require(!sector.isNullOrBlank()) { "sector is required for an outdoor log." }
+                require(!grade.isNullOrBlank()) { "grade is required." }
+                val outdoorRouteId = outdoorRouteService.findOrCreate(climberId, routeName, sector, location, grade)
+                ascentRepository.create(climberId, null, outdoorRouteId, null, null, ascentDate, attempts, style, notes)
+            }
+            else -> throw IllegalArgumentException("Invalid mode '$mode'. Use 'GYM' or 'ROCK'.")
+        }
+
+        if (!mediaUrl.isNullOrBlank()) {
+            mediaRepository.create(climberId, ascentId, mediaUrl, "IMAGE")
+        }
+        return ascentId
+    }
 }

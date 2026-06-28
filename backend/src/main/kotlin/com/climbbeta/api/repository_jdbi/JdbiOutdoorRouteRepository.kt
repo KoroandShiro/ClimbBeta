@@ -52,4 +52,24 @@ class JdbiOutdoorRouteRepository(
                 .orElse(null)
         }
     }
+
+    override fun findExisting(name: String?, sector: String, location: String, grade: String): OutdoorRoute? {
+        return jdbi.withHandle<OutdoorRoute?, Exception> { handle ->
+            handle.createQuery(
+                """
+                SELECT * FROM outdoor_routes
+                WHERE sector = :sector AND location = :location AND grade = :grade
+                  AND (name = :name OR (:name IS NULL AND name IS NULL))
+                LIMIT 1
+                """
+            )
+                .bind("name", name)
+                .bind("sector", sector)
+                .bind("location", location)
+                .bind("grade", grade)
+                .mapTo(OutdoorRoute::class.java)
+                .findOne()
+                .orElse(null)
+        }
+    }
 }

@@ -39,17 +39,12 @@ class BoulderController(private val boulderService: BoulderService) {
         request: HttpServletRequest
     ): ResponseEntity<Any> {
         val user = request.getAttribute("authenticatedUser") as User
-        return try {
-            val boulder = boulderService.createBoulder(
-                user = user, gymId = gymId, color = input.color, hexColor = input.hexColor,
-                grade = input.grade, setterName = input.setterName, setDate = input.setDate, imageUrl = input.imageUrl
-            )
-            ResponseEntity.status(HttpStatus.CREATED).body(boulder)
-        } catch (e: SecurityException) {
-            ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("error" to e.message))
-        } catch (e: IllegalArgumentException) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to e.message))
-        }
+        val boulder = boulderService.createBoulder(
+            user = user, gymId = gymId, color = input.color, hexColor = input.hexColor,
+            grade = input.grade, setterName = input.setterName, setDate = input.setDate, imageUrl = input.imageUrl
+        )
+        // Security -> 403, IllegalArgument (ex.: "Gym not found") -> 400 via GlobalExceptionHandler.
+        return ResponseEntity.status(HttpStatus.CREATED).body(boulder)
     }
 
     /**
@@ -71,14 +66,9 @@ class BoulderController(private val boulderService: BoulderService) {
         request: HttpServletRequest
     ): ResponseEntity<Any> {
         val user = request.getAttribute("authenticatedUser") as User
-        return try {
-            boulderService.updateBoulderStatus(user, boulderId, input.isActive)
-            ResponseEntity.ok(mapOf("message" to "Route status updated successfully!"))
-        } catch (e: SecurityException) {
-            ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("error" to e.message))
-        } catch (e: IllegalArgumentException) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to e.message))
-        }
+        boulderService.updateBoulderStatus(user, boulderId, input.isActive)
+        // Security -> 403; route/gym inexistente lança NoSuchElementException -> 404 (GlobalExceptionHandler).
+        return ResponseEntity.ok(mapOf("message" to "Route status updated successfully!"))
     }
 
     @GetMapping("/boulders/{boulderId}")

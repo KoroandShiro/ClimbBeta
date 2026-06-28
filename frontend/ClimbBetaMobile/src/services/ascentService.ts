@@ -33,6 +33,10 @@ export interface FeedItem {
     postImageUrl?: string | null;
     routeName?: string | null;
     routeGrade?: string | null;
+    /** 'INDOOR' (partner gym boulder) | 'FREELOG_GYM' (non-partner gym) | 'OUTDOOR'. */
+    logType?: string;
+    /** Partner gym name (for INDOOR logs). */
+    gymName?: string | null;
 }
 
 /**
@@ -43,6 +47,45 @@ export async function logAscent(data: AscentInput): Promise<{ id: number }> {
     return apiFetch<{ id: number }>('/ascents', {
         method: 'POST',
         body: JSON.stringify(data),
+    });
+}
+
+/** Payload do Free Log híbrido (ginásio não-parceiro OU rocha/outdoor). */
+export interface FreelogInput {
+    mode: 'GYM' | 'ROCK';
+    freelogGymName?: string | null;
+    grade: string;
+    routeName?: string | null;
+    sector?: string | null;
+    location?: string | null;
+    /** YYYY-MM-DD; se omitido o backend assume hoje. */
+    date?: string | null;
+    attempts: number;
+    style: string | null;
+    notes: string | null;
+    /** URL devolvido por uploadMedia(), já alojado no MinIO. */
+    mediaUrl?: string | null;
+}
+
+/**
+ * Regista um Free Log híbrido: sessão num ginásio não-parceiro ("GYM") ou subida
+ * em rocha ("ROCK", que reutiliza/cria a via outdoor). Foto opcional via mediaUrl.
+ */
+export async function logFreelog(data: FreelogInput): Promise<{ id: number }> {
+    return apiFetch<{ id: number }>('/ascents/freelog', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
+}
+
+/**
+ * Envia um ficheiro de media (foto) para o MinIO via /media/upload e devolve o URL público.
+ * O apiFetch deteta o FormData e deixa o Content-Type (com boundary) ser definido pelo motor nativo.
+ */
+export async function uploadMedia(formData: FormData): Promise<{ url: string }> {
+    return apiFetch<{ url: string }>('/media/upload', {
+        method: 'POST',
+        body: formData,
     });
 }
 

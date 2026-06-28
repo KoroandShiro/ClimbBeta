@@ -2,6 +2,7 @@ package com.climbbeta.api.services
 
 import com.climbbeta.api.domain.ClimberProfile
 import com.climbbeta.api.repository.ProfileRepository
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import com.climbbeta.api.domain.ClimberProfileWithUserDTO
 import com.climbbeta.api.domain.User
@@ -19,7 +20,9 @@ import java.util.UUID
 @Service
 class ProfileService(
     private val profileRepository: ProfileRepository,
-    private val minioClient: MinioClient
+    private val minioClient: MinioClient,
+    @Value("\${minio.public-url}") private val publicUrl: String,
+    @Value("\${minio.bucket-name}") private val bucketName: String
 ) {
     fun getClimberProfile(userId: Int): ClimberProfile {
         return profileRepository.getClimberProfile(userId)
@@ -57,7 +60,6 @@ class ProfileService(
      * @return Accessible dynamic public asset network identifier route string.
      */
     fun updateClimberAvatar(userId: Int, file: MultipartFile): String {
-        val bucketName = "climbbeta-media"
         val fileName = "$userId-${UUID.randomUUID()}-${file.originalFilename}"
 
         file.inputStream.use { inputStream ->
@@ -71,7 +73,7 @@ class ProfileService(
             )
         }
 
-        val avatarUrl = "http://192.168.1.141:9000/$bucketName/$fileName"
+        val avatarUrl = "$publicUrl/$bucketName/$fileName"
         profileRepository.updateAvatarUrl(userId, avatarUrl)
 
         return avatarUrl

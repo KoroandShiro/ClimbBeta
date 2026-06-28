@@ -14,8 +14,7 @@ import LogbookEntryScreen from '../screens/Logbook/LogbookEntryScreen';
 import LogAscentScreen from '../screens/Logbook/LogAscentScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
 import EditProfileScreen from '../screens/Profile/EditProfileScreen';
-import IndoorLogScreen from '../screens/Logbook/IndoorLogScreen';
-import OutdoorLogScreen from '../screens/Logbook/OutdoorLogScreen';
+import FreeLogScreen from '../screens/Logbook/FreeLogScreen';
 import GymDetailsScreen from '../screens/Explore/GymDetailsScreen';
 import AscentDetailsScreen from '../screens/Home/AscentDetailsScreen';
 import UserSearchScreen from '../screens/Home/UserSearchScreen';
@@ -76,8 +75,7 @@ function LogbookStackNavigator() {
     return (
         <LogbookStack.Navigator>
             <LogbookStack.Screen name="LogEntry" component={LogbookEntryScreen} options={{ title: 'Log Route' }} />
-            <LogbookStack.Screen name="IndoorLog" component={IndoorLogScreen} options={{ title: 'Indoor Log' }} />
-            <LogbookStack.Screen name="OutdoorLog" component={OutdoorLogScreen} options={{ title: 'Outdoor Log' }} />
+            <LogbookStack.Screen name="FreeLog" component={FreeLogScreen} options={{ title: 'Free Log' }} />
         </LogbookStack.Navigator>
     );
 }

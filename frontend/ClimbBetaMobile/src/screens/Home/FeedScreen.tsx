@@ -6,6 +6,13 @@ import { getFeed, FeedItem } from '../../services/ascentService';
 
 const { width } = Dimensions.get('window');
 
+/** Visual descriptor per ascent type, used to render the card's type badge. */
+const LOG_TYPE_BADGE: Record<string, { label: string; icon: any; bg: string; color: string }> = {
+  INDOOR:      { label: 'Gym',        icon: 'barbell',    bg: '#E8F5E9', color: '#2E7D32' },
+  FREELOG_GYM: { label: 'Gym · Free', icon: 'business',   bg: '#E3F2FD', color: '#1565C0' },
+  OUTDOOR:     { label: 'Outdoor',    icon: 'trail-sign', bg: '#FBE9E7', color: '#BF360C' },
+};
+
 /**
  * Social dashboard feed component.
  *
@@ -73,9 +80,22 @@ export default function FeedScreen({ navigation }: any) {
                 <View style={styles.userInfo}>
                   <Text style={styles.userName}>{post.authorUsername}</Text>
                   <Text style={styles.postLocation}>
-                    {post.ascent.gymName ?? post.ascent.freelogGymName ?? 'Outdoor'}
+                    {post.logType === 'INDOOR'
+                        ? (post.gymName ?? 'Partner Gym')
+                        : post.logType === 'OUTDOOR'
+                            ? 'Outdoor'
+                            : (post.ascent.freelogGymName ?? 'Gym')}
                   </Text>
                 </View>
+                {(() => {
+                  const badge = LOG_TYPE_BADGE[post.logType ?? 'FREELOG_GYM'] ?? LOG_TYPE_BADGE.FREELOG_GYM;
+                  return (
+                      <View style={[styles.typeBadge, { backgroundColor: badge.bg }]}>
+                        <Ionicons name={badge.icon} size={13} color={badge.color} />
+                        <Text style={[styles.typeBadgeText, { color: badge.color }]}>{badge.label}</Text>
+                      </View>
+                  );
+                })()}
               </View>
 
               {/* 2. Main Image */}
@@ -147,6 +167,8 @@ const styles = StyleSheet.create({
   userInfo: { flex: 1, justifyContent: 'center' },
   userName: { fontSize: 14, fontWeight: '600', color: '#111' },
   postLocation: { fontSize: 12, color: '#666', marginTop: 1 },
+  typeBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 },
+  typeBadgeText: { fontSize: 11, fontWeight: '700' },
   postImage: { width: width, height: width, backgroundColor: '#fafafa' },
   actionRow: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 12, paddingVertical: 10 },
   leftActions: { flexDirection: 'row', alignItems: 'center' },

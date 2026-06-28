@@ -98,7 +98,13 @@ class JdbiAscentRepository(private val jdbi: Jdbi) : AscentRepository {
                     cp.avatar_url as author_avatar,
                     COALESCE(m.media_url, b.image_url, g.cover_image_url) as post_image_url,
                     COALESCE(b.color, o.name, 'Via Livre') as route_name,
-                    COALESCE(b.grade, o.grade, a.freelog_grade) as route_grade
+                    COALESCE(b.grade, o.grade, a.freelog_grade) as route_grade,
+                    CASE
+                        WHEN a.boulder_id IS NOT NULL THEN 'INDOOR'
+                        WHEN a.outdoor_route_id IS NOT NULL THEN 'OUTDOOR'
+                        ELSE 'FREELOG_GYM'
+                    END as log_type,
+                    g.name as gym_name
                 FROM ascents a
                 JOIN follows_climber f ON f.followed_id = a.climber_id
                 JOIN users u ON u.id = a.climber_id
@@ -132,7 +138,9 @@ class JdbiAscentRepository(private val jdbi: Jdbi) : AscentRepository {
                         authorAvatarUrl = rs.getString("author_avatar"),
                         postImageUrl = rs.getString("post_image_url"),
                         routeName = rs.getString("route_name"),
-                        routeGrade = rs.getString("route_grade")
+                        routeGrade = rs.getString("route_grade"),
+                        logType = rs.getString("log_type"),
+                        gymName = rs.getString("gym_name")
                     )
                 }
                 .list()
