@@ -1,0 +1,16 @@
+# Artefactos de build (são gerados dentro do container)
+build/
+.gradle/
+bin/
+
+# IDE / metadados
+.idea/
+*.iml
+.vscode/
+
+# Coisas que não pertencem ao contexto de build da API
+requests/
+docker-compose.yml
+Dockerfile
+.dockerignore
+*.md
