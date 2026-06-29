@@ -29,13 +29,21 @@ class WebConfig(
 
     override fun addCorsMappings(registry: CorsRegistry) {
         registry.addMapping("/**") // Permite todas as rotas da nossa API
-            .allowedOrigins(
-                "http://localhost:5173", // O teu projeto Web (Dashboard Owner)
+            // Usamos allowedOriginPatterns (e NÃO allowedOrigins) porque precisamos de um wildcard
+            // (https://*.pages.dev) e de o conjugar com allowCredentials(true). O allowedOrigins não
+            // aceita padrões com '*', e '*' literal é proibido quando allowCredentials=true.
+            .allowedOriginPatterns(
+                // --- Desenvolvimento local ---
+                "http://localhost:5173", // Dashboard Web (Vite)
                 "http://localhost:3000", // Outras portas comuns
-                "http://localhost:8081"  // O teu Expo Web (App Mobile no Browser) - AQUI ESTÁ A CORREÇÃO!
+                "http://localhost:8081", // Expo Web (app no browser)
+                // --- Produção (Cloudflare) ---
+                "https://climbbetaapp.xyz",       // domínio principal
+                "https://www.climbbetaapp.xyz",   // variante www
+                "https://*.pages.dev"             // previews automáticos da Cloudflare Pages
             )
-            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Permite estes verbos
-            .allowedHeaders("*") // Permite enviar o nosso cabeçalho de Authorization
-            .allowCredentials(true) // Fundamental para a Fase de Cookies (Ticket 3E/1D)!
+            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Verbos permitidos
+            .allowedHeaders("*") // Permite o cabeçalho Authorization
+            .allowCredentials(true) // Mantido
     }
 }
