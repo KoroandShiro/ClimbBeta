@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Ignorado de propósito: o lock gerado no Windows quebrava o `npm ci` da Cloudflare Pages.
+# Sem ele, a Cloudflare usa `npm install` e resolve as dependências de Linux sozinha.
+package-lock.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
