@@ -66,7 +66,14 @@ docker rm climbbeta-api-test
 ```
 
 **4) Deploy no Raspberry Pi (ARM64):** como o PC é **amd64** e o RPi é **arm64**, a imagem
-constrói-se no próprio RPi. No Portainer, criar um *stack*:
+constrói-se no próprio RPi.
+
+> **Método final (autoritativo): ver [rpi-deploy-runbook.md](rpi-deploy-runbook.md).** Na prática o
+> Portainer **não** consegue usar `build: .` (não acede ao contexto da pasta). Por isso compila-se a
+> imagem no terminal (`docker build -t climbbeta-api:latest .`) e no Portainer usa-se `image:
+> climbbeta-api:latest` + `pull_policy: never`. O bloco abaixo é apenas ilustrativo do plano inicial.
+
+No Portainer, criar um *stack*:
 ```yaml
 services:
   api:

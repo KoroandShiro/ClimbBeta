@@ -1,5 +1,6 @@
 package com.climbbeta.api.services
 
+import com.climbbeta.api.domain.ActivationCode
 import com.climbbeta.api.domain.User
 import com.climbbeta.api.domain.UserRole
 import com.climbbeta.api.domain.UserStatus
@@ -16,6 +17,7 @@ import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
+import java.time.LocalDateTime
 
 @ExtendWith(MockitoExtension::class)
 class UserServiceTests {
@@ -37,72 +39,80 @@ class UserServiceTests {
     }
 
     @Test
-    fun `createUser deve falhar se email ja existir`() {
-        `when`(userRepository.existsByEmail("teste@teste.com")).thenReturn(true)
-
+    fun `createUser should fail when the password is too weak`() {
+        // Validation runs before any repository access, so no stubbing is needed here.
         val exception = assertThrows<IllegalArgumentException> {
-            userService.createUser("user1", "teste@teste.com", "pass123", UserRole.CLIMBER)
+            userService.createUser("user1", "test@test.com", "weak", UserRole.CLIMBER)
         }
-        assertEquals("Este email já está registado!", exception.message)
+        assertTrue(exception.message!!.startsWith("Password must be"))
     }
 
     @Test
-    fun `createUser deve criar utilizador com sucesso`() {
-        `when`(userRepository.existsByEmail("novo@teste.com")).thenReturn(false)
-        `when`(userRepository.existsByUsername("novo")).thenReturn(false)
+    fun `createUser should fail when the email already exists`() {
+        `when`(userRepository.existsByEmail("test@test.com")).thenReturn(true)
 
-        val expectedUser = User(id = 1, username = "novo", email = "novo@teste.com", passwordHash = "hash", role = UserRole.CLIMBER)
+        val exception = assertThrows<IllegalArgumentException> {
+            userService.createUser("user1", "test@test.com", "Demo1234!", UserRole.CLIMBER)
+        }
+        assertEquals("This email is already registered!", exception.message)
+    }
+
+    @Test
+    fun `createUser should create a user successfully`() {
+        `when`(userRepository.existsByEmail("new@test.com")).thenReturn(false)
+        `when`(userRepository.existsByUsername("new")).thenReturn(false)
+
+        val expectedUser = User(id = 1, username = "new", email = "new@test.com", passwordHash = "hash", role = UserRole.CLIMBER)
         `when`(userRepository.createUser(any())).thenReturn(expectedUser)
 
-        val result = userService.createUser("novo", "novo@teste.com", "pass123", UserRole.CLIMBER)
+        val result = userService.createUser("new", "new@test.com", "Demo1234!", UserRole.CLIMBER)
 
-        assertEquals("novo", result.username)
+        assertEquals("new", result.username)
         assertEquals(1, result.id)
     }
 
     @Test
-    fun `login deve falhar com credenciais invalidas`() {
-        `when`(userRepository.getUserByEmail("errado@teste.com")).thenReturn(null)
+    fun `login should fail with invalid credentials`() {
+        `when`(userRepository.getUserByEmail("wrong@test.com")).thenReturn(null)
 
         val exception = assertThrows<IllegalArgumentException> {
-            userService.login("errado@teste.com", "pass123")
+            userService.login("wrong@test.com", "Demo1234!")
         }
-        assertEquals("Credenciais inválidas.", exception.message)
+        assertEquals("Invalid credentials.", exception.message)
     }
 
     @Test
-    fun `login deve gerar token com sucesso se a password for valida`() {
-        val realHash = BCrypt.hashpw("senhaCorreta", BCrypt.gensalt())
-        val mockUser = User(id = 1, username = "user", email = "certo@teste.com", passwordHash = realHash, role = UserRole.CLIMBER)
+    fun `login should generate a token when the password is valid`() {
+        val realHash = BCrypt.hashpw("CorrectPass1!", BCrypt.gensalt())
+        val mockUser = User(id = 1, username = "user", email = "right@test.com", passwordHash = realHash, role = UserRole.CLIMBER)
 
-        `when`(userRepository.getUserByEmail("certo@teste.com")).thenReturn(mockUser)
+        `when`(userRepository.getUserByEmail("right@test.com")).thenReturn(mockUser)
 
-        val token = userService.login("certo@teste.com", "senhaCorreta")
+        val token = userService.login("right@test.com", "CorrectPass1!")
 
         assertNotNull(token)
         assertTrue(token.isNotEmpty())
     }
 
     @Test
-    fun `verifyActivationCode deve falhar com codigo invalido`() {
+    fun `verifyActivationCode should fail with an invalid code`() {
         `when`(activationCodeRepository.getByCode("invalid-code")).thenReturn(null)
 
-        // Criamos um GYM_OWNER PENDING para passar pelas primeiras validações do método
+        // A PENDING GYM_OWNER passes the first validations of the method
         val pendingOwner = User(id = 2, username = "owner", email = "o@test.com", passwordHash = "hash", role = UserRole.GYM_OWNER, status = UserStatus.PENDING)
 
-        // Corrigido para NoSuchElementException conforme o teu service
         val exception = assertThrows<NoSuchElementException> {
             userService.verifyActivationCode(pendingOwner, "invalid-code")
         }
-        assertEquals("Código de ativação inválido.", exception.message)
+        assertEquals("Invalid activation code.", exception.message)
     }
 
     @Test
-    fun `verifyActivationCode deve falhar com codigo ja usado`() {
-        val usedCode = com.climbbeta.api.domain.ActivationCode(
+    fun `verifyActivationCode should fail with an already used code`() {
+        val usedCode = ActivationCode(
             code = "used-code",
             isUsed = true,
-            createdAt = java.time.LocalDateTime.now(),
+            createdAt = LocalDateTime.now(),
             usedBy = 1
         )
         `when`(activationCodeRepository.getByCode("used-code")).thenReturn(usedCode)
@@ -112,7 +122,6 @@ class UserServiceTests {
         val exception = assertThrows<IllegalArgumentException> {
             userService.verifyActivationCode(pendingOwner, "used-code")
         }
-        // Mensagem corrigida para bater certo com a String do service
-        assertEquals("Este código já foi utilizado.", exception.message)
+        assertEquals("This code has already been used.", exception.message)
     }
 }

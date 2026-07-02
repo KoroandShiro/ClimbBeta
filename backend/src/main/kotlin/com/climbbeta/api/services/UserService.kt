@@ -32,6 +32,8 @@ class UserService(
      * @throws IllegalArgumentException If either the unique email address or username is already taken.
      */
     fun createUser(username: String, email: String, passwordRaw: String, role: UserRole): User {
+        validatePasswordStrength(passwordRaw)
+
         if (userRepository.existsByEmail(email)) {
             throw IllegalArgumentException("This email is already registered!")
         }
@@ -48,6 +50,23 @@ class UserService(
         )
 
         return userRepository.createUser(newUser)
+    }
+
+    /**
+     * Enforces the registration password policy on the server side, so a raw API call
+     * cannot bypass the client-side check. Login is intentionally NOT affected: existing
+     * accounts keep working regardless of this policy.
+     *
+     * The 64-character ceiling stays below BCrypt's 72-byte truncation limit, so no part
+     * of an accepted password is silently ignored when hashed.
+     */
+    private fun validatePasswordStrength(password: String) {
+        val requirement =
+            "Password must be 8-64 characters long and include at least one uppercase letter, one digit, and one special character."
+        if (password.length < 8 || password.length > 64) throw IllegalArgumentException(requirement)
+        if (password.none { it.isUpperCase() }) throw IllegalArgumentException(requirement)
+        if (password.none { it.isDigit() }) throw IllegalArgumentException(requirement)
+        if (password.none { !it.isLetterOrDigit() && !it.isWhitespace() }) throw IllegalArgumentException(requirement)
     }
 
     /**

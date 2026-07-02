@@ -8,7 +8,7 @@
 --  * Faz RESET total (TRUNCATE ... RESTART IDENTITY) -> apaga os dados atuais.
 --    Os IDs ficam previsíveis (users 1..30, gyms 1..5, etc.).
 --  * Passwords: usa pgcrypto (crypt + bcrypt $2a$), compatível com o jBCrypt do backend.
---    >>> TODAS as contas têm a password: demo1234 <<<
+--    >>> TODAS as contas têm a password: Demo1234! <<<
 --  * Imagens: reutiliza objetos reais já no MinIO (192.168.1.64:9000) para o Feed
 --    mostrar fotos verdadeiras; uma é do Pexels (sempre disponível).
 -- =========================================================================
@@ -59,9 +59,9 @@ INSERT INTO users (username, email, password_hash, role, status) VALUES
   ('luis_cunha',      'luis@gmail.com',       'x', 'CLIMBER'::user_role,   'VERIFIED'::user_status),
   ('vera_machado',    'vera@gmail.com',       'x', 'CLIMBER'::user_role,   'VERIFIED'::user_status);
 
--- Define a MESMA password (demo1234) para todas as contas. gen_salt() é volátil,
+-- Define a MESMA password (Demo1234!) para todas as contas. gen_salt() é volátil,
 -- por isso cada utilizador recebe um hash distinto (com salt próprio), todos válidos.
-UPDATE users SET password_hash = crypt('demo1234', gen_salt('bf', 10));
+UPDATE users SET password_hash = crypt('Demo1234!', gen_salt('bf', 10));
 
 -- =========================================================================
 -- 2) PERFIS (o backend cria-os no registo; aqui fazemos à mão)
@@ -141,25 +141,26 @@ INSERT INTO outdoor_routes (creator_id, name, sector, location, grade) VALUES
 -- =========================================================================
 -- 6a) "Showcase": curadas, recentes, com notas — dão vida ao topo do Feed.
 INSERT INTO ascents (climber_id, boulder_id, outdoor_route_id, freelog_gym_name, freelog_grade, date, attempts, style, notes) VALUES
-  (6,  1,   NULL, NULL,         NULL, DATE '2026-06-26', 2, 'Redpoint','Finalmente! O crux do amarelo caiu.'),
+  (6,  1,   NULL, NULL,         NULL, DATE '2026-06-26', 2, 'Top',     'Finalmente! O crux do amarelo caiu.'),
   (6,  NULL,1,    NULL,         NULL, DATE '2026-06-24', 1, 'Flash',   'Rocha perfeita na Peninha ao pôr do sol.'),
-  (6,  NULL,NULL, 'Boulder Lab','V5', DATE '2026-06-22', 4, 'Project', 'Ginásio novo, os V5 deles puxam muito.'),
+  (6,  NULL,NULL, 'Boulder Lab','V5', DATE '2026-06-22', 4, 'Top',     'Ginásio novo, os V5 deles puxam muito.'),
   (7,  3,   NULL, NULL,         NULL, DATE '2026-06-25', 1, 'Onsight', 'À primeira, que dia!'),
   (8,  5,   NULL, NULL,         NULL, DATE '2026-06-25', 3, 'Top',     'Slab traiçoeiro até ao fim.'),
-  (9,  NULL,2,    NULL,         NULL, DATE '2026-06-23', 5, 'Redpoint','A Fenda do Mar respeita-se.'),
-  (10, 8,   NULL, NULL,         NULL, DATE '2026-06-21', 2, 'Flash',   NULL),
+  (9,  NULL,2,    NULL,         NULL, DATE '2026-06-23', 5, 'Top',     'A Fenda do Mar respeita-se.'),
+  (10, 8,   NULL, NULL,         NULL, DATE '2026-06-21', 1, 'Flash',   NULL),
   (11, NULL,NULL, 'Vertical City','V4',DATE '2026-06-20',1, 'Flash',   'Sessão rápida ao almoço.'),
-  (12, 12,  NULL, NULL,         NULL, DATE '2026-06-19', 6, 'Project', 'Quase! Fica para a próxima.'),
-  (7,  NULL,4,    NULL,         NULL, DATE '2026-06-18', 3, 'Redpoint','O Teto Grande é brutal.'),
+  (12, 12,  NULL, NULL,         NULL, DATE '2026-06-19', 6, 'Top',     'Custou seis tentativas, mas finalmente caiu!'),
+  (7,  NULL,4,    NULL,         NULL, DATE '2026-06-18', 3, 'Top',     'O Teto Grande é brutal.'),
   (8,  2,   NULL, NULL,         NULL, DATE '2026-06-27', 1, 'Flash',   'Bom aquecimento da manhã.'),
-  (6,  6,   NULL, NULL,         NULL, DATE '2026-06-17', 2, 'Onsight', 'Boa leitura de movimentos.');
+  (6,  6,   NULL, NULL,         NULL, DATE '2026-06-17', 1, 'Onsight', 'Boa leitura de movimentos.');
 
 -- 6b) Leaderboard do boulder 1: os 25 escaladores (6..30) fizeram-no -> ranking cheio.
 INSERT INTO ascents (climber_id, boulder_id, date, attempts, style)
 SELECT g, 1,
        DATE '2026-06-15' - (g % 12),
-       1 + (g % 4),
-       (ARRAY['Flash','Onsight','Redpoint','Top'])[1 + (g % 4)]
+       CASE WHEN (ARRAY['Flash','Onsight','Top'])[1 + (g % 3)] IN ('Flash', 'Onsight')
+            THEN 1 ELSE 1 + (g % 4) END,
+       (ARRAY['Flash','Onsight','Top'])[1 + (g % 3)]
 FROM generate_series(6, 30) g;
 
 -- 6c) Volume INDOOR (90) espalhado por escaladores/boulders/datas (últimos 120 dias).
@@ -167,8 +168,9 @@ INSERT INTO ascents (climber_id, boulder_id, date, attempts, style)
 SELECT 6 + (g % 25),
        1 + (g % 30),
        DATE '2026-06-27' - (g % 120),
-       1 + (g % 5),
-       (ARRAY['Flash','Onsight','Redpoint','Top','Project'])[1 + (g % 5)]
+       CASE WHEN (ARRAY['Flash','Onsight','Top'])[1 + (g % 3)] IN ('Flash', 'Onsight')
+            THEN 1 ELSE 1 + (g % 5) END,
+       (ARRAY['Flash','Onsight','Top'])[1 + (g % 3)]
 FROM generate_series(0, 89) g;
 
 -- 6d) Volume OUTDOOR (24).
@@ -176,8 +178,9 @@ INSERT INTO ascents (climber_id, outdoor_route_id, date, attempts, style)
 SELECT 6 + (g % 25),
        1 + (g % 8),
        DATE '2026-06-27' - ((g * 5) % 110),
-       1 + (g % 4),
-       (ARRAY['Flash','Onsight','Redpoint','Top'])[1 + (g % 4)]
+       CASE WHEN (ARRAY['Flash','Onsight','Top'])[1 + (g % 3)] IN ('Flash', 'Onsight')
+            THEN 1 ELSE 1 + (g % 4) END,
+       (ARRAY['Flash','Onsight','Top'])[1 + (g % 3)]
 FROM generate_series(0, 23) g;
 
 -- 6e) Volume FREE LOG / ginásio não-parceiro (20).
@@ -186,8 +189,9 @@ SELECT 6 + (g % 25),
        (ARRAY['Boulder Lab','Vertical City','Rock Republic','Gravity Zone','The Cave','Urban Climb'])[1 + (g % 6)],
        'V' || (1 + (g % 8)),
        DATE '2026-06-27' - ((g * 7) % 100),
-       1 + (g % 5),
-       (ARRAY['Flash','Redpoint','Top','Project'])[1 + (g % 4)]
+       CASE WHEN (ARRAY['Flash','Onsight','Top'])[1 + (g % 3)] IN ('Flash', 'Onsight')
+            THEN 1 ELSE 1 + (g % 5) END,
+       (ARRAY['Flash','Onsight','Top'])[1 + (g % 3)]
 FROM generate_series(0, 19) g;
 
 -- =========================================================================
