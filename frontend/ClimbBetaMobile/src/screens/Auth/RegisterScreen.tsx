@@ -44,8 +44,10 @@ export default function RegisterScreen({ navigation }: any) {
             await register(username.trim(), email.trim(), password);
             navigation.navigate('Login', { registered: true });
         } catch (e) {
-            if (e instanceof ApiError && e.status === 400) {
-                setError('Email or username already in use.');
+            if (e instanceof ApiError) {
+                // Show the real backend message (weak password, email/username
+                // already taken, ...) instead of a generic guess.
+                setError(e.message);
             } else {
                 setError('Could not create account. Please try again.');
             }
