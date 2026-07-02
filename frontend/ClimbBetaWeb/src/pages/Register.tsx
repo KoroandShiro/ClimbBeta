@@ -27,7 +27,7 @@ export default function Register() {
             await register(username, email, password, 'GYM_OWNER');
             
             alert('Conta criada com sucesso! Podes fazer login agora.');
-            navigate('/login'); // Redireciona para o login após criar a conta
+            navigate('/login', { replace: true }); // Go to login after creating the account
         } catch (err: any) {
             setError(err.message || 'Erro ao criar conta. Verifica os dados ou tenta outro email.');
         } finally {

@@ -19,8 +19,8 @@ export default function Login() {
 
         try {
             const tokenRecebido = await apiLogin(email, password);
-            await contextLogin(tokenRecebido); // guarda token e carrega perfil do utilizador
-            navigate('/gyms');
+            await contextLogin(tokenRecebido); // stores the token and loads the user profile
+            navigate('/gyms', { replace: true });
         } catch (err: any) {
             setError(err.message);
         } finally {
