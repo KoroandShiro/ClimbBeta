@@ -195,7 +195,7 @@ export default function Dashboard() {
                         <h2 style={{ margin: 0 }}>My Gyms</h2>
                         <button
                             onClick={() => setShowCreateModal(true)}
-                            style={{ padding: '10px 20px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+                            style={{ padding: '10px 20px', backgroundColor: '#2E7D32', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
                         >
                             + Add Gym
                         </button>
@@ -219,7 +219,7 @@ export default function Dashboard() {
                                     </div>
                                     <button
                                         onClick={() => handleSelectGym(gym)}
-                                        style={{ padding: '10px 20px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+                                        style={{ padding: '10px 20px', backgroundColor: '#2E7D32', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
                                     >
                                         Manage Gym ➔
                                     </button>
@@ -255,7 +255,7 @@ export default function Dashboard() {
                                         <p style={{ color: '#4b5563', margin: '0 0 5px 0' }}><strong>Address:</strong> {selectedGym.address || 'Not set'}</p>
                                         <p style={{ color: '#4b5563', margin: '0' }}><strong>City:</strong> {selectedGym.city}</p>
                                     </div>
-                                    <button onClick={() => setIsEditingGym(true)} style={{ padding: '8px 16px', backgroundColor: '#f59e0b', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                                    <button onClick={() => setIsEditingGym(true)} style={{ padding: '8px 16px', backgroundColor: '#E8912D', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
                                         ✏️ Edit details
                                     </button>
                                 </div>
@@ -300,7 +300,7 @@ export default function Dashboard() {
                                 </div>
 
                                 <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                                    <button type="submit" disabled={isUpdating} style={{ padding: '10px 20px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '4px', cursor: isUpdating ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}>
+                                    <button type="submit" disabled={isUpdating} style={{ padding: '10px 20px', backgroundColor: '#2E7D32', color: 'white', border: 'none', borderRadius: '4px', cursor: isUpdating ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}>
                                         {isUpdating ? 'Processing...' : '💾 Save'}
                                     </button>
                                     <button type="button" onClick={() => { setIsEditingGym(false); setEditCoverFile(null); }} style={{ padding: '10px 20px', backgroundColor: '#9ca3af', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
@@ -376,7 +376,7 @@ export default function Dashboard() {
                                 <button
                                     type="submit"
                                     disabled={isAddingBoulder}
-                                    style={{ padding: '12px 24px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '6px', cursor: isAddingBoulder ? 'not-allowed' : 'pointer', fontWeight: 'bold', fontSize: '15px' }}
+                                    style={{ padding: '12px 24px', backgroundColor: '#2E7D32', color: 'white', border: 'none', borderRadius: '6px', cursor: isAddingBoulder ? 'not-allowed' : 'pointer', fontWeight: 'bold', fontSize: '15px' }}
                                 >
                                     {isAddingBoulder ? '⏳ Processing image...' : '✅ Publish Route'}
                                 </button>

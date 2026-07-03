@@ -177,7 +177,7 @@ export default function ExploreScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1, backgroundColor: '#EEF3EC' },
   header: { backgroundColor: '#fff', padding: 15, paddingTop: 20, borderBottomWidth: 1, borderBottomColor: '#e0e0e0' },
   searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f0f0f0', borderRadius: 10, paddingHorizontal: 10, height: 45 },
   searchIcon: { marginRight: 10 },

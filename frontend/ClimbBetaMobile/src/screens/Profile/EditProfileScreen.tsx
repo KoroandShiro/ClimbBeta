@@ -325,8 +325,8 @@ export default function EditProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f5f5f5' },
-    loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f5f5f5' },
+    container: { flex: 1, backgroundColor: '#EEF3EC' },
+    loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#EEF3EC' },
     avatarContainer: { alignItems: 'center', marginTop: 20, marginBottom: 10 },
     avatarPreview: { width: 120, height: 120, borderRadius: 60, backgroundColor: '#e0e0e0', borderWidth: 3, borderColor: '#fff' },
     cameraIconBadge: { position: 'absolute', bottom: 2, right: 2, backgroundColor: '#2E7D32', width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#fff' },
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
     menuTitle: { fontSize: 16, fontWeight: 'bold', color: '#666', marginBottom: 15, textAlign: 'center' },
     menuItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: '#f0f0f0', gap: 12 },
     menuItemText: { fontSize: 16, color: '#333' },
-    cancelItem: { justifyContent: 'center', borderBottomWidth: 0, marginTop: 10, backgroundColor: '#f5f5f5', borderRadius: 10 },
+    cancelItem: { justifyContent: 'center', borderBottomWidth: 0, marginTop: 10, backgroundColor: '#EEF3EC', borderRadius: 10 },
     cancelItemText: { fontSize: 16, fontWeight: 'bold', color: '#666' },
     fullscreenContainer: { flex: 1, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' },
     fullscreenImage: { width: '100%', height: '80%' },

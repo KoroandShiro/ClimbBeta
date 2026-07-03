@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { getFeed, FeedItem, likeAscent, unlikeAscent } from '../../services/ascentService';
 import FeedPostCard from '../../components/FeedPostCard';
+import { colors } from '../../theme';
 
 /**
  * Social dashboard feed.
@@ -67,9 +68,12 @@ export default function FeedScreen({ navigation }: any) {
       <View style={styles.container}>
         {/* Fixed Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>ClimbBeta</Text>
+          <View style={styles.brand}>
+            <Text style={styles.brandLogo}>🧗</Text>
+            <Text style={styles.headerTitle}>ClimbBeta</Text>
+          </View>
           <TouchableOpacity onPress={() => navigation.navigate('UserSearch')}>
-            <Ionicons name="search" size={26} color="#111" />
+            <Ionicons name="search" size={26} color={colors.text} />
           </TouchableOpacity>
         </View>
 
@@ -107,6 +111,8 @@ const styles = StyleSheet.create({
   emptyListContent: { flexGrow: 1, justifyContent: 'center' },
   errorText: { color: '#c62828', textAlign: 'center' },
   emptyText: { color: '#666', textAlign: 'center', fontSize: 16, lineHeight: 24 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 15, paddingVertical: 12, backgroundColor: '#fff', borderBottomWidth: 0.5, borderBottomColor: '#dbdbdb' },
-  headerTitle: { fontSize: 24, fontWeight: '700', color: '#111', fontStyle: 'italic' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 15, paddingVertical: 12, backgroundColor: '#fff', borderBottomWidth: 0.5, borderBottomColor: colors.border },
+  brand: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  brandLogo: { fontSize: 22 },
+  headerTitle: { fontSize: 24, fontWeight: '700', color: colors.primary, letterSpacing: -0.5 },
 });

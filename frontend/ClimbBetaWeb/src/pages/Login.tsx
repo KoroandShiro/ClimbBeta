@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // <-- ADICIONADO O Link AQUI
+import { useNavigate, Link } from 'react-router-dom';
 import { login as apiLogin } from '../services/authService';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -18,8 +18,8 @@ export default function Login() {
         setIsLoading(true);
 
         try {
-            const tokenRecebido = await apiLogin(email, password);
-            await contextLogin(tokenRecebido); // stores the token and loads the user profile
+            const token = await apiLogin(email, password);
+            await contextLogin(token); // stores the token and loads the user profile
             navigate('/gyms', { replace: true });
         } catch (err: any) {
             setError(err.message);
@@ -29,52 +29,50 @@ export default function Login() {
     };
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f3f4f6' }}>
-            <div style={{ padding: '40px', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', width: '100%', maxWidth: '400px' }}>
-                <h1 style={{ textAlign: 'center', marginBottom: '24px', color: '#1f2937' }}>🧗 ClimbBeta Web</h1>
+        <div className="cb-auth-page">
+            <div className="cb-card">
+                <div className="cb-brand">
+                    <span className="cb-logo" aria-hidden="true">🧗</span>
+                    <span className="cb-wordmark">ClimbBeta</span>
+                </div>
+                <h1 className="cb-title">Welcome back</h1>
+                <p className="cb-subtitle">Sign in to your gym backoffice</p>
 
-                {error && <p style={{ color: '#ef4444', textAlign: 'center', marginBottom: '16px', fontWeight: 'bold' }}>{error}</p>}
+                {error && <div className="cb-error">{error}</div>}
 
-                <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Email</label>
+                <form onSubmit={handleLogin}>
+                    <div className="cb-field">
+                        <label className="cb-label">Email</label>
                         <input
+                            className="cb-input"
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc', boxSizing: 'border-box' }}
+                            placeholder="you@yourgym.com"
                             required
                         />
                     </div>
 
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Password</label>
+                    <div className="cb-field">
+                        <label className="cb-label">Password</label>
                         <input
+                            className="cb-input"
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc', boxSizing: 'border-box' }}
+                            placeholder="Your password"
                             required
                         />
                     </div>
 
-                    <button
-                        type="submit"
-                        disabled={isLoading}
-                        style={{ padding: '12px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: isLoading ? 'not-allowed' : 'pointer', marginTop: '8px' }}
-                    >
-                        {isLoading ? 'A entrar...' : 'Entrar no Backoffice'}
+                    <button className="cb-btn" type="submit" disabled={isLoading}>
+                        {isLoading ? 'Signing in…' : 'Sign in'}
                     </button>
                 </form>
 
-                {/* --- NOVA SECÇÃO DE REDIRECIONAMENTO PARA REGISTO --- */}
-                <div style={{ marginTop: '24px', textAlign: 'center', fontSize: '14px' }}>
-                    <span style={{ color: '#6b7280' }}>Ainda não tens uma conta de dono de ginásio? </span>
-                    <Link to="/register" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 'bold' }}>
-                        Cria conta aqui
-                    </Link>
-                </div>
-
+                <p className="cb-alt">
+                    No gym owner account yet? <Link className="cb-link" to="/register">Create one</Link>
+                </p>
             </div>
         </div>
     );

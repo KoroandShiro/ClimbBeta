@@ -97,7 +97,7 @@ export default function FeedPostCard({ post, navigation, onToggleLike }: Props) 
                       Route {post.routeName ?? 'Logged'}
                       {post.routeGrade ? <Text style={styles.gradeText}> ({post.routeGrade})</Text> : ''}
                     </Text>
-                    {isIndoor && <Ionicons name="chevron-forward" size={16} color="#2563EB" />}
+                    {isIndoor && <Ionicons name="chevron-forward" size={16} color="#2E7D32" />}
                   </NameContainer>
               );
             })()}
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   detailsRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },
   boulderName: { fontSize: 15, fontWeight: '700', color: '#111' },
   routeNameWrap: { flexDirection: 'row', alignItems: 'center', flexShrink: 1, marginRight: 10 },
-  gradeText: { fontWeight: '700', color: '#2563EB' },
+  gradeText: { fontWeight: '700', color: '#2E7D32' },
   styleChip: { backgroundColor: '#E8F5E9', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4 },
   styleText: { color: '#2E7D32', fontSize: 11, fontWeight: '700', textTransform: 'uppercase' },
   captionText: { fontSize: 14, color: '#111', lineHeight: 20 },

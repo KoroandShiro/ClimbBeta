@@ -1,7 +1,14 @@
-// ClimbBeta/frontend/ClimbBetaWeb/src/pages/Register.tsx
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { register } from '../services/authService';
+
+// Mirrors the server-side password policy in UserService.validatePasswordStrength.
+const PASSWORD_RULES = [
+    { label: '8 to 64 characters', test: (p: string) => p.length >= 8 && p.length <= 64 },
+    { label: 'One uppercase letter', test: (p: string) => /[A-Z]/.test(p) },
+    { label: 'One number', test: (p: string) => /[0-9]/.test(p) },
+    { label: 'One symbol', test: (p: string) => /[^A-Za-z0-9\s]/.test(p) },
+];
 
 export default function Register() {
     const navigate = useNavigate();
@@ -12,100 +19,119 @@ export default function Register() {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    const ruleResults = useMemo(
+        () => PASSWORD_RULES.map((r) => ({ label: r.label, ok: r.test(password) })),
+        [password]
+    );
+    const passwordValid = ruleResults.every((r) => r.ok);
+    const passwordsMatch = confirmPassword.length > 0 && password === confirmPassword;
+    const canSubmit =
+        username.trim() !== '' && email.trim() !== '' && passwordValid && passwordsMatch && !isLoading;
+
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
 
         if (password !== confirmPassword) {
-            setError('As palavras-passe não coincidem.');
+            setError('Passwords do not match.');
             return;
         }
 
         setIsLoading(true);
         try {
-            // O papel é fixo: Quem se regista no portal Web é GYM_OWNER
+            // The role is fixed: whoever registers on the web portal is a GYM_OWNER
             await register(username, email, password, 'GYM_OWNER');
-            
-            alert('Conta criada com sucesso! Podes fazer login agora.');
-            navigate('/login', { replace: true }); // Go to login after creating the account
+            alert('Account created! You can log in now.');
+            navigate('/login', { replace: true });
         } catch (err: any) {
-            setError(err.message || 'Erro ao criar conta. Verifica os dados ou tenta outro email.');
+            setError(err.message || 'Could not create the account. Check your details or try another email.');
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center', backgroundColor: '#f3f4f6', fontFamily: 'sans-serif' }}>
-            <div style={{ width: '100%', maxWidth: '400px', padding: '30px', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-                <h2 style={{ textAlign: 'center', marginTop: '0', color: '#1f2937' }}>Registar Dono de Ginásio 🧗‍♂️</h2>
-                <p style={{ textAlign: 'center', color: '#6b7280', fontSize: '14px', marginBottom: '20px' }}>Cria a tua conta de parceiro ClimbBeta</p>
-                
-                {error && (
-                    <div style={{ backgroundColor: '#fee2e2', color: '#dc2626', padding: '10px', borderRadius: '4px', marginBottom: '15px', fontSize: '14px', fontWeight: 'bold' }}>
-                        {error}
-                    </div>
-                )}
+        <div className="cb-auth-page">
+            <div className="cb-card">
+                <div className="cb-brand">
+                    <span className="cb-logo" aria-hidden="true">🧗</span>
+                    <span className="cb-wordmark">ClimbBeta</span>
+                </div>
+                <h1 className="cb-title">Create your account</h1>
+                <p className="cb-subtitle">Join as a ClimbBeta gym partner</p>
 
-                <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px' }}>Nome da Conta</label>
-                        <input 
-                            type="text" 
-                            required 
-                            value={username} 
-                            onChange={(e) => setUsername(e.target.value)} 
-                            placeholder="Ex: Carlos Owner"
-                            style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #d1d5db', boxSizing: 'border-box' }}
+                {error && <div className="cb-error">{error}</div>}
+
+                <form onSubmit={handleRegister}>
+                    <div className="cb-field">
+                        <label className="cb-label">Account name</label>
+                        <input
+                            className="cb-input"
+                            type="text"
+                            required
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="e.g. Vertigo Boulder Room"
                         />
                     </div>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px' }}>Email</label>
-                        <input 
-                            type="email" 
-                            required 
-                            value={email} 
-                            onChange={(e) => setEmail(e.target.value)} 
-                            placeholder="teuemail@ginasio.com"
-                            style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #d1d5db', boxSizing: 'border-box' }}
+
+                    <div className="cb-field">
+                        <label className="cb-label">Email</label>
+                        <input
+                            className="cb-input"
+                            type="email"
+                            required
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="you@yourgym.com"
                         />
                     </div>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px' }}>Palavra-passe</label>
-                        <input 
-                            type="password" 
-                            required 
-                            value={password} 
-                            onChange={(e) => setPassword(e.target.value)} 
-                            placeholder="Mínimo 6 caracteres"
-                            style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #d1d5db', boxSizing: 'border-box' }}
+
+                    <div className="cb-field">
+                        <label className="cb-label">Password</label>
+                        <input
+                            className="cb-input"
+                            type="password"
+                            required
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Create a strong password"
                         />
+                        <ul className="cb-checklist">
+                            {ruleResults.map((r) => (
+                                <li key={r.label} className={`cb-check${r.ok ? ' ok' : ''}`}>
+                                    <span className="cb-check-icon" aria-hidden="true">✓</span>
+                                    {r.label}
+                                </li>
+                            ))}
+                        </ul>
                     </div>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px' }}>Confirmar Palavra-passe</label>
-                        <input 
-                            type="password" 
-                            required 
-                            value={confirmPassword} 
-                            onChange={(e) => setConfirmPassword(e.target.value)} 
-                            placeholder="Repete a palavra-passe"
-                            style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #d1d5db', boxSizing: 'border-box' }}
+
+                    <div className="cb-field">
+                        <label className="cb-label">Confirm password</label>
+                        <input
+                            className="cb-input"
+                            type="password"
+                            required
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="Repeat your password"
                         />
+                        {confirmPassword.length > 0 && !passwordsMatch && (
+                            <p style={{ margin: '6px 0 0', fontSize: '12.5px', color: 'var(--cb-danger)' }}>
+                                Passwords do not match.
+                            </p>
+                        )}
                     </div>
-                    
-                    <button 
-                        type="submit" 
-                        disabled={isLoading}
-                        style={{ marginTop: '10px', padding: '12px', backgroundColor: '#10b981', color: 'white', fontWeight: 'bold', border: 'none', borderRadius: '4px', cursor: isLoading ? 'not-allowed' : 'pointer' }}
-                    >
-                        {isLoading ? 'A Registar...' : 'Criar Conta'}
+
+                    <button className="cb-btn" type="submit" disabled={!canSubmit}>
+                        {isLoading ? 'Creating account…' : 'Create account'}
                     </button>
                 </form>
 
-                <div style={{ marginTop: '20px', textAlign: 'center', fontSize: '14px' }}>
-                    <span style={{ color: '#6b7280' }}>Já tens conta? </span>
-                    <Link to="/login" style={{ color: '#2563eb', textDecoration: 'none', fontWeight: 'bold' }}>Faz Login aqui</Link>
-                </div>
+                <p className="cb-alt">
+                    Already have an account? <Link className="cb-link" to="/login">Sign in</Link>
+                </p>
             </div>
         </div>
     );

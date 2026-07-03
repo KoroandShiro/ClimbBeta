@@ -36,24 +36,24 @@ export default function LogAscentScreen({ route, navigation }: any) {
                 notes: notes,
             });
 
-            // QoL: se este boulder estava nos Projetos guardados, oferecer removê-lo.
+            // QoL: if this boulder was in the saved projects, offer to remove it.
             let isSaved = false;
             try {
                 isSaved = (await checkSaveStatus(boulderId)).isSaved;
             } catch {
-                // Se a verificação falhar, segue o caminho normal de sucesso.
+                // If the check fails, just follow the normal success path.
             }
 
             if (isSaved) {
                 Alert.alert(
-                    "Boa subida! 🎉",
-                    "Queres remover esta via dos teus Projetos guardados?",
+                    "Nice send! 🎉",
+                    "Remove this route from your saved projects?",
                     [
-                        { text: "Não", style: "cancel", onPress: () => navigation.goBack() },
+                        { text: "No", style: "cancel", onPress: () => navigation.goBack() },
                         {
-                            text: "Sim, remover",
+                            text: "Yes, remove",
                             onPress: async () => {
-                                try { await unsaveProject(boulderId); } catch { /* ignora */ }
+                                try { await unsaveProject(boulderId); } catch { /* ignore */ }
                                 navigation.goBack();
                             },
                         },
@@ -130,7 +130,7 @@ export default function LogAscentScreen({ route, navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f9f9f9' },
+    container: { flex: 1, backgroundColor: '#EEF3EC' },
     scroll: { padding: 20 },
     title: { fontSize: 28, fontWeight: 'bold', color: '#1a1a1a' },
     subtitle: { fontSize: 16, color: '#666', marginBottom: 30 },

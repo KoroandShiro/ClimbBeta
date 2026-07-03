@@ -104,7 +104,7 @@ export default function BoulderDetailsScreen() {
         <View style={styles.centerContainer}>
           <Text style={styles.errorText}>Route not found.</Text>
           <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: 20 }}>
-            <Text style={{ color: '#2563eb', fontWeight: 'bold' }}>Go Back</Text>
+            <Text style={{ color: '#2E7D32', fontWeight: 'bold' }}>Go Back</Text>
           </TouchableOpacity>
         </View>
     );
@@ -141,7 +141,7 @@ export default function BoulderDetailsScreen() {
                     onPress={handleToggleSave}
                     disabled={saving}
                 >
-                  <Ionicons name={saving ? "hourglass-outline" : (isSaved ? "bookmark" : "bookmark-outline")} size={20} color={isSaved ? "#555" : "#2563eb"} />
+                  <Ionicons name={saving ? "hourglass-outline" : (isSaved ? "bookmark" : "bookmark-outline")} size={20} color={isSaved ? "#555" : "#2E7D32"} />
                   <Text style={[styles.actionBtnOutlineText, isSaved && styles.actionTextSaved]}>
                     {saving ? "Processing..." : (isSaved ? "Remove Project" : "Save Project")}
                   </Text>
@@ -191,7 +191,7 @@ export default function BoulderDetailsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f0f2f5' },
+  container: { flex: 1, backgroundColor: '#EEF3EC' },
   centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   errorText: { fontSize: 16, color: '#dc2626', fontWeight: 'bold' },
   imageContainer: { position: 'relative' },
@@ -200,15 +200,15 @@ const styles = StyleSheet.create({
   infoSection: { backgroundColor: '#fff', padding: 20, borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
   titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 },
   title: { fontSize: 24, fontWeight: 'bold', color: '#111' },
-  gradeBadge: { backgroundColor: '#2563eb', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 },
+  gradeBadge: { backgroundColor: '#2E7D32', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 },
   gradeText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
   setterText: { color: '#6b7280', fontSize: 14, marginBottom: 20 },
   actionRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 10 },
-  actionBtnOutline: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 12, borderWidth: 1, borderColor: '#2563eb', borderRadius: 8, gap: 8 },
-  actionBtnOutlineText: { color: '#2563eb', fontWeight: '600' },
+  actionBtnOutline: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 12, borderWidth: 1, borderColor: '#2E7D32', borderRadius: 8, gap: 8 },
+  actionBtnOutlineText: { color: '#2E7D32', fontWeight: '600' },
   actionBtnSaved: { borderColor: '#d1d5db', backgroundColor: '#f3f4f6' },
   actionTextSaved: { color: '#555' },
-  actionBtnSolid: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 12, backgroundColor: '#10b981', borderRadius: 8, gap: 8 },
+  actionBtnSolid: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 12, backgroundColor: '#2E7D32', borderRadius: 8, gap: 8 },
   actionBtnSolidText: { color: '#fff', fontWeight: '600' },
   archivedBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#fef3c7', borderColor: '#fcd34d', borderWidth: 1, borderRadius: 8, padding: 12 },
   archivedText: { flex: 1, color: '#92400e', fontSize: 13, fontWeight: '500' },

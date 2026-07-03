@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
     View,
     Text,
@@ -10,12 +10,22 @@ import {
     Platform,
     ScrollView,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { register } from '../../services/authService';
 import { ApiError } from '../../services/api';
+import { colors, radius } from '../../theme';
+
+// Mirrors the server-side password policy in UserService.validatePasswordStrength.
+const PASSWORD_RULES = [
+    { label: '8 to 64 characters', test: (p: string) => p.length >= 8 && p.length <= 64 },
+    { label: 'One uppercase letter', test: (p: string) => /[A-Z]/.test(p) },
+    { label: 'One number', test: (p: string) => /[0-9]/.test(p) },
+    { label: 'One symbol', test: (p: string) => /[^A-Za-z0-9\s]/.test(p) },
+];
 
 /**
- * Onboarding registration portal setup tracking account allocations.
- * Dispatches raw details to initialize base DB profile maps upstream.
+ * Registration screen. Shows a live password checklist that mirrors the backend
+ * policy and only enables the button once the password is valid and confirmed.
  */
 export default function RegisterScreen({ navigation }: any) {
     const [username, setUsername] = useState('');
@@ -25,10 +35,15 @@ export default function RegisterScreen({ navigation }: any) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    /**
-     * Asserts internal password equivalence matrices and requests account provision procedures.
-     * Automatically pipes users backward into the [LoginScreen] track upon successful creations.
-     */
+    const ruleResults = useMemo(
+        () => PASSWORD_RULES.map((r) => ({ label: r.label, ok: r.test(password) })),
+        [password]
+    );
+    const passwordValid = ruleResults.every((r) => r.ok);
+    const passwordsMatch = confirm.length > 0 && password === confirm;
+    const canSubmit =
+        username.trim() !== '' && email.trim() !== '' && passwordValid && passwordsMatch && !loading;
+
     const handleRegister = async () => {
         if (!username.trim() || !email.trim() || !password || !confirm) {
             setError('Please fill in all fields.');
@@ -45,8 +60,7 @@ export default function RegisterScreen({ navigation }: any) {
             navigation.navigate('Login', { registered: true });
         } catch (e) {
             if (e instanceof ApiError) {
-                // Show the real backend message (weak password, email/username
-                // already taken, ...) instead of a generic guess.
+                // Show the real backend message instead of a generic guess.
                 setError(e.message);
             } else {
                 setError('Could not create account. Please try again.');
@@ -62,54 +76,84 @@ export default function RegisterScreen({ navigation }: any) {
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
             <ScrollView contentContainerStyle={styles.inner} keyboardShouldPersistTaps="handled">
-                <Text style={styles.title}>Create Account</Text>
+                <View style={styles.brand}>
+                    <Text style={styles.logo}>🧗</Text>
+                    <Text style={styles.wordmark}>ClimbBeta</Text>
+                </View>
+                <Text style={styles.title}>Create your account</Text>
                 <Text style={styles.subtitle}>Join the ClimbBeta community</Text>
 
                 {error && <Text style={styles.error}>{error}</Text>}
 
+                <Text style={styles.label}>Username</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="Username"
-                    placeholderTextColor="#9E9E9E"
+                    placeholder="Your name"
+                    placeholderTextColor={colors.placeholder}
                     autoCapitalize="none"
                     value={username}
                     onChangeText={setUsername}
                 />
+
+                <Text style={styles.label}>Email</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="Email"
-                    placeholderTextColor="#9E9E9E"
+                    placeholder="you@email.com"
+                    placeholderTextColor={colors.placeholder}
                     autoCapitalize="none"
                     keyboardType="email-address"
                     value={email}
                     onChangeText={setEmail}
                 />
+
+                <Text style={styles.label}>Password</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="Password"
-                    placeholderTextColor="#9E9E9E"
+                    placeholder="Create a strong password"
+                    placeholderTextColor={colors.placeholder}
                     secureTextEntry
                     value={password}
                     onChangeText={setPassword}
                 />
+
+                <View style={styles.checklist}>
+                    {ruleResults.map((r) => (
+                        <View key={r.label} style={styles.checkRow}>
+                            <Ionicons
+                                name={r.ok ? 'checkmark-circle' : 'ellipse-outline'}
+                                size={16}
+                                color={r.ok ? colors.success : colors.placeholder}
+                            />
+                            <Text style={[styles.checkText, r.ok && styles.checkTextOk]}>{r.label}</Text>
+                        </View>
+                    ))}
+                </View>
+
+                <Text style={styles.label}>Confirm password</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="Confirm Password"
-                    placeholderTextColor="#9E9E9E"
+                    placeholder="Repeat your password"
+                    placeholderTextColor={colors.placeholder}
                     secureTextEntry
                     value={confirm}
                     onChangeText={setConfirm}
                 />
+                {confirm.length > 0 && !passwordsMatch && (
+                    <Text style={styles.mismatch}>Passwords do not match.</Text>
+                )}
 
-                <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
-                    {loading
-                        ? <ActivityIndicator color="#fff" />
-                        : <Text style={styles.buttonText}>Create Account</Text>
-                    }
+                <TouchableOpacity
+                    style={[styles.button, !canSubmit && styles.buttonDisabled]}
+                    onPress={handleRegister}
+                    disabled={!canSubmit}
+                >
+                    {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Create account</Text>}
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                    <Text style={styles.link}>Already have an account? <Text style={styles.linkBold}>Log in here</Text></Text>
+                    <Text style={styles.link}>
+                        Already have an account? <Text style={styles.linkBold}>Log in here</Text>
+                    </Text>
                 </TouchableOpacity>
             </ScrollView>
         </KeyboardAvoidingView>
@@ -117,31 +161,24 @@ export default function RegisterScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f5f5f5' },
-    inner: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 32, paddingVertical: 40 },
-    title: { fontSize: 32, fontWeight: 'bold', color: '#2E7D32', textAlign: 'center', marginBottom: 6 },
-    subtitle: { fontSize: 15, color: '#777', textAlign: 'center', marginBottom: 32 },
-    error: { color: '#c62828', backgroundColor: '#ffebee', padding: 12, borderRadius: 8, marginBottom: 16, textAlign: 'center' },
-    input: {
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        paddingHorizontal: 16,
-        paddingVertical: 14,
-        fontSize: 16,
-        color: '#333',
-        marginBottom: 14,
-        borderWidth: 1,
-        borderColor: '#e0e0e0',
-    },
-    button: {
-        backgroundColor: '#2E7D32',
-        borderRadius: 10,
-        paddingVertical: 15,
-        alignItems: 'center',
-        marginTop: 6,
-        marginBottom: 20,
-    },
+    container: { flex: 1, backgroundColor: colors.page },
+    inner: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 28, paddingVertical: 40 },
+    brand: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 14 },
+    logo: { fontSize: 28 },
+    wordmark: { fontSize: 24, fontWeight: 'bold', color: colors.primary, letterSpacing: -0.5 },
+    title: { fontSize: 22, fontWeight: 'bold', color: colors.text, textAlign: 'center', marginBottom: 4 },
+    subtitle: { fontSize: 14, color: colors.textMuted, textAlign: 'center', marginBottom: 24 },
+    error: { color: colors.danger, backgroundColor: colors.dangerBg, padding: 12, borderRadius: radius.sm, marginBottom: 16, textAlign: 'center', fontWeight: '500' },
+    label: { fontSize: 13, fontWeight: '600', color: colors.text, marginBottom: 6 },
+    input: { backgroundColor: colors.surface, borderRadius: radius.sm, paddingHorizontal: 14, paddingVertical: 13, fontSize: 15, color: colors.text, marginBottom: 16, borderWidth: 1, borderColor: colors.borderStrong },
+    checklist: { marginBottom: 14, gap: 6 },
+    checkRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    checkText: { fontSize: 13, color: colors.textMuted },
+    checkTextOk: { color: colors.success },
+    mismatch: { color: colors.danger, fontSize: 13, marginTop: 4, marginBottom: 10 },
+    button: { backgroundColor: colors.primary, borderRadius: radius.sm, paddingVertical: 15, alignItems: 'center', marginTop: 6, marginBottom: 20 },
+    buttonDisabled: { opacity: 0.55 },
     buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
-    link: { textAlign: 'center', color: '#777', fontSize: 14 },
-    linkBold: { color: '#2E7D32', fontWeight: 'bold' },
+    link: { textAlign: 'center', color: colors.textMuted, fontSize: 14 },
+    linkBold: { color: colors.primary, fontWeight: 'bold' },
 });

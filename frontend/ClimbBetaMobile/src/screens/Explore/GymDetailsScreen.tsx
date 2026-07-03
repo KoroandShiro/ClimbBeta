@@ -151,7 +151,7 @@ export default function GymDetailsScreen({ route, navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1, backgroundColor: '#EEF3EC' },
   header: { padding: 20, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e0e0e0' },
   title: { fontSize: 24, fontWeight: 'bold', color: '#333' },
   subtitle: { fontSize: 14, color: '#666', marginTop: 5 },

@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import type { JSX } from 'react';
 import Register from './pages/Register';
+import './theme.css';
 
 // --- ROUTE GUARD ---
 // Wraps the Dashboard. If the owner has no token, they are kicked out to Login.
