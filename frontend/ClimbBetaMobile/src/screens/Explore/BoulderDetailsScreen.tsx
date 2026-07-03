@@ -133,27 +133,34 @@ export default function BoulderDetailsScreen() {
           </View>
           <Text style={styles.setterText}>Setter: {boulder.setterName || 'Unknown'}</Text>
 
-          {/* Action Bar (Dynamic Button) */}
-          <View style={styles.actionRow}>
-            <TouchableOpacity
-                style={[styles.actionBtnOutline, isSaved && styles.actionBtnSaved]}
-                onPress={handleToggleSave}
-                disabled={saving}
-            >
-              <Ionicons name={saving ? "hourglass-outline" : (isSaved ? "bookmark" : "bookmark-outline")} size={20} color={isSaved ? "#555" : "#2563eb"} />
-              <Text style={[styles.actionBtnOutlineText, isSaved && styles.actionTextSaved]}>
-                {saving ? "Processing..." : (isSaved ? "Remove Project" : "Save Project")}
-              </Text>
-            </TouchableOpacity>
+          {/* Action Bar — hidden for archived routes */}
+          {boulder.isActive ? (
+              <View style={styles.actionRow}>
+                <TouchableOpacity
+                    style={[styles.actionBtnOutline, isSaved && styles.actionBtnSaved]}
+                    onPress={handleToggleSave}
+                    disabled={saving}
+                >
+                  <Ionicons name={saving ? "hourglass-outline" : (isSaved ? "bookmark" : "bookmark-outline")} size={20} color={isSaved ? "#555" : "#2563eb"} />
+                  <Text style={[styles.actionBtnOutlineText, isSaved && styles.actionTextSaved]}>
+                    {saving ? "Processing..." : (isSaved ? "Remove Project" : "Save Project")}
+                  </Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity
-                style={styles.actionBtnSolid}
-                onPress={() => navigation.navigate('LogAscent', { gymId: boulder.gymId, boulderId: boulder.id })}
-            >
-              <Ionicons name="checkmark-done" size={20} color="#fff" />
-              <Text style={styles.actionBtnSolidText}>Log Beta</Text>
-            </TouchableOpacity>
-          </View>
+                <TouchableOpacity
+                    style={styles.actionBtnSolid}
+                    onPress={() => navigation.navigate('LogAscent', { gymId: boulder.gymId, boulderId: boulder.id })}
+                >
+                  <Ionicons name="checkmark-done" size={20} color="#fff" />
+                  <Text style={styles.actionBtnSolidText}>Log Beta</Text>
+                </TouchableOpacity>
+              </View>
+          ) : (
+              <View style={styles.archivedBanner}>
+                <Ionicons name="archive-outline" size={18} color="#92400e" />
+                <Text style={styles.archivedText}>This route has been archived by the gym and can no longer be logged.</Text>
+              </View>
+          )}
         </View>
 
         {/* Leaderboard */}
@@ -203,6 +210,8 @@ const styles = StyleSheet.create({
   actionTextSaved: { color: '#555' },
   actionBtnSolid: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 12, backgroundColor: '#10b981', borderRadius: 8, gap: 8 },
   actionBtnSolidText: { color: '#fff', fontWeight: '600' },
+  archivedBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#fef3c7', borderColor: '#fcd34d', borderWidth: 1, borderRadius: 8, padding: 12 },
+  archivedText: { flex: 1, color: '#92400e', fontSize: 13, fontWeight: '500' },
   leaderboardSection: { padding: 20 },
   sectionTitle: { fontSize: 20, fontWeight: 'bold', color: '#111', marginBottom: 15 },
   emptyText: { color: '#6b7280', fontStyle: 'italic', textAlign: 'center', marginTop: 10 },

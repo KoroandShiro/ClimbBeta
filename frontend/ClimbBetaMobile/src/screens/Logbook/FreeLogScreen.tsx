@@ -189,7 +189,7 @@ export default function FreeLogScreen({ route, navigation }: any) {
                 <View style={styles.section}>
                     <Text style={styles.label}>Style</Text>
                     <View style={styles.styleRow}>
-                        {['Flash', 'Onsight', 'Redpoint', 'Top'].map((s) => (
+                        {['Flash', 'Onsight', 'Top'].map((s) => (
                             <TouchableOpacity key={s} style={[styles.chip, style === s && styles.chipActive]} onPress={() => setStyle(s)}>
                                 <Text style={[styles.chipText, style === s && styles.chipTextActive]}>{s}</Text>
                             </TouchableOpacity>
