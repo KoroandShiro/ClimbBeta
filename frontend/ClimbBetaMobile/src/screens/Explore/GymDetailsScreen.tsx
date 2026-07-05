@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Image, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getActiveBoulders, type Boulder } from '../../services/gymService';
 
@@ -17,6 +17,7 @@ export default function GymDetailsScreen({ route, navigation }: any) {
 
   const [boulders, setBoulders] = useState<Boulder[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   /**
@@ -45,6 +46,22 @@ export default function GymDetailsScreen({ route, navigation }: any) {
   }, [gymId]);
 
   /**
+   * Pull-to-refresh: reloads the wall without the full-screen spinner, like the feed.
+   */
+  const onRefresh = async () => {
+    try {
+      setRefreshing(true);
+      setErrorMsg(null);
+      const data = await getActiveBoulders(gymId);
+      setBoulders(data);
+    } catch (error: any) {
+      setErrorMsg(error?.message ?? 'Could not load boulders.');
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  /**
    * Computes header text descriptions based on route metrics.
    */
   const subtitle = useMemo(() => {
@@ -59,7 +76,12 @@ export default function GymDetailsScreen({ route, navigation }: any) {
           <Text style={styles.subtitle}>{subtitle}</Text>
         </View>
 
-        <ScrollView style={styles.content}>
+        <ScrollView
+            style={styles.content}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#2E7D32']} tintColor="#2E7D32" />
+            }
+        >
           <Text style={styles.sectionTitle}>Active Boulders</Text>
 
           {isLoading && (
@@ -129,7 +151,7 @@ export default function GymDetailsScreen({ route, navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1, backgroundColor: '#EEF3EC' },
   header: { padding: 20, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e0e0e0' },
   title: { fontSize: 24, fontWeight: 'bold', color: '#333' },
   subtitle: { fontSize: 14, color: '#666', marginTop: 5 },

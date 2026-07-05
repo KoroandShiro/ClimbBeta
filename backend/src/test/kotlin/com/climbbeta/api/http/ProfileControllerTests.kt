@@ -1,8 +1,10 @@
 package com.climbbeta.api.http
 
-import com.climbbeta.api.domain.ClimberProfile
+import com.climbbeta.api.domain.ClimberProfileWithUserDTO
 import com.climbbeta.api.domain.User
 import com.climbbeta.api.domain.UserRole
+import com.climbbeta.api.repository.UserRepository
+import com.climbbeta.api.repository_jdbi.JdbiSaveRepository
 import com.climbbeta.api.services.ProfileService
 import jakarta.servlet.http.HttpServletRequest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -21,13 +23,19 @@ class ProfileControllerTests {
     private lateinit var profileService: ProfileService
 
     @Mock
+    private lateinit var saveRepository: JdbiSaveRepository
+
+    @Mock
+    private lateinit var userRepository: UserRepository
+
+    @Mock
     private lateinit var request: HttpServletRequest
 
     @InjectMocks
     private lateinit var profileController: ProfileController
 
     @Test
-    fun `getMyProfile deve retornar 403 se o user nao for CLIMBER`() {
+    fun `getMyProfile should return 403 when the user is not a CLIMBER`() {
         val ownerUser = User(id = 1, username = "owner", email = "test", passwordHash = "h", role = UserRole.GYM_OWNER)
         whenever(request.getAttribute("authenticatedUser")).thenReturn(ownerUser)
 
@@ -37,12 +45,15 @@ class ProfileControllerTests {
     }
 
     @Test
-    fun `getMyProfile deve retornar perfil se for CLIMBER`() {
+    fun `getMyProfile should return the profile when the user is a CLIMBER`() {
         val climberUser = User(id = 1, username = "climber", email = "test", passwordHash = "h", role = UserRole.CLIMBER)
-        val profile = ClimberProfile(userId = 1, bio = "Bio ok", height = 180, apeIndex = 1.0)
-        
+        val profile = ClimberProfileWithUserDTO(
+            userId = 1, username = "climber", email = "test",
+            bio = "Bio ok", height = 180, apeIndex = 1.0
+        )
+
         whenever(request.getAttribute("authenticatedUser")).thenReturn(climberUser)
-        whenever(profileService.getClimberProfile(1)).thenReturn(profile)
+        whenever(profileService.getClimberProfileWithUser(1, climberUser)).thenReturn(profile)
 
         val response = profileController.getMyProfile(request)
 
@@ -51,11 +62,13 @@ class ProfileControllerTests {
     }
 
     @Test
-    fun `updateMyProfile deve retornar 403 se o user nao for CLIMBER`() {
+    fun `updateMyProfile should return 403 when the user is not a CLIMBER`() {
         val adminUser = User(id = 1, username = "admin", email = "test", passwordHash = "h", role = UserRole.ADMIN)
         whenever(request.getAttribute("authenticatedUser")).thenReturn(adminUser)
 
-        val response = profileController.updateMyProfile(ProfileUpdateInput("Bio", 185, null), request)
+        val response = profileController.updateMyProfile(
+            ProfileUpdateInput(username = null, bio = "Bio", height = 185, apeIndex = null), request
+        )
 
         assertEquals(HttpStatus.FORBIDDEN, response.statusCode)
     }

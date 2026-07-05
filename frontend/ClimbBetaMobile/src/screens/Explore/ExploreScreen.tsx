@@ -9,6 +9,7 @@ import {
   TextInput,
   ImageBackground,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getGyms, type Gym } from '../../services/gymService';
@@ -23,29 +24,40 @@ export default function ExploreScreen({ navigation }: any) {
   const [gyms, setGyms] = useState<Gym[]>([]);
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   /**
-   * Refreshes the global list of climbing facilities whenever the user focuses the view.
+   * Fetches the gym list into state, surfacing any error message.
+   */
+  const fetchGyms = useCallback(async () => {
+    try {
+      setErrorMsg(null);
+      const data = await getGyms();
+      setGyms(data);
+    } catch (error: any) {
+      setErrorMsg(error?.message ?? 'Could not load gyms.');
+    }
+  }, []);
+
+  /**
+   * Reloads the facilities with the full-screen spinner whenever the view is focused.
    */
   useFocusEffect(
       useCallback(() => {
-        const loadGyms = async () => {
-          try {
-            setIsLoading(true);
-            setErrorMsg(null);
-            const data = await getGyms();
-            setGyms(data);
-          } catch (error: any) {
-            setErrorMsg(error?.message ?? 'Could not load gyms.');
-          } finally {
-            setIsLoading(false);
-          }
-        };
-
-        loadGyms();
-      }, [])
+        setIsLoading(true);
+        fetchGyms().finally(() => setIsLoading(false));
+      }, [fetchGyms])
   );
+
+  /**
+   * Pull-to-refresh: reloads without the full-screen spinner, like the feed.
+   */
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchGyms();
+    setRefreshing(false);
+  }, [fetchGyms]);
 
   /**
    * Memoized lookup filter parsing gym properties against the clean text search buffer.
@@ -76,7 +88,12 @@ export default function ExploreScreen({ navigation }: any) {
           </View>
         </View>
 
-        <ScrollView style={styles.content}>
+        <ScrollView
+            style={styles.content}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#2E7D32']} tintColor="#2E7D32" />
+            }
+        >
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Explore Gyms</Text>
             <Ionicons name="business" size={20} color="#2E7D32" />
@@ -99,16 +116,9 @@ export default function ExploreScreen({ navigation }: any) {
                 <TouchableOpacity
                     style={styles.retryButton}
                     onPress={async () => {
-                      try {
-                        setIsLoading(true);
-                        setErrorMsg(null);
-                        const data = await getGyms();
-                        setGyms(data);
-                      } catch (error: any) {
-                        setErrorMsg(error?.message ?? 'Could not load gyms.');
-                      } finally {
-                        setIsLoading(false);
-                      }
+                      setIsLoading(true);
+                      await fetchGyms();
+                      setIsLoading(false);
                     }}
                 >
                   <Text style={styles.retryButtonText}>Try again</Text>
@@ -167,7 +177,7 @@ export default function ExploreScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1, backgroundColor: '#EEF3EC' },
   header: { backgroundColor: '#fff', padding: 15, paddingTop: 20, borderBottomWidth: 1, borderBottomColor: '#e0e0e0' },
   searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f0f0f0', borderRadius: 10, paddingHorizontal: 10, height: 45 },
   searchIcon: { marginRight: 10 },

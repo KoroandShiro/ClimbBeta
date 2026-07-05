@@ -112,7 +112,7 @@ export default function ProfileScreen({ navigation }: any) {
               style={styles.actionCard}
               onPress={() => navigation.navigate('FollowList', { userId: profile?.userId, initialTab: 'followers' })}
           >
-            <Ionicons name="people" size={26} color="#1976D2" />
+            <Ionicons name="people" size={26} color="#2E7D32" />
             <Text style={styles.actionCount}>{profile?.followersCount ?? 0}</Text>
             <Text style={styles.actionSub}>Followers</Text>
           </TouchableOpacity>
@@ -121,7 +121,7 @@ export default function ProfileScreen({ navigation }: any) {
               style={styles.actionCard}
               onPress={() => navigation.navigate('FollowList', { userId: profile?.userId, initialTab: 'following' })}
           >
-            <Ionicons name="person-add" size={26} color="#1976D2" />
+            <Ionicons name="person-add" size={26} color="#2E7D32" />
             <Text style={styles.actionCount}>{profile?.followingCount ?? 0}</Text>
             <Text style={styles.actionSub}>Following</Text>
           </TouchableOpacity>
@@ -158,8 +158,8 @@ export default function ProfileScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f5f5f5' },
+  container: { flex: 1, backgroundColor: '#EEF3EC' },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#EEF3EC' },
   errorText: { color: 'red', margin: 16 },
   header: { alignItems: 'center', padding: 20, backgroundColor: '#fff' },
   avatar: { width: 100, height: 100, borderRadius: 50, marginBottom: 10, backgroundColor: '#e0e0e0' },
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
   actionsContainer: { flexDirection: 'row', padding: 15, gap: 15 },
   actionCard: { flex: 1, backgroundColor: '#fff', padding: 20, borderRadius: 12, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
   actionTitle: { fontSize: 14, fontWeight: 'bold', color: '#333', marginTop: 10, textAlign: 'center' },
-  actionCount: { fontSize: 20, fontWeight: 'bold', color: '#1976D2', marginTop: 8 },
+  actionCount: { fontSize: 20, fontWeight: 'bold', color: '#2E7D32', marginTop: 8 },
   actionSub: { fontSize: 12, color: '#777', marginTop: 4 },
   editProfileButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginHorizontal: 16, marginTop: 4, padding: 12, backgroundColor: '#2E7D32', borderRadius: 8 },
   editProfileButtonText: { color: '#fff', fontWeight: 'bold', marginLeft: 8 },

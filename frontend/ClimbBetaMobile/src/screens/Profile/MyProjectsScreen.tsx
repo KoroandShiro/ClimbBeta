@@ -85,7 +85,7 @@ export default function MyProjectsScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f5f5f5', padding: 15 },
+    container: { flex: 1, backgroundColor: '#EEF3EC', padding: 15 },
     center: { justifyContent: 'center', alignItems: 'center' },
     headerText: { fontSize: 16, color: '#555', marginBottom: 20, textAlign: 'center' },
     grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },

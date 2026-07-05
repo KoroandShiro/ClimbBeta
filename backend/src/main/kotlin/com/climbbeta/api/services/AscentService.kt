@@ -2,6 +2,7 @@ package com.climbbeta.api.services
 
 import com.climbbeta.api.domain.Ascent
 import com.climbbeta.api.repository.AscentRepository
+import com.climbbeta.api.repository.BoulderRepository
 import com.climbbeta.api.repository.MediaRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -19,7 +20,8 @@ import java.time.LocalDate
 class AscentService(
     private val ascentRepository: AscentRepository,
     private val outdoorRouteService: OutdoorRouteService,
-    private val mediaRepository: MediaRepository
+    private val mediaRepository: MediaRepository,
+    private val boulderRepository: BoulderRepository
 ) {
 
     /**
@@ -40,8 +42,21 @@ class AscentService(
         freelogGymName: String?, freelogGrade: String?,
         date: LocalDate?, attempts: Int, style: String?, notes: String?
     ): Int {
+        require(attempts >= 1) { "The number of attempts must be at least 1." }
+
         if (boulderId != null && outdoorRouteId != null) {
             throw IllegalArgumentException("An ascent cannot be both Indoor and Outdoor at the same time.")
+        }
+
+        // Integrity guard: a boulder can only be logged if it exists AND is still active.
+        // Without this, the feed shortcut / the gym badge / the saved projects would allow
+        // logging a soft-deleted boulder (is_active = false) that is no longer on the wall.
+        if (boulderId != null) {
+            val boulder = boulderRepository.getBoulderById(boulderId)
+                ?: throw NoSuchElementException("This boulder does not exist.")
+            if (!boulder.isActive) {
+                throw IllegalStateException("This boulder has been archived and no longer accepts logs.")
+            }
         }
 
         return ascentRepository.create(
@@ -78,6 +93,8 @@ class AscentService(
         routeName: String?, sector: String?, location: String?,
         date: LocalDate?, attempts: Int, style: String?, notes: String?, mediaUrl: String?
     ): Int {
+        require(attempts >= 1) { "The number of attempts must be at least 1." }
+
         val ascentDate = date ?: LocalDate.now()
 
         val ascentId = when (mode.uppercase()) {

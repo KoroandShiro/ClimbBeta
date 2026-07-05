@@ -105,8 +105,8 @@ class JdbiBoulderRepository(private val jdbi: Jdbi) : BoulderRepository {
                 SELECT 
                     ROW_NUMBER() OVER (
                         ORDER BY 
-                            CASE WHEN MIN(a.style) = 'flash' THEN 1 
-                                 WHEN MIN(a.style) = 'onsight' THEN 2 
+                            CASE WHEN MIN(a.style) = 'Flash' THEN 1 
+                                 WHEN MIN(a.style) = 'Onsight' THEN 2 
                                  ELSE 3 END,
                             MIN(a.attempts) ASC
                     ) as rank,
@@ -122,8 +122,8 @@ class JdbiBoulderRepository(private val jdbi: Jdbi) : BoulderRepository {
                 WHERE a.boulder_id = :boulderId
                 GROUP BY a.climber_id, u.username, cp.avatar_url
                 ORDER BY 
-                    CASE WHEN MIN(a.style) = 'flash' THEN 1 
-                         WHEN MIN(a.style) = 'onsight' THEN 2 
+                    CASE WHEN MIN(a.style) = 'Flash' THEN 1 
+                         WHEN MIN(a.style) = 'Onsight' THEN 2 
                          ELSE 3 END,
                     MIN(a.attempts) ASC
                 """

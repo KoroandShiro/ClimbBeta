@@ -11,10 +11,11 @@ import {
 } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
 import { ApiError } from '../../services/api';
+import { colors, radius } from '../../theme';
 
 /**
- * UI View Component processing identity pass-through targets.
- * Validates baseline text formatting constraints locally before dispatching requests downstream.
+ * Sign-in screen. Validates local input before dispatching the auth request,
+ * and keeps a generic 401 message so it never reveals which field was wrong.
  */
 export default function LoginScreen({ navigation }: any) {
     const { login } = useAuth();
@@ -23,10 +24,6 @@ export default function LoginScreen({ navigation }: any) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    /**
-     * Packages text entry state buffers and triggers authentication handshakes.
-     * Intercepts 401 exceptions to isolate bad payload alerts from dropped connections.
-     */
     const handleLogin = async () => {
         if (!email.trim() || !password) {
             setError('Please fill in both email and password.');
@@ -37,8 +34,6 @@ export default function LoginScreen({ navigation }: any) {
         try {
             await login(email.trim(), password);
         } catch (e) {
-            console.error("ACTUAL ERROR CAUGHT IN LOGIN:", e);
-
             if (e instanceof ApiError && e.status === 401) {
                 setError('Incorrect email or password.');
             } else {
@@ -55,38 +50,48 @@ export default function LoginScreen({ navigation }: any) {
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
             <View style={styles.inner}>
-                <Text style={styles.title}>ClimbBeta</Text>
+                <View style={styles.brand}>
+                    <Text style={styles.logo}>🧗</Text>
+                    <Text style={styles.wordmark}>ClimbBeta</Text>
+                </View>
+                <Text style={styles.title}>Welcome back</Text>
                 <Text style={styles.subtitle}>Log into your account</Text>
 
                 {error && <Text style={styles.error}>{error}</Text>}
 
+                <Text style={styles.label}>Email</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="Email"
-                    placeholderTextColor="#9E9E9E"
+                    placeholder="you@email.com"
+                    placeholderTextColor={colors.placeholder}
                     autoCapitalize="none"
                     keyboardType="email-address"
                     value={email}
                     onChangeText={setEmail}
                 />
+
+                <Text style={styles.label}>Password</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="Password"
-                    placeholderTextColor="#9E9E9E"
+                    placeholder="Your password"
+                    placeholderTextColor={colors.placeholder}
                     secureTextEntry
                     value={password}
                     onChangeText={setPassword}
                 />
 
-                <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
-                    {loading
-                        ? <ActivityIndicator color="#fff" />
-                        : <Text style={styles.buttonText}>Log In</Text>
-                    }
+                <TouchableOpacity
+                    style={[styles.button, loading && styles.buttonDisabled]}
+                    onPress={handleLogin}
+                    disabled={loading}
+                >
+                    {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Sign in</Text>}
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-                    <Text style={styles.link}>Don't have an account yet? <Text style={styles.linkBold}>Sign Up</Text></Text>
+                    <Text style={styles.link}>
+                        Don't have an account yet? <Text style={styles.linkBold}>Sign up</Text>
+                    </Text>
                 </TouchableOpacity>
             </View>
         </KeyboardAvoidingView>
@@ -94,31 +99,19 @@ export default function LoginScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f5f5f5' },
-    inner: { flex: 1, justifyContent: 'center', paddingHorizontal: 32 },
-    title: { fontSize: 36, fontWeight: 'bold', color: '#2E7D32', textAlign: 'center', marginBottom: 6 },
-    subtitle: { fontSize: 16, color: '#777', textAlign: 'center', marginBottom: 32 },
-    error: { color: '#c62828', backgroundColor: '#ffebee', padding: 12, borderRadius: 8, marginBottom: 16, textAlign: 'center' },
-    input: {
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        paddingHorizontal: 16,
-        paddingVertical: 14,
-        fontSize: 16,
-        color: '#333',
-        marginBottom: 14,
-        borderWidth: 1,
-        borderColor: '#e0e0e0',
-    },
-    button: {
-        backgroundColor: '#2E7D32',
-        borderRadius: 10,
-        paddingVertical: 15,
-        alignItems: 'center',
-        marginTop: 6,
-        marginBottom: 20,
-    },
+    container: { flex: 1, backgroundColor: colors.page },
+    inner: { flex: 1, justifyContent: 'center', paddingHorizontal: 28 },
+    brand: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 18 },
+    logo: { fontSize: 30 },
+    wordmark: { fontSize: 26, fontWeight: 'bold', color: colors.primary, letterSpacing: -0.5 },
+    title: { fontSize: 24, fontWeight: 'bold', color: colors.text, textAlign: 'center', marginBottom: 4 },
+    subtitle: { fontSize: 15, color: colors.textMuted, textAlign: 'center', marginBottom: 28 },
+    error: { color: colors.danger, backgroundColor: colors.dangerBg, padding: 12, borderRadius: radius.sm, marginBottom: 16, textAlign: 'center', fontWeight: '500' },
+    label: { fontSize: 13, fontWeight: '600', color: colors.text, marginBottom: 6 },
+    input: { backgroundColor: colors.surface, borderRadius: radius.sm, paddingHorizontal: 14, paddingVertical: 13, fontSize: 15, color: colors.text, marginBottom: 16, borderWidth: 1, borderColor: colors.borderStrong },
+    button: { backgroundColor: colors.primary, borderRadius: radius.sm, paddingVertical: 15, alignItems: 'center', marginTop: 4, marginBottom: 22 },
+    buttonDisabled: { opacity: 0.6 },
     buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
-    link: { textAlign: 'center', color: '#777', fontSize: 14 },
-    linkBold: { color: '#2E7D32', fontWeight: 'bold' },
+    link: { textAlign: 'center', color: colors.textMuted, fontSize: 14 },
+    linkBold: { color: colors.primary, fontWeight: 'bold' },
 });

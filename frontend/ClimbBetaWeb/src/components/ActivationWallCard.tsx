@@ -16,42 +16,35 @@ export default function ActivationWallCard() {
             await verifyCode(code);
             updateUserStatus('VERIFIED');
         } catch (err: any) {
-            setError(err.message || 'Código inválido. Tenta novamente.');
+            setError(err.message || 'Invalid code. Please try again.');
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
-            <div style={{ padding: '40px', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', maxWidth: '420px', width: '100%', textAlign: 'center' }}>
-                <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔒</div>
-                <h2 style={{ color: '#1f2937', marginBottom: '8px' }}>Conta Pendente de Ativação</h2>
-                <p style={{ color: '#6b7280', marginBottom: '24px', lineHeight: '1.6' }}>
-                    A tua conta está pendente. Insere o código de ativação fornecido pelo Admin para desbloquear o acesso ao backoffice.
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+            <div className="cb-card" style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '44px', marginBottom: '12px' }}>🔒</div>
+                <h2 className="cb-title">Account pending activation</h2>
+                <p className="cb-subtitle" style={{ marginBottom: '20px' }}>
+                    Your account is pending. Enter the activation code provided by an admin to unlock the backoffice.
                 </p>
 
-                {error && (
-                    <p style={{ color: '#ef4444', marginBottom: '16px', fontWeight: 'bold', backgroundColor: '#fef2f2', padding: '10px', borderRadius: '6px' }}>
-                        {error}
-                    </p>
-                )}
+                {error && <div className="cb-error">{error}</div>}
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     <input
+                        className="cb-input"
                         type="text"
                         value={code}
                         onChange={(e) => setCode(e.target.value)}
-                        placeholder="Código de ativação"
+                        placeholder="Activation code"
                         required
-                        style={{ padding: '12px', border: '2px solid #d1d5db', borderRadius: '6px', fontSize: '16px', textAlign: 'center', letterSpacing: '2px' }}
+                        style={{ textAlign: 'center', letterSpacing: '2px' }}
                     />
-                    <button
-                        type="submit"
-                        disabled={isLoading}
-                        style={{ padding: '12px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', fontSize: '16px', fontWeight: 'bold', cursor: isLoading ? 'not-allowed' : 'pointer' }}
-                    >
-                        {isLoading ? 'A verificar...' : 'Ativar Conta'}
+                    <button className="cb-btn" type="submit" disabled={isLoading}>
+                        {isLoading ? 'Verifying…' : 'Activate account'}
                     </button>
                 </form>
             </div>
