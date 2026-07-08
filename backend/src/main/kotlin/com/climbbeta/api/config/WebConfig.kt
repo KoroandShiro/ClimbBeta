@@ -1,6 +1,7 @@
 package com.climbbeta.api.config
 
 import com.climbbeta.api.pipeline.AuthenticationInterceptor
+import com.climbbeta.api.pipeline.AuthorizationInterceptor
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
@@ -8,23 +9,34 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @Configuration
 class WebConfig(
-    private val authenticationInterceptor: AuthenticationInterceptor
+    private val authenticationInterceptor: AuthenticationInterceptor,
+    private val authorizationInterceptor: AuthorizationInterceptor
 ) : WebMvcConfigurer {
 
     override fun addInterceptors(registry: InterceptorRegistry) {
-        registry.addInterceptor(authenticationInterceptor)
-            .addPathPatterns("/**") // O Segurança vigia TODAS as rotas...
-            .excludePathPatterns(   // ... EXCETO estas!
-                "/users/register",
-                "/users/login",
-                "/error",
+        // Rotas públicas: ficam de fora dos DOIS interceptors (não exigem login nem role).
+        val publicPaths = arrayOf(
+            "/users/register",
+            "/users/login",
+            "/error",
 
-                // === ADICIONADO: LIBERTAR O SWAGGER DA AUTENTICAÇÃO ===
-                "/swagger-ui/**",
-                "/v3/api-docs/**",
-                "/v3/api-docs.yaml",
-                "/swagger-ui.html"
-            )
+            // === LIBERTAR O SWAGGER DA AUTENTICAÇÃO ===
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/v3/api-docs.yaml",
+            "/swagger-ui.html"
+        )
+
+        // 1º) Autenticação: "quem és tu?" — valida o token e injeta o authenticatedUser.
+        registry.addInterceptor(authenticationInterceptor)
+            .addPathPatterns("/**")
+            .excludePathPatterns(*publicPaths)
+
+        // 2º) Autorização: "a tua role pode entrar nesta rota?" — corre DEPOIS, por isso o
+        // authenticatedUser já está disponível. Lê a anotação @ProtectedRoute e devolve 403.
+        registry.addInterceptor(authorizationInterceptor)
+            .addPathPatterns("/**")
+            .excludePathPatterns(*publicPaths)
     }
 
     override fun addCorsMappings(registry: CorsRegistry) {

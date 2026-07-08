@@ -3,6 +3,8 @@ package com.climbbeta.api.http
 import com.climbbeta.api.domain.Ascent
 import com.climbbeta.api.domain.FeedItem
 import com.climbbeta.api.domain.User
+import com.climbbeta.api.domain.UserRole
+import com.climbbeta.api.pipeline.ProtectedRoute
 import com.climbbeta.api.services.AscentService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -59,6 +61,7 @@ class AscentController(private val ascentService: AscentService) {
      * @param user Automatically resolved active entity injected by the security pipeline.
      * @return Map tracking the assigned ascent key with status 201 (Created).
      */
+    @ProtectedRoute(UserRole.CLIMBER)
     @PostMapping
     fun create(
         @RequestBody input: AscentInputModel,
@@ -78,6 +81,7 @@ class AscentController(private val ascentService: AscentService) {
      *
      * @return Map with the new ascent id and status 201 (Created).
      */
+    @ProtectedRoute(UserRole.CLIMBER)
     @PostMapping("/freelog")
     fun createFreelog(
         @RequestBody input: FreelogInputModel,
@@ -96,6 +100,7 @@ class AscentController(private val ascentService: AscentService) {
     /**
      * Extracts the complete logbook collection bound to the requesting climber.
      */
+    @ProtectedRoute(UserRole.CLIMBER)
     @GetMapping("/me")
     fun getMyLog(@RequestAttribute("authenticatedUser") user: User): List<Ascent> {
         return ascentService.getClimberLogbook(user.id)
@@ -125,6 +130,7 @@ class AscentController(private val ascentService: AscentService) {
      *
      * Ensures cascade deletion boundaries align with the record owner profile.
      */
+    @ProtectedRoute(UserRole.CLIMBER)
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Int, @RequestAttribute("authenticatedUser") user: User): ResponseEntity<Unit> {
         val deleted = ascentService.removeAscent(id, user.id)

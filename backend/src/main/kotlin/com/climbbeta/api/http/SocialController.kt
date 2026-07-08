@@ -3,6 +3,8 @@ package com.climbbeta.api.http
 import com.climbbeta.api.domain.ClimberSummary
 import com.climbbeta.api.domain.FeedItem
 import com.climbbeta.api.domain.User
+import com.climbbeta.api.domain.UserRole
+import com.climbbeta.api.pipeline.ProtectedRoute
 import com.climbbeta.api.services.AscentService
 import com.climbbeta.api.services.FollowService
 import org.springframework.http.HttpStatus
@@ -23,6 +25,7 @@ class SocialController(
     /**
      * Follows another climber. Prevents users from subscribing to themselves.
      */
+    @ProtectedRoute(UserRole.CLIMBER)
     @PostMapping("/climbers/{id}/follow")
     fun follow(
         @PathVariable id: Int,
@@ -39,6 +42,7 @@ class SocialController(
         }
     }
 
+    @ProtectedRoute(UserRole.CLIMBER)
     @DeleteMapping("/climbers/{id}/follow")
     fun unfollow(
         @PathVariable id: Int,
@@ -79,6 +83,7 @@ class SocialController(
     /**
      * Compiles a timeline of recent logs recorded by climbers the user follows.
      */
+    @ProtectedRoute(UserRole.CLIMBER)
     @GetMapping("/feed")
     fun getFeed(
         @RequestAttribute("authenticatedUser") user: User

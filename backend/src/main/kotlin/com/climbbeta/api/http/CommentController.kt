@@ -2,6 +2,8 @@ package com.climbbeta.api.http
 
 import com.climbbeta.api.domain.CommentItem
 import com.climbbeta.api.domain.User
+import com.climbbeta.api.domain.UserRole
+import com.climbbeta.api.pipeline.ProtectedRoute
 import com.climbbeta.api.services.CommentService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -23,6 +25,7 @@ class CommentController(private val commentService: CommentService) {
     fun getComments(@PathVariable id: Int): List<CommentItem> =
         commentService.getComments(id)
 
+    @ProtectedRoute(UserRole.CLIMBER)
     @PostMapping("/{id}/comments")
     fun addComment(
         @PathVariable id: Int,

@@ -2,6 +2,7 @@ package com.climbbeta.api.http
 
 import com.climbbeta.api.domain.User
 import com.climbbeta.api.domain.UserRole
+import com.climbbeta.api.pipeline.ProtectedRoute
 import com.climbbeta.api.repository.UserRepository
 import com.climbbeta.api.repository_jdbi.JdbiSaveRepository
 import com.climbbeta.api.services.ProfileService
@@ -24,6 +25,7 @@ data class ProfileUpdateInput(
  */
 @RestController
 @RequestMapping("/profiles")
+@ProtectedRoute(UserRole.CLIMBER)
 class ProfileController(
     private val profileService: ProfileService,
     private val saveRepository: JdbiSaveRepository,

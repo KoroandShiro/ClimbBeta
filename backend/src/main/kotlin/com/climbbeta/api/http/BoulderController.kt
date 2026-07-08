@@ -1,6 +1,8 @@
 package com.climbbeta.api.http
 
 import com.climbbeta.api.domain.User
+import com.climbbeta.api.domain.UserRole
+import com.climbbeta.api.pipeline.ProtectedRoute
 import com.climbbeta.api.services.BoulderService
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
@@ -32,6 +34,7 @@ class BoulderController(private val boulderService: BoulderService) {
      * @return Created entity response (201), 403 (Forbidden) if ownership verification tags mismatch,
      * or 400 (Bad Request) if parameters are structurally malformed.
      */
+    @ProtectedRoute(UserRole.GYM_OWNER)
     @PostMapping("/gyms/{gymId}/boulders")
     fun createBoulder(
         @PathVariable gymId: Int,
@@ -59,6 +62,7 @@ class BoulderController(private val boulderService: BoulderService) {
     /**
      * Alters visibility parameters for a target route (e.g., stripping down worn tracks).
      */
+    @ProtectedRoute(UserRole.GYM_OWNER)
     @PutMapping("/boulders/{boulderId}/status")
     fun updateBoulderStatus(
         @PathVariable boulderId: Int,

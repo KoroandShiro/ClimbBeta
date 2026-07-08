@@ -2,6 +2,7 @@ package com.climbbeta.api.http
 
 import com.climbbeta.api.domain.UserRole
 import com.climbbeta.api.domain.UserStatus
+import com.climbbeta.api.pipeline.ProtectedRoute
 import com.climbbeta.api.services.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -106,6 +107,7 @@ class UserController(
     /**
      * Processes admin activation coupons to unlock pending commercial gym manager capabilities.
      */
+    @ProtectedRoute(UserRole.GYM_OWNER)
     @PostMapping("/verify-code")
     fun verifyCode(
         @RequestBody input: VerifyCodeInputModel,

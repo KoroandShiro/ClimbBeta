@@ -2,6 +2,8 @@ package com.climbbeta.api.http
 
 import com.climbbeta.api.domain.Gym
 import com.climbbeta.api.domain.User
+import com.climbbeta.api.domain.UserRole
+import com.climbbeta.api.pipeline.ProtectedRoute
 import com.climbbeta.api.services.GymService
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
@@ -61,6 +63,7 @@ class GymController(
      * @return Formatted DTO output with status 201 (Created), 403 if unverified,
      * or 400 if validation parameters are violated.
      */
+    @ProtectedRoute(UserRole.GYM_OWNER)
     @PostMapping
     fun createGym(
         @RequestBody input: GymCreateInputModel,
@@ -106,6 +109,7 @@ class GymController(
         return ResponseEntity.ok(GymOutputModel.fromDomain(gym))
     }
 
+    @ProtectedRoute(UserRole.GYM_OWNER)
     @PutMapping("/{id}")
     fun updateGym(
         @PathVariable id: Int,

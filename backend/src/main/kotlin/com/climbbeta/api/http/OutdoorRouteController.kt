@@ -2,6 +2,8 @@ package com.climbbeta.api.http
 
 import com.climbbeta.api.domain.OutdoorRoute
 import com.climbbeta.api.domain.User
+import com.climbbeta.api.domain.UserRole
+import com.climbbeta.api.pipeline.ProtectedRoute
 import com.climbbeta.api.services.OutdoorRouteService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -30,6 +32,7 @@ class OutdoorRouteController(
      *
      * @param user Automatically resolved by the interceptor from the security header context.
      */
+    @ProtectedRoute(UserRole.CLIMBER)
     @PostMapping
     fun createRoute(
         @RequestBody input: OutdoorRouteCreateInput,

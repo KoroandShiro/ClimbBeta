@@ -1,6 +1,8 @@
 package com.climbbeta.api.http
 
 import com.climbbeta.api.domain.User
+import com.climbbeta.api.domain.UserRole
+import com.climbbeta.api.pipeline.ProtectedRoute
 import com.climbbeta.api.services.GamificationService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -19,6 +21,7 @@ class GamificationController(private val gamificationService: GamificationServic
     /**
      * Registers an appreciation mark (like) against a peer's public log entry.
      */
+    @ProtectedRoute(UserRole.CLIMBER)
     @PostMapping("/ascents/{id}/like")
     fun likeAscent(
         @PathVariable id: Int,
@@ -32,6 +35,7 @@ class GamificationController(private val gamificationService: GamificationServic
         }
     }
 
+    @ProtectedRoute(UserRole.CLIMBER)
     @DeleteMapping("/ascents/{id}/like")
     fun unlikeAscent(
         @PathVariable id: Int,
@@ -48,6 +52,7 @@ class GamificationController(private val gamificationService: GamificationServic
     /**
      * Saves a route to the user's personal project list.
      */
+    @ProtectedRoute(UserRole.CLIMBER)
     @PostMapping("/boulders/{id}/save")
     fun saveBoulder(
         @PathVariable id: Int,
@@ -61,6 +66,7 @@ class GamificationController(private val gamificationService: GamificationServic
         }
     }
 
+    @ProtectedRoute(UserRole.CLIMBER)
     @DeleteMapping("/boulders/{id}/save")
     fun unsaveBoulder(
         @PathVariable id: Int,
@@ -77,6 +83,7 @@ class GamificationController(private val gamificationService: GamificationServic
     /**
      * Checks if a specific route is bookmarked by the user. Used to toggle UI elements.
      */
+    @ProtectedRoute(UserRole.CLIMBER)
     @GetMapping("/boulders/{id}/save-status")
     fun checkSaveStatus(
         @PathVariable id: Int,
@@ -86,6 +93,7 @@ class GamificationController(private val gamificationService: GamificationServic
         return ResponseEntity.ok(mapOf("isSaved" to isSaved))
     }
 
+    @ProtectedRoute(UserRole.CLIMBER)
     @GetMapping("/projects/me")
     fun getSavedBoulders(
         @RequestAttribute("authenticatedUser") user: User

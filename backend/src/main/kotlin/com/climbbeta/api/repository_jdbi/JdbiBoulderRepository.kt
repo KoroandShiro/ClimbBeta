@@ -94,9 +94,9 @@ class JdbiBoulderRepository(private val jdbi: Jdbi) : BoulderRepository {
      *
      * Uses a `ROW_NUMBER() OVER` window function grouping performance metrics per climber.
      * Performance priority ranks clean completion send styles over absolute attempt counts:
-     * 1. Flash
-     * 2. Onsight
-     * 3. Redpoint / Base Sent
+     * 1. Onsight
+     * 2. Flash
+     * 3. Top
      */
     override fun getLeaderboard(boulderId: Int): List<LeaderboardEntry> {
         return jdbi.withHandle<List<LeaderboardEntry>, Exception> { handle ->
@@ -105,8 +105,8 @@ class JdbiBoulderRepository(private val jdbi: Jdbi) : BoulderRepository {
                 SELECT 
                     ROW_NUMBER() OVER (
                         ORDER BY 
-                            CASE WHEN MIN(a.style) = 'Flash' THEN 1 
-                                 WHEN MIN(a.style) = 'Onsight' THEN 2 
+                            CASE WHEN MIN(a.style) = 'Onsight' THEN 1 
+                                 WHEN MIN(a.style) = 'Flash' THEN 2 
                                  ELSE 3 END,
                             MIN(a.attempts) ASC
                     ) as rank,
@@ -122,8 +122,8 @@ class JdbiBoulderRepository(private val jdbi: Jdbi) : BoulderRepository {
                 WHERE a.boulder_id = :boulderId
                 GROUP BY a.climber_id, u.username, cp.avatar_url
                 ORDER BY 
-                    CASE WHEN MIN(a.style) = 'Flash' THEN 1 
-                         WHEN MIN(a.style) = 'Onsight' THEN 2 
+                    CASE WHEN MIN(a.style) = 'Onsight' THEN 1 
+                         WHEN MIN(a.style) = 'Flash' THEN 2 
                          ELSE 3 END,
                     MIN(a.attempts) ASC
                 """
