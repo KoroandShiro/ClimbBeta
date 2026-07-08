@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import { useHeaderHeight } from '@react-navigation/elements';
 import {
     FeedItem, CommentItem, getAscentDetail, getComments, addComment, likeAscent, unlikeAscent,
 } from '../../services/ascentService';
@@ -22,6 +23,7 @@ const LOG_TYPE_LABEL: Record<string, string> = {
  */
 export default function AscentDetailsScreen({ route }: any) {
     const ascentId: number = route.params?.ascentId;
+    const headerHeight = useHeaderHeight();
 
     const [detail, setDetail] = useState<FeedItem | null>(null);
     const [comments, setComments] = useState<CommentItem[]>([]);
@@ -87,8 +89,12 @@ export default function AscentDetailsScreen({ route }: any) {
     const a = detail.ascent;
 
     return (
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-            <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            keyboardVerticalOffset={headerHeight}
+            style={{ flex: 1 }}
+        >
+            <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 12 }} keyboardShouldPersistTaps="handled">
                 <Image source={{ uri: detail.postImageUrl ?? FALLBACK_IMG }} style={styles.heroImage} />
 
                 <View style={styles.content}>
@@ -141,19 +147,20 @@ export default function AscentDetailsScreen({ route }: any) {
                         </View>
                     ))}
 
-                    <View style={styles.inputRow}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Add a comment..."
-                            value={newComment}
-                            onChangeText={setNewComment}
-                        />
-                        <TouchableOpacity style={styles.sendBtn} onPress={submitComment} disabled={posting}>
-                            {posting ? <ActivityIndicator color="#fff" size="small" /> : <Ionicons name="send" size={20} color="#fff" />}
-                        </TouchableOpacity>
-                    </View>
                 </View>
             </ScrollView>
+
+            <View style={styles.inputRow}>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Add a comment..."
+                    value={newComment}
+                    onChangeText={setNewComment}
+                />
+                <TouchableOpacity style={styles.sendBtn} onPress={submitComment} disabled={posting}>
+                    {posting ? <ActivityIndicator color="#fff" size="small" /> : <Ionicons name="send" size={20} color="#fff" />}
+                </TouchableOpacity>
+            </View>
         </KeyboardAvoidingView>
     );
 }
@@ -184,7 +191,7 @@ const styles = StyleSheet.create({
     commentAvatar: { width: 30, height: 30, borderRadius: 15, backgroundColor: '#e0e0e0', marginRight: 10 },
     commentAuthor: { fontWeight: 'bold', color: '#333', marginBottom: 2 },
     commentText: { color: '#555' },
-    inputRow: { flexDirection: 'row', marginTop: 20, alignItems: 'center', marginBottom: 30 },
+    inputRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 10, paddingBottom: 12, borderTopWidth: 1, borderTopColor: '#eee', backgroundColor: '#fff' },
     input: { flex: 1, backgroundColor: '#f0f0f0', padding: 12, borderRadius: 20, marginRight: 10 },
     sendBtn: { backgroundColor: '#2E7D32', width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center' },
 });

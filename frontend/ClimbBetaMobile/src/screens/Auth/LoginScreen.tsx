@@ -8,6 +8,7 @@ import {
     ActivityIndicator,
     KeyboardAvoidingView,
     Platform,
+    ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
@@ -51,7 +52,7 @@ export default function LoginScreen({ navigation }: any) {
             style={styles.container}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
-            <View style={styles.inner}>
+            <ScrollView contentContainerStyle={styles.inner} keyboardShouldPersistTaps="handled">
                 <View style={styles.brand}>
                     <Text style={styles.logo}>🧗</Text>
                     <Text style={styles.wordmark}>ClimbBeta</Text>
@@ -104,14 +105,14 @@ export default function LoginScreen({ navigation }: any) {
                         Don't have an account yet? <Text style={styles.linkBold}>Sign up</Text>
                     </Text>
                 </TouchableOpacity>
-            </View>
+            </ScrollView>
         </KeyboardAvoidingView>
     );
 }
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.page },
-    inner: { flex: 1, justifyContent: 'center', paddingHorizontal: 28 },
+    inner: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 28 },
     brand: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 18 },
     logo: { fontSize: 30 },
     wordmark: { fontSize: 26, fontWeight: 'bold', color: colors.primary, letterSpacing: -0.5 },
