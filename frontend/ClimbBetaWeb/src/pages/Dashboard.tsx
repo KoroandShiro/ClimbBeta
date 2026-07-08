@@ -322,7 +322,7 @@ export default function Dashboard() {
 
                         <form onSubmit={handleAddBoulder} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                             <div>
-                                <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', color: '#374151', marginBottom: '5px' }}>Base Color</label>
+                                <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', color: '#374151', marginBottom: '5px' }}>Hold color (route)</label>
                                 <select value={newColorName} onChange={e => setNewColorName(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db', borderRadius: '4px' }}>
                                     <option value="Vermelho">Vermelho</option>
                                     <option value="Azul">Azul</option>
@@ -335,7 +335,7 @@ export default function Dashboard() {
                             </div>
 
                             <div>
-                                <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', color: '#374151', marginBottom: '5px' }}>Hex Color (Tag)</label>
+                                <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', color: '#374151', marginBottom: '5px' }}>Difficulty tag color</label>
                                 <input type="color" required value={newHexColor} onChange={e => setNewHexColor(e.target.value)} style={{ width: '100%', padding: '2px', border: '1px solid #d1d5db', borderRadius: '4px', height: '42px', cursor: 'pointer' }} />
                             </div>
 

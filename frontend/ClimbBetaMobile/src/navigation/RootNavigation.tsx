@@ -124,8 +124,8 @@ function AppTabs() {
             })}
         >
             <Tab.Screen name="Home" component={HomeStackNavigator} options={{ title: 'Feed' }} />
-            <Tab.Screen name="Explore" component={ExploreStackNavigator} options={{ title: 'Explore' }} />
-            <Tab.Screen name="Logbook" component={LogbookStackNavigator} options={{ title: 'Log' }} />
+            <Tab.Screen name="Explore" component={ExploreStackNavigator} options={{ title: 'Gyms' }} />
+            <Tab.Screen name="Logbook" component={LogbookStackNavigator} options={{ title: 'Add' }} />
             <Tab.Screen name="Profile" component={ProfileStackNavigator} options={{ title: 'Profile' }} />
         </Tab.Navigator>
     );

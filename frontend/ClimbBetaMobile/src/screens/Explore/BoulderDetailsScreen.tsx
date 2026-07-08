@@ -152,7 +152,7 @@ export default function BoulderDetailsScreen() {
                     onPress={() => navigation.navigate('LogAscent', { gymId: boulder.gymId, boulderId: boulder.id })}
                 >
                   <Ionicons name="checkmark-done" size={20} color="#fff" />
-                  <Text style={styles.actionBtnSolidText}>Log Beta</Text>
+                  <Text style={styles.actionBtnSolidText}>Log Ascent</Text>
                 </TouchableOpacity>
               </View>
           ) : (

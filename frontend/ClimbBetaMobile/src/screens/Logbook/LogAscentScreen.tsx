@@ -98,7 +98,7 @@ export default function LogAscentScreen({ route, navigation }: any) {
                 <View style={styles.section}>
                     <Text style={styles.label}>Style</Text>
                     <View style={styles.styleRow}>
-                        {['Flash', 'Onsight', 'Top'].map((s) => (
+                        {['Onsight', 'Flash', 'Top'].map((s) => (
                             <TouchableOpacity
                                 key={s}
                                 style={[styles.styleBtn, style === s && styles.styleBtnActive]}
