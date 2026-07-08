@@ -19,6 +19,9 @@ export default function LogAscentScreen({ route, navigation }: any) {
     const [notes, setNotes] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    // Onsight/Flash are first-try sends -> attempts is locked at 1.
+    const isFirstTry = style === 'Flash' || style === 'Onsight';
+
     /**
      * Submits technical climb data payloads to the API layer.
      * Gracefully falls back to UI messaging alerts upon intercepting unexpected service failures.
@@ -81,11 +84,11 @@ export default function LogAscentScreen({ route, navigation }: any) {
                 <View style={styles.section}>
                     <Text style={styles.label}>Attempts</Text>
                     <View style={styles.counterRow}>
-                        <TouchableOpacity style={styles.circleBtn} onPress={() => setAttempts(Math.max(1, attempts - 1))}>
+                        <TouchableOpacity style={[styles.circleBtn, isFirstTry && styles.circleBtnDisabled]} disabled={isFirstTry} onPress={() => setAttempts(Math.max(1, attempts - 1))}>
                             <Ionicons name="remove" size={24} color="#333" />
                         </TouchableOpacity>
                         <Text style={styles.counterText}>{attempts}</Text>
-                        <TouchableOpacity style={styles.circleBtn} onPress={() => setAttempts(attempts + 1)}>
+                        <TouchableOpacity style={[styles.circleBtn, isFirstTry && styles.circleBtnDisabled]} disabled={isFirstTry} onPress={() => setAttempts(attempts + 1)}>
                             <Ionicons name="add" size={24} color="#333" />
                         </TouchableOpacity>
                     </View>
@@ -99,7 +102,10 @@ export default function LogAscentScreen({ route, navigation }: any) {
                             <TouchableOpacity
                                 key={s}
                                 style={[styles.styleBtn, style === s && styles.styleBtnActive]}
-                                onPress={() => setStyle(s)}
+                                onPress={() => {
+                                    setStyle(s);
+                                    if (s === 'Flash' || s === 'Onsight') setAttempts(1);
+                                }}
                             >
                                 <Text style={[styles.styleBtnText, style === s && styles.styleBtnTextActive]}>{s}</Text>
                             </TouchableOpacity>
@@ -138,6 +144,7 @@ const styles = StyleSheet.create({
     label: { fontSize: 16, fontWeight: '600', color: '#333', marginBottom: 10 },
     counterRow: { flexDirection: 'row', alignItems: 'center' },
     circleBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#e0e0e0', justifyContent: 'center', alignItems: 'center' },
+    circleBtnDisabled: { opacity: 0.35 },
     counterText: { fontSize: 24, fontWeight: 'bold', marginHorizontal: 20, minWidth: 30, textAlign: 'center' },
     styleRow: { flexDirection: 'row', justifyContent: 'space-between' },
     styleBtn: { flex: 1, paddingVertical: 10, borderWidth: 1, borderColor: '#ccc', borderRadius: 8, marginHorizontal: 4, alignItems: 'center' },

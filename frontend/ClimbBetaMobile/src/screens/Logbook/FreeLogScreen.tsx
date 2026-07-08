@@ -40,6 +40,9 @@ export default function FreeLogScreen({ route, navigation }: any) {
     const [photoUri, setPhotoUri] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
+    // Onsight/Flash are first-try sends -> attempts is locked at 1.
+    const isFirstTry = style === 'Flash' || style === 'Onsight';
+
     /** Opens the gallery (permissions checked first), mirroring EditProfileScreen. */
     async function pickFromGallery() {
         const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -175,11 +178,11 @@ export default function FreeLogScreen({ route, navigation }: any) {
                 <View style={styles.section}>
                     <Text style={styles.label}>Attempts</Text>
                     <View style={styles.counterRow}>
-                        <TouchableOpacity style={styles.circleBtn} onPress={() => setAttempts(Math.max(1, attempts - 1))}>
+                        <TouchableOpacity style={[styles.circleBtn, isFirstTry && styles.circleBtnDisabled]} disabled={isFirstTry} onPress={() => setAttempts(Math.max(1, attempts - 1))}>
                             <Ionicons name="remove" size={24} color="#333" />
                         </TouchableOpacity>
                         <Text style={styles.counterText}>{attempts}</Text>
-                        <TouchableOpacity style={styles.circleBtn} onPress={() => setAttempts(attempts + 1)}>
+                        <TouchableOpacity style={[styles.circleBtn, isFirstTry && styles.circleBtnDisabled]} disabled={isFirstTry} onPress={() => setAttempts(attempts + 1)}>
                             <Ionicons name="add" size={24} color="#333" />
                         </TouchableOpacity>
                     </View>
@@ -190,7 +193,7 @@ export default function FreeLogScreen({ route, navigation }: any) {
                     <Text style={styles.label}>Style</Text>
                     <View style={styles.styleRow}>
                         {['Flash', 'Onsight', 'Top'].map((s) => (
-                            <TouchableOpacity key={s} style={[styles.chip, style === s && styles.chipActive]} onPress={() => setStyle(s)}>
+                            <TouchableOpacity key={s} style={[styles.chip, style === s && styles.chipActive]} onPress={() => { setStyle(s); if (s === 'Flash' || s === 'Onsight') setAttempts(1); }}>
                                 <Text style={[styles.chipText, style === s && styles.chipTextActive]}>{s}</Text>
                             </TouchableOpacity>
                         ))}
@@ -249,6 +252,7 @@ const styles = StyleSheet.create({
     input: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 12, fontSize: 16 },
     counterRow: { flexDirection: 'row', alignItems: 'center' },
     circleBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#e0e0e0', justifyContent: 'center', alignItems: 'center' },
+    circleBtnDisabled: { opacity: 0.35 },
     counterText: { fontSize: 24, fontWeight: 'bold', marginHorizontal: 20, minWidth: 30, textAlign: 'center' },
     styleRow: { flexDirection: 'row', justifyContent: 'space-between' },
     chip: { flex: 1, paddingVertical: 10, borderWidth: 1, borderColor: '#ccc', borderRadius: 8, marginHorizontal: 3, alignItems: 'center' },

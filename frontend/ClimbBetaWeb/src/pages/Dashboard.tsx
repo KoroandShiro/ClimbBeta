@@ -39,8 +39,13 @@ export default function Dashboard() {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        loadGyms();
-    }, []);
+        if (authLoading) return;              // ainda a resolver a sessão -> espera
+        if (user) {
+            loadGyms();                        // user pronto -> vai buscar os ginásios dele
+        } else {
+            setIsLoading(false);               // sem sessão -> o route guard trata do redirect
+        }
+    }, [authLoading, user]);
 
     const loadGyms = async () => {
         try {

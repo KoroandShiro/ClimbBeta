@@ -32,6 +32,8 @@ export default function RegisterScreen({ navigation }: any) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirm, setConfirm] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -107,14 +109,23 @@ export default function RegisterScreen({ navigation }: any) {
                 />
 
                 <Text style={styles.label}>Password</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Create a strong password"
-                    placeholderTextColor={colors.placeholder}
-                    secureTextEntry
-                    value={password}
-                    onChangeText={setPassword}
-                />
+                <View style={styles.passwordWrap}>
+                    <TextInput
+                        style={[styles.input, styles.passwordInput]}
+                        placeholder="Create a strong password"
+                        placeholderTextColor={colors.placeholder}
+                        secureTextEntry={!showPassword}
+                        value={password}
+                        onChangeText={setPassword}
+                    />
+                    <TouchableOpacity
+                        style={styles.eyeBtn}
+                        onPress={() => setShowPassword((v) => !v)}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                        <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={22} color={colors.textMuted} />
+                    </TouchableOpacity>
+                </View>
 
                 <View style={styles.checklist}>
                     {ruleResults.map((r) => (
@@ -130,14 +141,23 @@ export default function RegisterScreen({ navigation }: any) {
                 </View>
 
                 <Text style={styles.label}>Confirm password</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Repeat your password"
-                    placeholderTextColor={colors.placeholder}
-                    secureTextEntry
-                    value={confirm}
-                    onChangeText={setConfirm}
-                />
+                <View style={styles.passwordWrap}>
+                    <TextInput
+                        style={[styles.input, styles.passwordInput]}
+                        placeholder="Repeat your password"
+                        placeholderTextColor={colors.placeholder}
+                        secureTextEntry={!showConfirm}
+                        value={confirm}
+                        onChangeText={setConfirm}
+                    />
+                    <TouchableOpacity
+                        style={styles.eyeBtn}
+                        onPress={() => setShowConfirm((v) => !v)}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                        <Ionicons name={showConfirm ? 'eye-off-outline' : 'eye-outline'} size={22} color={colors.textMuted} />
+                    </TouchableOpacity>
+                </View>
                 {confirm.length > 0 && !passwordsMatch && (
                     <Text style={styles.mismatch}>Passwords do not match.</Text>
                 )}
@@ -171,6 +191,9 @@ const styles = StyleSheet.create({
     error: { color: colors.danger, backgroundColor: colors.dangerBg, padding: 12, borderRadius: radius.sm, marginBottom: 16, textAlign: 'center', fontWeight: '500' },
     label: { fontSize: 13, fontWeight: '600', color: colors.text, marginBottom: 6 },
     input: { backgroundColor: colors.surface, borderRadius: radius.sm, paddingHorizontal: 14, paddingVertical: 13, fontSize: 15, color: colors.text, marginBottom: 16, borderWidth: 1, borderColor: colors.borderStrong },
+    passwordWrap: { position: 'relative', justifyContent: 'center', marginBottom: 16 },
+    passwordInput: { marginBottom: 0, paddingRight: 48 },
+    eyeBtn: { position: 'absolute', right: 4, top: 0, bottom: 0, width: 44, alignItems: 'center', justifyContent: 'center' },
     checklist: { marginBottom: 14, gap: 6 },
     checkRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     checkText: { fontSize: 13, color: colors.textMuted },
