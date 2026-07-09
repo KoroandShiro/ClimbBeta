@@ -5,6 +5,22 @@ import { useAuth } from '../contexts/AuthContext';
 import ActivationWallCard from '../components/ActivationWallCard';
 import CreateGymModal from '../components/CreateGymModal';
 
+/** Hold-color palette for the swatch picker. Keep names/hex in sync with the mobile HOLD_COLOR_HEX map. */
+const HOLD_COLORS: { name: string; hex: string }[] = [
+    { name: 'Red', hex: '#EF4444' },
+    { name: 'Orange', hex: '#F97316' },
+    { name: 'Yellow', hex: '#EAB308' },
+    { name: 'Green', hex: '#22C55E' },
+    { name: 'Blue', hex: '#3B82F6' },
+    { name: 'Purple', hex: '#8B5CF6' },
+    { name: 'Pink', hex: '#EC4899' },
+    { name: 'Black', hex: '#111827' },
+    { name: 'White', hex: '#F3F4F6' },
+    { name: 'Grey', hex: '#9CA3AF' },
+    { name: 'Brown', hex: '#92400E' },
+    { name: 'Teal', hex: '#14B8A6' },
+];
+
 export default function Dashboard() {
     const navigate = useNavigate();
     const { logout: contextLogout, user, isLoading: authLoading } = useAuth();
@@ -26,7 +42,7 @@ export default function Dashboard() {
     const [boulders, setBoulders] = useState<Boulder[]>([]);
     const [bouldersLoading, setBouldersLoading] = useState(false);
     const [bouldersError, setBouldersError] = useState<string | null>(null);
-    const [newColorName, setNewColorName] = useState('Vermelho');
+    const [newColorName, setNewColorName] = useState('Red');
     const [newHexColor, setNewHexColor] = useState('#EF4444');
     const [newGrade, setNewGrade] = useState('V0');
     const [newSetterName, setNewSetterName] = useState('');
@@ -323,15 +339,26 @@ export default function Dashboard() {
                         <form onSubmit={handleAddBoulder} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                             <div>
                                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 'bold', color: '#374151', marginBottom: '5px' }}>Hold color (route)</label>
-                                <select value={newColorName} onChange={e => setNewColorName(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db', borderRadius: '4px' }}>
-                                    <option value="Vermelho">Vermelho</option>
-                                    <option value="Azul">Azul</option>
-                                    <option value="Verde">Verde</option>
-                                    <option value="Amarelo">Amarelo</option>
-                                    <option value="Preto">Preto</option>
-                                    <option value="Branco">Branco</option>
-                                    <option value="Outra">Outra (Define na Hex)</option>
-                                </select>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                    {HOLD_COLORS.map(c => {
+                                        const selected = newColorName === c.name;
+                                        return (
+                                            <button
+                                                type="button"
+                                                key={c.name}
+                                                title={c.name}
+                                                onClick={() => setNewColorName(c.name)}
+                                                style={{
+                                                    width: '32px', height: '32px', borderRadius: '50%',
+                                                    backgroundColor: c.hex, padding: 0, cursor: 'pointer',
+                                                    border: selected ? '3px solid #2E7D32' : '1px solid #d1d5db',
+                                                    boxShadow: selected ? '0 0 0 2px #fff inset' : 'none',
+                                                }}
+                                            />
+                                        );
+                                    })}
+                                </div>
+                                <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '6px' }}>Selected: <strong>{newColorName}</strong></p>
                             </div>
 
                             <div>

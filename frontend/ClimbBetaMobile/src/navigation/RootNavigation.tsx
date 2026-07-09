@@ -96,6 +96,7 @@ function ProfileStackNavigator() {
             <ProfileStack.Screen name="MyProjects" component={MyProjectsScreen} options={{ title: 'Saved Projects' }} />
             <ProfileStack.Screen name="FollowList" component={FollowListScreen} options={{ title: 'Connections' }} />
             <ProfileStack.Screen name="BoulderDetails" component={BoulderDetailsScreen} options={{ title: 'Route Statistics' }} />
+            <ProfileStack.Screen name="AscentDetails" component={AscentDetailsScreen} options={{ title: 'Ascent Details' }} />
             <ProfileStack.Screen name="LogAscent" component={LogAscentScreen} options={{ title: 'Log Ascent' }} />
         </ProfileStack.Navigator>
     );

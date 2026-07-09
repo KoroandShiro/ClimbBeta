@@ -5,8 +5,12 @@ import { getActiveBoulders, type Boulder } from '../../services/gymService';
 
 const FALLBACK_BOULDER_IMG = 'https://images.unsplash.com/photo-1522163182402-834f871fd851?auto=format&fit=crop&w=400&q=80';
 
-/** Maps the common hold-color names (from the web dashboard picker) to a hex, for a small swatch. */
+/** Maps hold-color names (from the web dashboard swatch grid) to a hex, for a small swatch.
+ *  Includes English (current palette) + legacy Portuguese names so older boulders still render. */
 const HOLD_COLOR_HEX: Record<string, string> = {
+  red: '#EF4444', orange: '#F97316', yellow: '#EAB308', green: '#22C55E',
+  blue: '#3B82F6', purple: '#8B5CF6', pink: '#EC4899', black: '#111827',
+  white: '#F3F4F6', grey: '#9CA3AF', gray: '#9CA3AF', brown: '#92400E', teal: '#14B8A6',
   vermelho: '#EF4444', azul: '#3B82F6', verde: '#22C55E',
   amarelo: '#EAB308', preto: '#111827', branco: '#F3F4F6',
 };
