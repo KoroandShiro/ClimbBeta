@@ -1,3 +1,18 @@
+/**
+ * @file services/gymService.ts
+ * @description Serviços relacionados com ginásios e rotas: getGyms, getActiveBoulders, createGym,
+ *              createBoulder, updateGym, archiveBoulder, uploadMedia (upload para MinIO).
+ *
+ * Exports:
+ *  - getGyms(), getActiveBoulders(gymId), createBoulder(gymId, data), createGym(data), updateGym(...)
+ *  - uploadMedia(file): Promise<string>  // retorna URL
+ *
+ * Testes:
+ *  - src/__tests__/services/gymService.test.ts
+ *
+ * Observações:
+ *  - `uploadMedia` usa `BASE_URL` e token do localStorage; cuidar de CORS e timeouts no backend.
+ */
 import { apiFetch, BASE_URL } from './api';
 
 export interface Gym {

@@ -1,3 +1,10 @@
+/**
+ * @file RegisterScreen.tsx
+ * @description Ecrã de registo de utilizador na app mobile.
+ *
+ * Testes:
+ *  - src/__tests__/screens/Auth/registerScreen.test.tsx
+ */
 import React, { useMemo, useState } from 'react';
 import {
     View,

@@ -1,5 +1,13 @@
 // ClimbBeta mobile — shared visual foundation (Direction A: Forest)
 // The React Native counterpart of the web's theme.css tokens.
+/**
+ * @file theme.ts
+ * @description Definição de tema e tokens visuais partilhados pela app mobile.
+ *
+ * Observações:
+ *  - Centraliza cores, espaçamentos e estilos base para React Native.
+ *  - Deve permanecer livre de lógica de negócio.
+ */
 
 export const colors = {
     primary: '#2E7D32',

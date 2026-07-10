@@ -1,3 +1,19 @@
+/**
+ * @file Dashboard.tsx
+ * @description Portal de gestão — lista ginásios do utilizador, edição de ginásio e gestão da wall (boulders).
+ *              Permite: criar ginásio, editar detalhes, adicionar/arquivar boulders e upload de imagens.
+ *
+ * Dependências:
+ *  - ../services/gymService (getGyms, getActiveBoulders, createBoulder, updateGym, archiveBoulder, uploadMedia)
+ *  - ../contexts/AuthContext (useAuth)
+ *  - ../components/{ActivationWallCard,CreateGymModal}
+ *
+ * Testes:
+ *  - src/__tests__/pages/Dashboard.test.tsx
+ *
+ * Observações:
+ *  - Contém muita lógica local; se crescer, considerar mover o state/logic para hooks separados.
+ */
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getGyms, getActiveBoulders, createBoulder, updateGym, archiveBoulder, uploadMedia, type Gym, type Boulder } from '../services/gymService';

@@ -1,3 +1,7 @@
+/**
+ * @file ProfileScreen.tsx
+ * @description Ecrã principal do perfil do utilizador.
+ */
 import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';

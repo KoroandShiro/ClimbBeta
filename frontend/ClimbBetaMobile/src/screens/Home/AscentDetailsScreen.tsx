@@ -1,3 +1,7 @@
+/**
+ * @file AscentDetailsScreen.tsx
+ * @description Ecrã de detalhe de uma subida (ascent/beta).
+ */
 import React, { useCallback, useState } from 'react';
 import {
     View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, TextInput,

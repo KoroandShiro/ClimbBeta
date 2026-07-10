@@ -1,3 +1,13 @@
+/**
+ * @file AuthContext.tsx
+ * @description Contexto de autenticação para a app mobile. Expõe token, user, login, logout.
+ *
+ * Notas:
+ *  - Persiste token em SecureStore (ou expo-secure-store) no ambiente mobile.
+ *
+ * Testes:
+ *  - src/__tests__/contexts/authContext.test.tsx
+ */
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { login, logout, getStoredToken } from '../services/authService';
 

@@ -1,4 +1,12 @@
 /* ClimbBeta — shared visual foundation (Direction A: Forest) */
+/*
+ * @file theme.css
+ * @description Variáveis CSS e estilos globais usados pela app web (paleta, tokens de UI).
+ *
+ * Observações:
+ *  - Mantém prefixo de variáveis com --cb- (ex.: --cb-primary).
+ *  - Evita regras com efeito global muito agressivo que possam conflitar com componentes.
+ */
 :root {
   --cb-primary: #2E7D32;
   --cb-primary-hover: #276A2B;

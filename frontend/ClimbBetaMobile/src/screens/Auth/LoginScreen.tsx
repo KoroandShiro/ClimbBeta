@@ -1,3 +1,10 @@
+/**
+ * @file LoginScreen.tsx
+ * @description Ecrã de login da app mobile.
+ *
+ * Testes:
+ *  - src/__tests__/screens/Auth/loginScreen.test.tsx
+ */
 import React, { useState } from 'react';
 import {
     View,

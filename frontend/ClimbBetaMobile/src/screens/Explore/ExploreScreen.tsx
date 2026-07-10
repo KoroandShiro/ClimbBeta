@@ -1,3 +1,7 @@
+/**
+ * @file ExploreScreen.tsx
+ * @description Ecrã de exploração para listar ginásios, paredes e navegação associada.
+ */
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import {

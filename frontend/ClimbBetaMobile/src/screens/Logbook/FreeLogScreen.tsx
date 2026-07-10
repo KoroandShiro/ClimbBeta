@@ -1,3 +1,7 @@
+/**
+ * @file FreeLogScreen.tsx
+ * @description Ecrã para registar escaladas livres / outdoor sem ginásio associado.
+ */
 import React, { useState } from 'react';
 import {
     View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView,

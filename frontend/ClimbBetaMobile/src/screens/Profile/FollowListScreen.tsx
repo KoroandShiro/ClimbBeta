@@ -1,3 +1,7 @@
+/**
+ * @file FollowListScreen.tsx
+ * @description Ecrã que mostra a lista de seguidores / seguidos.
+ */
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { getFollowers, getFollowing, followUser, unfollowUser, type UserSearchResult } from '../../services/socialService';

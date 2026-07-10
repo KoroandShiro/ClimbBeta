@@ -1,3 +1,22 @@
+/**
+ * @file CreateGymModal.tsx
+ * @description Modal usado para criação de um novo ginásio (nome, morada, cidade + upload opcional).
+ *              Faz upload de imagem via `uploadMedia` e cria ginásio com `createGym`.
+ *
+ * Props:
+ *  - onCreated: () => void  — callback ao criar com sucesso
+ *  - onClose: () => void    — fecha o modal
+ *
+ * Dependências:
+ *  - ../services/gymService (createGym, uploadMedia)
+ *  - ../contexts/AuthContext (useAuth)
+ *
+ * Testes:
+ *  - src/__tests__/components/CreateGymModal.test.tsx
+ *
+ * Observações:
+ *  - Requer `user` do context (ownerId). Valida campos em HTML.
+ */
 import { useState } from 'react';
 import { createGym, uploadMedia } from '../services/gymService';
 import { useAuth } from '../contexts/AuthContext';

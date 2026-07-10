@@ -1,3 +1,21 @@
+/**
+ * @file AuthContext.tsx
+ * @description Contexto de autenticação que expõe token, user, login, logout e updateUserStatus.
+ *              Persiste token e user em localStorage e busca o perfil com `getMe`.
+ *
+ * Exports:
+ *  - AuthProvider: provider que envolve a aplicação
+ *  - useAuth(): hook para aceder ao contexto
+ *
+ * Dependências:
+ *  - ../services/authService (getMe)
+ *
+ * Testes:
+ *  - src/__tests__/contexts/AuthContext.test.tsx
+ *
+ * Notas:
+ *  - Evitar lógica pesada aqui; preferir serviços para chamadas de rede.
+ */
 import { createContext, useState, useEffect, useContext } from 'react';
 import type { ReactNode } from 'react';
 import { getMe, type UserProfile } from '../services/authService';

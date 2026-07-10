@@ -1,3 +1,7 @@
+/**
+ * @file MyProjectsScreen.tsx
+ * @description Ecrã com os projetos guardados / favoritos do utilizador.
+ */
 import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, ImageBackground, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';

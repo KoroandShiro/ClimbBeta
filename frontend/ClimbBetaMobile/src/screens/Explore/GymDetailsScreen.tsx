@@ -1,3 +1,7 @@
+/**
+ * @file GymDetailsScreen.tsx
+ * @description Ecrã de detalhe do ginásio com paredes, informação e navegação interna.
+ */
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Image, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';

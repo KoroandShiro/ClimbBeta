@@ -1,3 +1,7 @@
+/**
+ * @file BoulderDetailsScreen.tsx
+ * @description Ecrã de detalhe de uma boulder/route com informação e interações associadas.
+ */
 import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
