@@ -44,7 +44,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('climbbeta_user', JSON.stringify(userProfile));
       setUser(userProfile);
     } catch (e) {
-      console.error('Falha ao carregar perfil de utilizador', e);
+      // The token was accepted but the profile could not be loaded. Roll back the partial
+      // login so the app is not left "authenticated" without a user, and re-throw so the
+      // caller (the login screen) can tell the user that something went wrong.
+      console.error('Failed to load user profile', e);
+      localStorage.removeItem('climbbeta_token');
+      localStorage.removeItem('climbbeta_user');
+      setToken(null);
+      setUser(null);
+      throw new Error('We could not load your profile. Please try signing in again.');
     }
   };
 
