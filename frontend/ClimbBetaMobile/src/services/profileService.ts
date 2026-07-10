@@ -1,3 +1,10 @@
+/**
+ * @file profileService.ts
+ * @description Serviços ligados ao perfil do utilizador, edição de perfil e dados associados.
+ *
+ * Testes:
+ *  - src/__tests__/services/profileService.test.ts
+ */
 import { apiFetch } from './api';
 
 export interface ClimberProfileWithUserDTO {

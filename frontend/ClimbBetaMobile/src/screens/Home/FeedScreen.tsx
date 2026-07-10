@@ -1,3 +1,7 @@
+/**
+ * @file FeedScreen.tsx
+ * @description Ecrã principal do feed social da app mobile.
+ */
 import React, { useCallback, useRef, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, RefreshControl, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';

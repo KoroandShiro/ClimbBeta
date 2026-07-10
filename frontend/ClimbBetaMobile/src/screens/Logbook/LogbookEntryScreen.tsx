@@ -1,3 +1,7 @@
+/**
+ * @file LogbookEntryScreen.tsx
+ * @description Ecrã de detalhe de uma entrada do logbook.
+ */
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';

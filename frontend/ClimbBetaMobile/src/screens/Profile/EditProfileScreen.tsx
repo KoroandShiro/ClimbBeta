@@ -1,3 +1,7 @@
+/**
+ * @file EditProfileScreen.tsx
+ * @description Ecrã para edição do perfil do utilizador.
+ */
 import React, { useEffect, useState } from 'react';
 import {
     View,

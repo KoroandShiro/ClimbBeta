@@ -1,3 +1,10 @@
+/**
+ * @file index.ts
+ * @description Entrypoint para a bundling do app mobile (ex.: registro do componente principal).
+ *
+ * Observações:
+ *  - Normalmente controlado pelo Expo; evitar lógica extra.
+ */
 import { registerRootComponent } from 'expo';
 
 import App from './App';

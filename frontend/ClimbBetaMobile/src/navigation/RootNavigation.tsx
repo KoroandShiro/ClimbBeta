@@ -1,3 +1,13 @@
+/**
+ * @file RootNavigation.tsx
+ * @description Define a navegação raiz da aplicação mobile e organiza os stacks/tabs principais.
+ *
+ * Observações:
+ *  - Responsável por encaminhar o utilizador entre auth, home, explore, logbook e profile.
+ *
+ * Testes:
+ *  - src/__tests__/navigation/rootNavigation.test.tsx
+ */
 import React from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';

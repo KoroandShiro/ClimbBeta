@@ -1,3 +1,10 @@
+/**
+ * @file socialService.ts
+ * @description Serviços para a componente social da app: feed, follows, comentários e interações.
+ *
+ * Testes:
+ *  - src/__tests__/services/socialService.test.ts
+ */
 import { apiFetch } from './api';
 
 export interface UserSearchResult {

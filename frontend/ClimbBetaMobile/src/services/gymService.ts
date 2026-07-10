@@ -1,3 +1,10 @@
+/**
+ * @file gymService.ts
+ * @description Serviços relacionados com ginásios no mobile, incluindo leitura de gyms, paredes e detalhe de ginásio.
+ *
+ * Testes:
+ *  - src/__tests__/services/gymService.test.ts
+ */
 import { apiFetch } from './api';
 
 export interface Gym {

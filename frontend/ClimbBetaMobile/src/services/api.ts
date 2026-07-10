@@ -1,3 +1,13 @@
+/**
+ * @file services/api.ts
+ * @description Helper para chamadas HTTP no mobile; injeta token, trata respostas e errors.
+ *
+ * Export:
+ *  - apiFetch<T>(endpoint: string, options?: RequestInit): Promise<T>
+ *
+ * Testes:
+ *  - src/__tests__/services/api.test.ts
+ */
 import * as SecureStore from 'expo-secure-store';
 
 /**

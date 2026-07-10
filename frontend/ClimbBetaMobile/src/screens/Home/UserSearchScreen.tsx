@@ -1,3 +1,7 @@
+/**
+ * @file UserSearchScreen.tsx
+ * @description Ecrã para procurar utilizadores e explorar perfis no contexto social.
+ */
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';

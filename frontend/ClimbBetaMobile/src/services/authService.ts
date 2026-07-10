@@ -1,3 +1,10 @@
+/**
+ * @file authService.ts
+ * @description Serviços de autenticação no mobile: login, register, getMe e logout.
+ *
+ * Testes:
+ *  - src/__tests__/services/authService.test.ts
+ */
 import * as SecureStore from 'expo-secure-store';
 import { apiFetch, TOKEN_KEY } from './api';
 

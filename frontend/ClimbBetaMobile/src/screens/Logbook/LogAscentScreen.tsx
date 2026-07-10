@@ -1,3 +1,7 @@
+/**
+ * @file LogAscentScreen.tsx
+ * @description Ecrã para registar uma subida associada a uma parede/ginásio.
+ */
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';

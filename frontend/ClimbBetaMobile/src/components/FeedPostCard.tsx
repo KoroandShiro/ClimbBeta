@@ -1,3 +1,18 @@
+/**
+ * @file FeedPostCard.tsx
+ * @description Cartão do feed que renderiza uma subida (ascent), autor, imagem e acções (like, comentar).
+ *
+ * Props:
+ *  - post: object — ascent details, author, routeName, routeGrade, likeCount, likedByMe
+ *  - navigation: Navigation prop para navegar para AscentDetails
+ *  - onToggleLike: (ascentId: number, liked: boolean) => void
+ *
+ * Testes:
+ *  - src/__tests__/components/feedPostCard.test.tsx
+ *
+ * Observações:
+ *  - Usa react-native components; manter referências ao TouchableOpacity e Image.
+ */
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';

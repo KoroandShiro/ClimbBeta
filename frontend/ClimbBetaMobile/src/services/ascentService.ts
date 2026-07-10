@@ -1,3 +1,10 @@
+/**
+ * @file ascentService.ts
+ * @description Serviços para subidas (ascents/betas): criação, leitura, detalhe e ações relacionadas.
+ *
+ * Testes:
+ *  - src/__tests__/services/ascentService.test.ts
+ */
 import { apiFetch } from './api';
 
 export interface AscentInput {
