@@ -1,3 +1,14 @@
+/**
+ * @file Register.tsx
+ * @description Página de registo para Gym Owners. Valida força da password localmente e chama
+ *              `authService.register` para criar conta.
+ *
+ * Testes:
+ *  - src/__tests__/pages/Register.test.tsx
+ *
+ * Observações:
+ *  - O papel criado aqui é fixo para `GYM_OWNER`.
+ */
 import { useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { register } from '../services/authService';

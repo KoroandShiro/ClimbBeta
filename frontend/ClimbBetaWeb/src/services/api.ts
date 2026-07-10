@@ -1,3 +1,18 @@
+/**
+ * @file services/api.ts
+ * @description Helper de comunicação com a API (apiFetch) e definição de `BASE_URL`.
+ *              Trata cabeçalhos, Content-Type e checagem de respostas (errors / 204 handling).
+ *
+ * Exporta:
+ *  - BASE_URL: string
+ *  - apiFetch<T>(endpoint: string, options?: RequestInit): Promise<T>
+ *
+ * Testes:
+ *  - src/__tests__/services/api.test.ts
+ *
+ * Observações:
+ *  - Evitar codificar URLs absolutas em vários locais; usar `BASE_URL`.
+ */
 //export const BASE_URL = 'http://localhost:8080';
 export const BASE_URL = 'https://api.climbbetaapp.xyz';
 

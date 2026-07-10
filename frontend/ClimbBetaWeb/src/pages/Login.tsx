@@ -1,3 +1,14 @@
+/**
+ * @file Login.tsx
+ * @description Página de login do backoffice. Submete credenciais a `authService.login` e invoca
+ *              `useAuth().login` para persistir o token e carregar o perfil (getMe).
+ *
+ * Testes:
+ *  - src/__tests__/pages/Login.test.tsx
+ *
+ * Observações:
+ *  - Tratar mensagens de erro para o utilizador; não guardar passwords em localStorage.
+ */
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { login as apiLogin } from '../services/authService';

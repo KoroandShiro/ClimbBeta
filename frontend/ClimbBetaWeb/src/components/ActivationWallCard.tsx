@@ -1,3 +1,20 @@
+/**
+ * @file ActivationWallCard.tsx
+ * @description Card de ativação de conta exibido quando o utilizador tem status PENDING.
+ *              Contém um formulário simples para submeter um código de ativação via `verifyCode`.
+ *
+ * Props: nenhum (componente usado internamente pelo Dashboard)
+ *
+ * Dependências:
+ *  - ../services/authService (verifyCode)
+ *  - ../contexts/AuthContext (updateUserStatus)
+ *
+ * Testes:
+ *  - src/__tests__/components/ActivationWallCard.test.tsx
+ *
+ * Observações:
+ *  - Lida com mensagens de erro locais; não faz redirects.
+ */
 import { useState } from 'react';
 import { verifyCode } from '../services/authService';
 import { useAuth } from '../contexts/AuthContext';

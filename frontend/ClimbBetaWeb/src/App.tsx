@@ -1,3 +1,19 @@
+/**
+ * @file App.tsx
+ * @description Roteamento principal da aplicação web. Define Guards (ProtectedRoute / GuestRoute)
+ *              e regista as rotas: /login, /register, /gyms (Dashboard).
+ *
+ * Principais exports:
+ *  - default: App component
+ *
+ * Dependências:
+ *  - ./contexts/AuthContext
+ *  - ./pages/{Login,Register,Dashboard}
+ *
+ *
+ * Observações:
+ *  - Mantém guardas simples; alterações de navegação devem considerar o comportamento do BrowserRouter.
+ */
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './pages/Login';

@@ -1,3 +1,17 @@
+/**
+ * @file services/authService.ts
+ * @description Funções relacionadas com autenticação e perfil: register, login, getMe, verifyCode, logout.
+ *
+ * Exports:
+ *  - register(username, email, passwordRaw, role)
+ *  - login(email, passwordRaw)
+ *  - getMe()
+ *  - verifyCode(code)
+ *  - logout()
+ *
+ * Testes:
+ *  - src/__tests__/services/authService.test.ts
+ */
 import { apiFetch } from './api';
 
 interface LoginResponse {
