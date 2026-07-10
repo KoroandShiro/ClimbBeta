@@ -43,6 +43,7 @@ class AscentService(
         date: LocalDate?, attempts: Int, style: String?, notes: String?
     ): Int {
         require(attempts >= 1) { "The number of attempts must be at least 1." }
+        requireCoherentStyle(style, attempts)
 
         if (boulderId != null && outdoorRouteId != null) {
             throw IllegalArgumentException("An ascent cannot be both Indoor and Outdoor at the same time.")
@@ -94,6 +95,7 @@ class AscentService(
         date: LocalDate?, attempts: Int, style: String?, notes: String?, mediaUrl: String?
     ): Int {
         require(attempts >= 1) { "The number of attempts must be at least 1." }
+        requireCoherentStyle(style, attempts)
 
         val ascentDate = date ?: LocalDate.now()
 
@@ -117,5 +119,17 @@ class AscentService(
             mediaRepository.create(climberId, ascentId, mediaUrl, "IMAGE")
         }
         return ascentId
+    }
+
+    /**
+     * Domain invariant: an Onsight or Flash is, by definition, a first-try send, so it must have
+     * exactly 1 attempt. Anything else is contradictory and is rejected (translated to 400 by the
+     * GlobalExceptionHandler). Case-insensitive to be robust to the client's casing.
+     */
+    private fun requireCoherentStyle(style: String?, attempts: Int) {
+        val isFirstTry = style?.trim()?.let { it.equals("Flash", true) || it.equals("Onsight", true) } ?: false
+        require(!isFirstTry || attempts == 1) {
+            "An Onsight or Flash is a first-try send, so it must have exactly 1 attempt."
+        }
     }
 }

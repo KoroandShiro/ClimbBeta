@@ -33,7 +33,7 @@ services:
     restart: always
     environment:
       MINIO_ROOT_USER: minio_admin
-      MINIO_ROOT_PASSWORD: minio_secret2026
+      MINIO_ROOT_PASSWORD: minio_local_dev
     ports:
       - "9000:9000"
       - "9001:9001"

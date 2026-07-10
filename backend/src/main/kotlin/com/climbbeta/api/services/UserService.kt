@@ -34,6 +34,13 @@ class UserService(
     fun createUser(username: String, email: String, passwordRaw: String, role: UserRole): User {
         validatePasswordStrength(passwordRaw)
 
+        // Registration is public, so a request must never be able to self-assign ADMIN. Admin
+        // accounts are created only directly in the database. GYM_OWNER is allowed but starts
+        // PENDING and still needs an activation code to become VERIFIED.
+        if (role == UserRole.ADMIN) {
+            throw IllegalArgumentException("You cannot register with the ADMIN role.")
+        }
+
         if (userRepository.existsByEmail(email)) {
             throw IllegalArgumentException("This email is already registered!")
         }
