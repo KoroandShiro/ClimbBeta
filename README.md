@@ -198,7 +198,6 @@ Authentication is a Bearer JWT validated by an interceptor. Authorization is rol
 
 - REST API description: `docs/climbbeta-api-docs.yaml`
 - Database schema (the source of truth for the domain): `backend/src/main/resources/sql/create-schema.sql`
-- Deployment and operations notes: the `docs/` folder (Docker setup, Raspberry Pi runbook, Cloudflare tunnel, web deploy)
 
 ## Local port reference
 
