@@ -132,6 +132,42 @@ npx expo start -c
 
 Find your IP with `ipconfig` (Windows) or `ifconfig` (Mac/Linux) and use the Wi-Fi IPv4 address, with the phone on the same Wi-Fi network.
 
+## Tests
+
+**Web (Jest + React Testing Library)** — from `frontend/ClimbBetaWeb/`:
+
+```bash
+npm install
+npm test
+```
+
+This runs the component, page and service test suites. The production build (`npm run build`) deliberately does not type-check or run these files — the tests have their own runner and config — so they never interfere with the deploy.
+
+**Mobile (Jest + jest-expo + React Testing Library)** — from `frontend/ClimbBetaMobile/`:
+
+```bash
+npm install
+npm test
+```
+
+On very recent Node (24+), Jest may fail to start with a `localStorage` error (`Cannot initialize local storage...`). If that happens, disable the experimental web storage when running the tests:
+
+```bash
+# Windows PowerShell
+$env:NODE_OPTIONS='--no-experimental-webstorage'; npm test
+
+# macOS / Linux
+NODE_OPTIONS=--no-experimental-webstorage npm test
+```
+
+On Node 20 or 22 LTS this is not needed.
+
+**Backend (JUnit + Mockito)** — from `backend/`, with the local database running (`docker-compose up -d` first, since the repository tests hit a real PostgreSQL):
+
+```bash
+./gradlew test        # Windows: .\gradlew.bat test
+```
+
 ## Features
 
 ### Climber (mobile app)
