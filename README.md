@@ -21,7 +21,7 @@ The backend, PostgreSQL and MinIO run in Docker on a Raspberry Pi (managed with 
 |-----------|------------|
 | Backend | Kotlin, Spring Boot, JDBI (PostgreSQL) |
 | Database | PostgreSQL 15 |
-| Authentication | JWT (Bearer token) |
+| Authentication | Opaque bearer token (random UUID, stored server-side) |
 | Image storage | MinIO (S3-compatible) |
 | Web frontend | React 19, Vite, TypeScript |
 | Mobile frontend | React Native, Expo (SDK 54) |
@@ -171,7 +171,7 @@ On Node 20 or 22 LTS this is not needed.
 ## Features
 
 ### Climber (mobile app)
-- Sign up and sign in with JWT (the token is stored with Expo SecureStore)
+- Sign up and sign in with an opaque bearer token (stored with Expo SecureStore)
 - Logbook with three ascent types:
   - **Indoor** — a specific boulder of a partner gym
   - **Free Log** — a session at a non-partner gym
@@ -192,7 +192,7 @@ On Node 20 or 22 LTS this is not needed.
 
 ## Roles and access control
 
-Authentication is a Bearer JWT validated by an interceptor. Authorization is role-based (`CLIMBER`, `GYM_OWNER`, `ADMIN`) and declared per route with a `@ProtectedRoute` annotation, enforced centrally by a second interceptor. Resource-ownership rules (for example, only the owner may edit their gym) stay in the services, since they depend on the data rather than just the role.
+Authentication is an opaque bearer token validated by an interceptor. Authorization is role-based (`CLIMBER`, `GYM_OWNER`, `ADMIN`) and declared per route with a `@ProtectedRoute` annotation, enforced centrally by a second interceptor. Resource-ownership rules (for example, only the owner may edit their gym) stay in the services, since they depend on the data rather than just the role.
 
 ## Documentation and database
 
