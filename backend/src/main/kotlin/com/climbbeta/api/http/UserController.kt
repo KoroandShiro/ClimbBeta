@@ -105,6 +105,19 @@ class UserController(
     }
 
     /**
+     * Server-side logout: revokes (deletes) the current bearer token so it can no longer be used,
+     * even if it leaked. The client clears its own local copy separately.
+     */
+    @PostMapping("/logout")
+    fun logout(request: jakarta.servlet.http.HttpServletRequest): ResponseEntity<Any> {
+        val authHeader = request.getHeader("Authorization")
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            userService.logout(authHeader.substring(7))
+        }
+        return ResponseEntity.noContent().build()
+    }
+
+    /**
      * Processes admin activation coupons to unlock pending commercial gym manager capabilities.
      */
     @ProtectedRoute(UserRole.GYM_OWNER)

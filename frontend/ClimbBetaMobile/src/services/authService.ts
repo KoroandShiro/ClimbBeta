@@ -50,6 +50,18 @@ export async function logout(): Promise<void> {
 }
 
 /**
+ * Revokes the current session token on the server (best-effort), so it can no longer be used even
+ * if it leaked. Call this BEFORE clearing the local token, while it is still stored.
+ */
+export async function logoutServer(): Promise<void> {
+    try {
+        await apiFetch('/users/logout', { method: 'POST' });
+    } catch {
+        // Best-effort: the local token is cleared regardless.
+    }
+}
+
+/**
  * Lê diretamente do chaveiro nativo do SO o token JWT atualmente armazenado, se existir.
  */
 export async function getStoredToken(): Promise<string | null> {

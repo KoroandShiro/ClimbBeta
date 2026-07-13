@@ -18,7 +18,7 @@
  */
 import { createContext, useState, useEffect, useContext } from 'react';
 import type { ReactNode } from 'react';
-import { getMe, type UserProfile } from '../services/authService';
+import { getMe, logout as logoutRequest, type UserProfile } from '../services/authService';
 
 export type { UserProfile };
 
@@ -75,6 +75,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
+    // Best-effort server-side revocation. apiFetch reads the token synchronously, so firing this
+    // before we clear localStorage still sends the correct Authorization header.
+    logoutRequest();
     localStorage.removeItem('climbbeta_token');
     localStorage.removeItem('climbbeta_user');
     setToken(null);

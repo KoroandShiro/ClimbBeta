@@ -9,7 +9,7 @@
  *  - src/__tests__/contexts/authContext.test.tsx
  */
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { login, logout, getStoredToken } from '../services/authService';
+import { login, logout, logoutServer, getStoredToken } from '../services/authService';
 
 interface AuthContextValue {
     token: string | null;
@@ -40,7 +40,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const handleLogout = async () => {
-        await logout();
+        await logoutServer();  // revoke on the server while the token still exists
+        await logout();        // then clear the local token
         setToken(null);
     };
 

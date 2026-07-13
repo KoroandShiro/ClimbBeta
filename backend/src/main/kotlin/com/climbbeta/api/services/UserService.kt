@@ -130,5 +130,10 @@ class UserService(
         return tokenString
     }
 
+    /** Revokes a session token (server-side logout), so it can no longer be used even if leaked. */
+    fun logout(rawToken: String) {
+        tokenRepository.deleteToken(rawToken)
+    }
+
     fun searchUsers(query: String, currentUserId: Int) = userRepository.searchUsers(query, currentUserId)
 }

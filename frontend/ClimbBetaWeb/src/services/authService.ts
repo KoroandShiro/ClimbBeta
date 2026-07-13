@@ -53,4 +53,10 @@ export const verifyCode = (code: string): Promise<UserProfile> => {
     });
 };
 
-export const logout = (): void => {};
+export const logout = async (): Promise<void> => {
+    try {
+        await apiFetch<void>('/users/logout', { method: 'POST' });
+    } catch {
+        // Best-effort: the local session is cleared regardless of whether the server call succeeds.
+    }
+};

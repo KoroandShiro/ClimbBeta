@@ -67,6 +67,7 @@ export default function Dashboard() {
     // File to upload for the new route photo
     const [newImageFile, setNewImageFile] = useState<File | null>(null);
     const [isAddingBoulder, setIsAddingBoulder] = useState(false); // Loading state for the route upload
+    const [fileInputKey, setFileInputKey] = useState(0); // bump to reset the route-photo file input after a successful upload
 
     const [isLoading, setIsLoading] = useState(true);
 
@@ -177,6 +178,7 @@ export default function Dashboard() {
             // Partial reset to make bulk creation easier
             setNewGrade('V0');
             setNewImageFile(null); // Clear the selected photo
+            setFileInputKey(k => k + 1); // reset the file input so it shows empty again
             alert('Route added to the wall!');
         } catch (error: any) {
             alert('Error adding route: ' + error.message);
@@ -414,8 +416,10 @@ export default function Dashboard() {
                                             setNewImageFile(null);
                                         }
                                     }}
-                                    // Key tied to state so the input clears when the state resets
-                                    key={newImageFile ? 'has-file' : 'empty'}
+                                    // Reset the input only after a successful upload by bumping this key.
+                                    // (Tying it to the file made React remount the input on selection, dropping
+                                    //  the first pick and forcing you to choose the file twice.)
+                                    key={fileInputKey}
                                     style={{ width: '100%', padding: '8px', border: '1px dashed #d1d5db', borderRadius: '4px', backgroundColor: '#f9fafb', boxSizing: 'border-box' }}
                                 />
                             </div>
